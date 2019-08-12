@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<install4JCommon version="7.0.9" lookAndFeel="3" mainFrameIconMode="largeWithText" editorIconMode="largeWithText" rememberWindowSizes="true" showMultipleTabsNotice="true" browserCommand="" openLastProjectOnStartup="true" floatingMultiPlatform="true" useOnlineDocumentation="false" showIds="false" printIdsForExport="false">
+  <licenseKey name="licence" company="isj" key="L-9QIXhu1a0r-3lKL9FgcfD#433917" />
+  <directoryPresets config="C:/Users/Administrateur/.install4j7" export="" />
+  <recentProjects>
+    <file name="C:\Users\Administrateur\.install4j7\random List.install4j" />
+  </recentProjects>
+  <codeCompletionSettings codeCompletionAutoImport="true" codeCompletionAutoPopup="true" codeCompletionAutoPopupDelay="1000" codeCompletionLookupHeight="10" problemsLevel="all" />
+  <jdks />
+  <beanSelectorSettings>
+    <applications largeIcons="true" />
+    <formComponents largeIcons="true" />
+    <actionList largeIcons="true" />
+    <styles largeIcons="true" />
+  </beanSelectorSettings>
+</install4JCommon>

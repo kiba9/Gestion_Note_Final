@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="351.0" prefWidth="524.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.isj.interfaces.controller.RecuperationMotDePasse">
+   <children>
+      <Text fill="#121451" layoutX="4.0" layoutY="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Confirmation du code pour la récupération du mot de passe" textAlignment="CENTER" wrappingWidth="516.17578125" AnchorPane.topAnchor="12.0">
+         <font>
+            <Font name="Sitka Heading" size="21.0" />
+         </font></Text>
+      <Text layoutX="6.0" layoutY="106.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Veuillez saisir le code de confirmation" textAlignment="CENTER" wrappingWidth="516.1757690906525">
+         <font>
+            <Font name="Sitka Heading" size="17.0" />
+         </font>
+      </Text>
+      <Button layoutX="211.0" layoutY="292.0" mnemonicParsing="false" onAction="#handleCodeSms" prefHeight="39.0" prefWidth="107.0" text="OK" />
+      <HBox alignment="CENTER_RIGHT" layoutX="50.0" layoutY="219.0" maxWidth="-Infinity" prefHeight="39.0" prefWidth="422.0" style="-fx-background-color: white; -fx-border-color: #a2a2a2; -fx-border-width: 0px 0px 2px 0px;">
+         <children>
+            <TextField fx:id="telephonecode" promptText="Numéro de téléphone" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </TextField>
+            <ImageView fitHeight="27.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/téléphone.png" />
+               </image>
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </ImageView>
+         </children>
+      </HBox>
+      <HBox layoutX="50.0" layoutY="140.0" prefHeight="47.0" prefWidth="422.0">
+         <children>
+            <TextField fx:id="code1" prefHeight="25.0" prefWidth="62.0" promptText="    ----">
+               <HBox.margin>
+                  <Insets left="20.0" right="40.0" top="10.0" />
+               </HBox.margin>
+            </TextField>
+            <TextField fx:id="code2" prefHeight="25.0" prefWidth="62.0" promptText="    ----">
+               <HBox.margin>
+                  <Insets left="5.0" right="40.0" top="10.0" />
+               </HBox.margin>
+            </TextField>
+            <TextField fx:id="code3" prefHeight="25.0" prefWidth="62.0" promptText="    ----">
+               <HBox.margin>
+                  <Insets left="5.0" right="40.0" top="10.0" />
+               </HBox.margin>
+            </TextField>
+            <TextField fx:id="code4" prefHeight="25.0" prefWidth="62.0" promptText="    ----">
+               <HBox.margin>
+                  <Insets left="10.0" right="40.0" top="10.0" />
+               </HBox.margin>
+            </TextField>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ListeEtud" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cfb39345-114c-4b5e-b577-debf14e6f9e5">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="304"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F8F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFBFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 7">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 7_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 7_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 7_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 8">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 8_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 8_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 8_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 9">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 9_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 9_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 9_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 10">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 10_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 10_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 10_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="93e5f971-af8e-4bd0-a359-8ce85ddf4c78"/>
+	<subDataset name="Table Dataset 2" uuid="3be4e384-3997-46db-a595-c4c6d01fe818"/>
+	<subDataset name="New Dataset" uuid="6269ae33-d63a-4dc3-8914-2407f7a7cc0c">
+		<queryString language="SQL">
+			<![CDATA[SELECT nom,prenom,date_naissance,sexe,matricule,telephone FROM candidat,etudiant
+where candidat.code=etudiant.code_authentification ;]]>
+		</queryString>
+	</subDataset>
+	<subDataset name="New Data" uuid="5f2886ae-9e6e-4065-80d0-298ed1d1c45e">
+		<queryString language="SQL">
+			<![CDATA[SELECT nom,prenom,date_naissance,sexe,matricule,telephone FROM candidat,etudiant
+where candidat.code=etudiant.code_authentification ;]]>
+		</queryString>
+		<field name="nom" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="prenom" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="date_naissance" class="java.sql.Timestamp">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="sexe" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="matricule" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="telephone" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+	</subDataset>
+	<subDataset name="New" uuid="110aedee-605f-4a0a-aa75-d37aa55487b9">
+		<queryString language="SQL">
+			<![CDATA[SELECT nom,prenom,date_naissance,sexe,matricule,telephone FROM candidat,etudiant
+where candidat.code=etudiant.code_authentification
+and sexe="MASCULIN"
+order by nom asc;]]>
+		</queryString>
+	</subDataset>
+	<subDataset name="Man" uuid="00a39a09-f260-4c08-9fb2-ab65b9f7e936">
+		<queryString language="SQL">
+			<![CDATA[SELECT nom,prenom,date_naissance,sexe,matricule,telephone FROM candidat,etudiant
+where candidat.code=etudiant.code_authentification
+and sexe="MASCULIN"
+order by sexe desc;]]>
+		</queryString>
+	</subDataset>
+	<subDataset name="Table Dataset 3" uuid="6faf24da-1b43-4f95-bb9d-d1660cf84dac"/>
+	<subDataset name="NEW2" uuid="8af2723d-c086-4a2c-8607-2dcc8bba17c8">
+		<queryString language="SQL">
+			<![CDATA[SELECT nom,prenom,date_naissance,sexe,matricule,telephone FROM candidat,etudiant
+where candidat.code=etudiant.code_authentification
+and sexe="FEMININ"
+order by nom;]]>
+		</queryString>
+	</subDataset>
+	<subDataset name="nouveau" uuid="46f86250-0dab-455a-b6ac-9f3da41c49ec">
+		<queryString language="SQL">
+			<![CDATA[SELECT nom,prenom,date_naissance,sexe,matricule,telephone FROM candidat,etudiant
+where candidat.code=etudiant.code_authentification
+and sexe="MASCULIN"
+order by nom;]]>
+		</queryString>
+		<field name="nom" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="prenom" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="date_naissance" class="java.sql.Date">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="sexe" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="matricule" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="telephone" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<group name="nom">
+			<groupExpression><![CDATA[$F{nom}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="n2" uuid="2a47a022-e60f-4ad8-8f9f-0a6eb0f7efa2">
+		<queryString language="SQL">
+			<![CDATA[SELECT nom,prenom,date_naissance,sexe,matricule,telephone FROM candidat,etudiant
+where candidat.code=etudiant.code_authentification
+and sexe="MASCULIN"
+order by nom asc;]]>
+		</queryString>
+		<field name="nom" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="prenom" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="date_naissance" class="java.sql.Date">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="sexe" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="matricule" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="telephone" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+	</subDataset>
+	<queryString>
+		<![CDATA[SELECT nom,prenom,date_naissance,sexe,matricule,telephone FROM candidat,etudiant
+where candidat.code=etudiant.code_authentification
+and sexe="FEMININ"
+order by nom asc;
+]]>
+	</queryString>
+	<field name="nom" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="prenom" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="date_naissance" class="java.sql.Date">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="sexe" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="matricule" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="telephone" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band height="554" splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="250" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="98" width="181" height="133" uuid="89367ea7-ab38-42e7-9a55-2c583772d569"/>
+				<imageExpression><![CDATA["C:\\Users\\HP Laptop\\Pictures\\Saved Pictures\\LOGO.PNG"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="10" y="57" width="237" height="20" uuid="c8df6201-5e23-4567-908c-45781600926c"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MINISTERE DE L'ENSEIGNEMENT SUPERIEURE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="38" width="118" height="19" uuid="0b23fc1e-385a-42d6-9f4f-29a86929467e"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PAIX-TRAVAIL-PATRIE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="18" width="145" height="20" uuid="bb3e8c94-a0e6-484a-aa22-83dbb062a0a8"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPUBLIQUE DU CAMEROUN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="11" y="77" width="118" height="19" uuid="fb93530b-7a09-451e-bd21-868e6cd08d7d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[INSTITUT SAINT JEAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="304" y="58" width="145" height="19" uuid="c3247466-4e45-45e2-a966-2ef0a0e35f3a"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[UNIVERSITE DE YAOUNDE I]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="305" y="18" width="145" height="20" uuid="3bc90caa-594c-4b9f-bc52-30dfcb5e68e5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPUBLIQUE DU CAMEROUN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="305" y="39" width="118" height="19" uuid="7a331ab2-f327-4d85-b521-33202789d6b4"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PAIX-TRAVAIL-PATRIE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="304" y="77" width="261" height="19" uuid="05829970-722a-4e41-8d03-ae7de47247db"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ECOLE NATIONALE SUPERIEURE POLYTECHNIQUE]]></text>
+			</staticText>
+			<image>
+				<reportElement x="430" y="106" width="135" height="134" uuid="7c3794b7-cb85-467e-941d-648f80f5dde0"/>
+				<imageExpression><![CDATA["C:\\Users\\HP Laptop\\Pictures\\YADE.jpg"]]></imageExpression>
+			</image>
+			<line>
+				<reportElement x="283" y="96" width="289" height="1" uuid="6512f0e7-c951-4bac-9f93-8e564f209f8d"/>
+			</line>
+			<line>
+				<reportElement x="283" y="240" width="289" height="1" uuid="bfbe1eb2-4525-4935-9736-fd552f593c65"/>
+			</line>
+			<line>
+				<reportElement x="282" y="96" width="1" height="144" uuid="12f2af08-d250-48ff-bb2d-f02f28f2d08e"/>
+			</line>
+			<line>
+				<reportElement x="571" y="97" width="1" height="144" uuid="339df9dd-4428-4c48-aab2-0fac616a2e4a"/>
+			</line>
+			<line>
+				<reportElement x="-1" y="97" width="1" height="144" uuid="bce31ff1-eb33-403c-9d71-ce359e1d6b9a"/>
+			</line>
+			<line>
+				<reportElement x="129" y="97" width="1" height="144" uuid="21d09ea5-abe7-405d-8631-5f590259551b"/>
+			</line>
+			<line>
+				<reportElement x="0" y="97" width="130" height="1" uuid="6a0f3439-37f7-4ba4-b2e6-0c74d92e4a1e"/>
+			</line>
+			<line>
+				<reportElement x="0" y="240" width="130" height="1" uuid="24a6ea9e-eca1-4c5f-a846-aa96502b57af"/>
+			</line>
+			<image>
+				<reportElement x="294" y="112" width="291" height="128" uuid="fe4c6a97-46c9-49c1-827a-c4081b174b46"/>
+				<imageExpression><![CDATA["C:\\Users\\HP Laptop\\Pictures\\ENS.jpg"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="100" splitType="Stretch">
+			<staticText>
+				<reportElement x="192" y="16" width="166" height="20" uuid="9aa59700-d613-47d7-8b4c-b50ff338b055"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Liste des Etudiants de ISJ]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="283" splitType="Stretch">
+			<staticText>
+				<reportElement x="11" y="151" width="100" height="20" uuid="e4b544c8-d8d9-4689-8226-2543c127209d"/>
+				<text><![CDATA[MASCULIN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="0" width="100" height="20" uuid="19b4425a-f012-4fed-a5f4-84a9879499ca"/>
+				<text><![CDATA[FEMININ]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table 9" style="table 9" x="10" y="20" width="360" height="56" uuid="7cde7d7e-6e84-4b2b-8d27-2aa8d315b6bc"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="New Data" uuid="7b1a72d0-f8e9-4b3f-b0b3-c4c15f126cc0"/>
+					<jr:column width="90" uuid="3656e022-976e-4fcc-ae6e-fa48b62f715c">
+						<jr:tableHeader style="table 9_TH" height="30"/>
+						<jr:columnHeader style="table 9_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="c1012468-8aef-4b1a-a25a-51711ef5267b"/>
+								<text><![CDATA[nom]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 9_CH" height="30"/>
+						<jr:detailCell style="table 9_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="436c5116-50d9-4d99-8bb6-8b920c3905e4"/>
+								<textFieldExpression><![CDATA[$F{nom}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="2dee4063-ed7e-4330-832c-f0a63f7d1777">
+						<jr:tableHeader style="table 9_TH" height="30"/>
+						<jr:columnHeader style="table 9_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="c5842249-c19e-4740-8f31-08f128051fc9"/>
+								<text><![CDATA[prenom]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 9_CH" height="30"/>
+						<jr:detailCell style="table 9_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="68cb5df9-65a0-4f00-b22e-75e3780fb9d3"/>
+								<textFieldExpression><![CDATA[$F{prenom}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="44921806-b9ed-480b-aa31-1ae30b28b5e1">
+						<jr:tableHeader style="table 9_TH" height="30"/>
+						<jr:columnHeader style="table 9_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="1e13a887-1541-4fbc-b510-af7ee4f3309c"/>
+								<text><![CDATA[date_naissance]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 9_CH" height="30"/>
+						<jr:detailCell style="table 9_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="bd89906b-ccd8-496c-9428-a4155bc95fa3"/>
+								<textFieldExpression><![CDATA[$F{date_naissance}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="ffefeecb-d757-48da-981f-aff85b2bd915">
+						<jr:tableHeader style="table 9_TH" height="30"/>
+						<jr:columnHeader style="table 9_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="beba5c59-f4d6-4ce8-8ea5-1a7688084a5c"/>
+								<text><![CDATA[sexe]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 9_CH" height="30"/>
+						<jr:detailCell style="table 9_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="5e8b67a3-89d7-4b3d-91de-abcf29a1d0d9"/>
+								<textFieldExpression><![CDATA[$F{sexe}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="2332bdaf-ce2f-434f-a899-1f343e6c2a6e">
+						<jr:tableHeader style="table 9_TH" height="30"/>
+						<jr:columnHeader style="table 9_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="d4575919-0989-4d11-b67d-06c961a968dc"/>
+								<text><![CDATA[matricule]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 9_CH" height="30"/>
+						<jr:detailCell style="table 9_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="963ecbb6-265a-4f6b-aba7-1368cddac7bb"/>
+								<textFieldExpression><![CDATA[$F{matricule}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="5bf8840b-8ae7-4a4b-8bd4-54166eb889cb">
+						<jr:tableHeader style="table 9_TH" height="30"/>
+						<jr:columnHeader style="table 9_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="2f8a0d13-32f2-4528-9dec-01f1f058b273"/>
+								<text><![CDATA[telephone]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 9_CH" height="30"/>
+						<jr:detailCell style="table 9_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="c08f89a6-ab76-406c-b687-cd08b2b7535c"/>
+								<textFieldExpression><![CDATA[$F{telephone}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<componentElement>
+				<reportElement key="table 10" style="table 10" x="11" y="171" width="347" height="79" uuid="27f28e9f-efdc-4d75-bed6-16792828b9d8"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="n2" uuid="e55455c4-af83-4679-843e-c44980dc1b6b">
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="90" uuid="84c58246-f66a-49aa-9bca-b36afd24e3f7">
+						<jr:tableHeader style="table 10_TH" height="30"/>
+						<jr:tableFooter style="table 10_TH" height="30"/>
+						<jr:columnHeader style="table 10_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="c5649cd8-6a18-4a17-83e1-e9167e5c40f7"/>
+								<text><![CDATA[nom]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 10_CH" height="30"/>
+						<jr:detailCell style="table 10_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="c09e4ecd-44f2-4d9a-b115-563a5c93d004"/>
+								<textFieldExpression><![CDATA[$F{nom}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="0f3df512-31da-4def-a212-eadf4131a186">
+						<jr:tableHeader style="table 10_TH" height="30"/>
+						<jr:tableFooter style="table 10_TH" height="30"/>
+						<jr:columnHeader style="table 10_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="d736860b-b431-4184-81c5-80edf460135f"/>
+								<text><![CDATA[prenom]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 10_CH" height="30"/>
+						<jr:detailCell style="table 10_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="c66739e7-e628-42b2-b262-ce87995bb75b"/>
+								<textFieldExpression><![CDATA[$F{prenom}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="7f2894c3-cd28-464b-94ea-763eed87b70d">
+						<jr:tableHeader style="table 10_TH" height="30"/>
+						<jr:tableFooter style="table 10_TH" height="30"/>
+						<jr:columnHeader style="table 10_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="66bb26b7-73f0-44e7-908d-c11a951c656a"/>
+								<text><![CDATA[date_naissance]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 10_CH" height="30"/>
+						<jr:detailCell style="table 10_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="242bc539-9a62-410b-a3d4-1cfc61455241"/>
+								<textFieldExpression><![CDATA[$F{date_naissance}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="8f587fd5-dcbf-4d35-9657-64a36490adac">
+						<jr:tableHeader style="table 10_TH" height="30"/>
+						<jr:tableFooter style="table 10_TH" height="30"/>
+						<jr:columnHeader style="table 10_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="8743d756-0da4-4976-82f4-e8bb33866444"/>
+								<text><![CDATA[sexe]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 10_CH" height="30"/>
+						<jr:detailCell style="table 10_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="7bb31754-3aa4-497e-a372-e393f7594657"/>
+								<textFieldExpression><![CDATA[$F{sexe}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="3aaf7b4a-7260-4a5a-9cc4-75344f449629">
+						<jr:tableHeader style="table 10_TH" height="30"/>
+						<jr:tableFooter style="table 10_TH" height="30"/>
+						<jr:columnHeader style="table 10_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="01fd0c88-7fb2-4547-9bcd-d17d2994c511"/>
+								<text><![CDATA[matricule]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 10_CH" height="30"/>
+						<jr:detailCell style="table 10_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="70ebab4f-91aa-43ea-ba77-a299d23d5fd5"/>
+								<textFieldExpression><![CDATA[$F{matricule}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="5e65b415-62cc-46d1-9abb-c626cba5060e">
+						<jr:tableHeader style="table 10_TH" height="30"/>
+						<jr:tableFooter style="table 10_TH" height="30"/>
+						<jr:columnHeader style="table 10_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="b12db1e4-6110-4736-a569-8c250357c03e"/>
+								<text><![CDATA[telephone]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="table 10_CH" height="30"/>
+						<jr:detailCell style="table 10_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="66c9b330-97b5-491a-b55d-5b7550d7178e"/>
+								<textFieldExpression><![CDATA[$F{telephone}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>
