@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="ant-apache-log4j">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/ant-apache-log4j.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/comm.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/pduutils.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/smsserver-3.5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.17.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
