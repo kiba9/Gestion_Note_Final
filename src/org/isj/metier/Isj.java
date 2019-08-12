@@ -907,7 +907,7 @@ public class Isj {
 
                         UE ue = new UE(libelle, "", codeUe, UE.Statut.ACTIVE, Integer.valueOf(cred), retrouverModule(mod), retrouverNiveau(Long.valueOf(niveau)), retrouverSpecialite(specialite));
                        new UEFacade().create(ue);
-                        System.out.println(codeUe+" "+libelle+" "+" "+cred+" "+retrouverModule(mod)+" "+retrouverNiveau(Long.valueOf(niveau))+" "+retrouverSpecialite(specialite));
+                        //System.out.println(codeUe+" "+libelle+" "+" "+cred+" "+retrouverModule(mod)+" "+retrouverNiveau(Long.valueOf(niveau))+" "+retrouverSpecialite(specialite));
 
                     }
 
@@ -944,7 +944,7 @@ public class Isj {
                     numSemestre = Long.valueOf(dataFormatter.formatCellValue(row.getCell(4)));
                     anDeb = (long) row.getCell(5).getNumericCellValue();
                     codeUe = dataFormatter.formatCellValue(row.getCell(6));
-                    System.out.println(codeUe);
+                   // System.out.println(codeUe);
 
                     Semestre semestre = new SemestreFacade().find(retrouverCodeSemestre(numSemestre, anDeb));
                     Enseignement En = new Enseignement(libelle, description, heure, prog, semestre, retrouverUe(codeUe));
@@ -1216,6 +1216,7 @@ public class Isj {
                     long id_estInscrit = retrouverCodeEstInscrit(estInscr,libelle,anneDebut);
                     System.out.println(id_estInscrit);
                     long id_typEvalation = retrouverTypeEvaluation(typeEval, codeUE, anneDebut);
+                    System.out.println(id_typEvalation);
                     TypeEvaluation typeEvaluation = new TypeEvaluationFacade().find(id_typEvalation);
                     //System.out.println(new EstInscritFacade().find(id_estInscrit));
 

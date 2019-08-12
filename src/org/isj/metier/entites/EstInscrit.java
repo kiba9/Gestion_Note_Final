@@ -93,7 +93,7 @@ public class EstInscrit extends Securite implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getEnseignement(), getCandidatInscrit());
+        return Objects.hash(super.hashCode(), getCode(), getEnseignement(), getCandidatInscrit());
     }
 
     @Override
