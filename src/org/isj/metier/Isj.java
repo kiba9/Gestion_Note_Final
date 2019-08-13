@@ -57,6 +57,7 @@ public class Isj {
             System.out.println(secu.hashCode());
         }
 */
+       new Isj().creerFichePresence("LIC 2", "Licence", "semestre 1", 2018, PATH_OUT_XLSX+"f.xlsx");
        // new EstInscritFacade().findAll();
 
        // System.out.println( new EtudiantFacade().find((long)3124).getMatricule());
@@ -554,18 +555,18 @@ public class Isj {
     /**
      * Fonction qui creer un fichier excel pour l'enregistrement des abscences
      *
-     * @param niv     le niveau pour lequelle ont veut generer la liste
+     * @param classe     le niveau pour lequelle ont veut generer la liste
      * @param filiere la filiere presice
      * @param annee   l'annee correspondante
      * @throws Exception en cas d'erreur
      */
-    public void creerFichePresence(int niv, String filiere, String semestre, int annee, String pathOut) throws Exception {
+    public void creerFichePresence(String classe, String filiere, String semestre, int annee, String pathOut) throws Exception {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet();
 
-        String sql = "{CALL isj.etud_class(?,?,?)}";
+        String sql = "{CALL etud_class(?,?,?)}";
         CallableStatement procEtudClass = new EtudiantFacade().getConnection().prepareCall(sql);
-        procEtudClass.setInt(1, niv);
+        procEtudClass.setString(1, classe);
         procEtudClass.setString(2, filiere);
         procEtudClass.setInt(3, annee);
         procEtudClass.execute();
@@ -611,8 +612,11 @@ public class Isj {
 
         sheet.setColumnWidth(0, 1000);
         sheet.setColumnWidth(1, 2700);
+        sheet.setColumnWidth(2, 3500);
+        sheet.setColumnWidth(3, 3500);
+        sheet.setColumnWidth(4, 3500);
 
-        InputStream imageStream = new FileInputStream(pathOut + "input.jpg");
+        InputStream imageStream = new FileInputStream( "src/org/isj/metier/input.jpg");
 
         XSSFDrawing drawing = sheet.createDrawingPatriarch();
         XSSFClientAnchor anchor = new XSSFClientAnchor();
@@ -662,7 +666,7 @@ public class Isj {
         row = sheet.createRow(11);
         row.createCell(1).setCellValue("Classe:");
         row.getCell(1).setCellStyle(cellLight);
-        row.createCell(2).setCellValue(filiere + " " + niv);
+        row.createCell(2).setCellValue(classe);
         row.getCell(2).setCellStyle(cellBold);
         sheet.addMergedRegion(new CellRangeAddress(11, 11, 2, 3));
         row = sheet.createRow(12);
@@ -840,6 +844,8 @@ public class Isj {
         sendEmail.sendAttachFile(maillist, "Fiche de Note ", "<h3>" + titre + "</h3>", pathOut);
 
     }
+
+
 
     /**
      * fonction qui renvoie la meilleure note et la pire note a une evaluation specifique
@@ -1232,6 +1238,68 @@ public class Isj {
         fis.close();
     }
 
+    public void importerDiscipline(String pathOut)throws IOException{
+        FileInputStream fis = new FileInputStream(new File(pathOut));
+        XSSFWorkbook workbook = new XSSFWorkbook(fis);
+
+        Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+        while (sheetIterator.hasNext()) {
+            Sheet sheet = sheetIterator.next();
+            String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
+            String oldMat = sheet.getRow(4).getCell(1).getStringCellValue();
+            String oldLibelle = sheet.getRow(4).getCell(1).getStringCellValue();
+
+            int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
+
+            Iterator<Row> rowIterator = sheet.iterator();
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                int numrow = row.getRowNum();
+
+                if (numrow > 3) {
+                    String libelle, libelleEval, estInscr, codeUE, typeEval, description;
+                    Date Date_Displine;
+                    int heureJustifie = 0, heureNonJustifie = 0, nombre_retard = 0;
+
+                    description = row.getCell(0).getStringCellValue().trim();
+                    libelle = row.getCell(1).getStringCellValue();
+                    Date_Displine = row.getCell(2).getDateCellValue();
+                    heureNonJustifie = (int)row.getCell(3).getNumericCellValue();
+                    heureJustifie = (int)row.getCell(4).getNumericCellValue();
+                    libelleEval = row.getCell(3).getStringCellValue().toUpperCase().trim();
+                    description = row.getCell(4).getStringCellValue().toUpperCase().trim();
+                    nombre_retard = (int) row.getCell(5).getNumericCellValue();
+
+
+                    typeEval = libelleEval.substring(0,libelleEval.indexOf(" ")).trim();
+                    codeUE = libelleEval.substring(libelleEval.indexOf(" ")).trim();
+
+                    if (estInscr.equalsIgnoreCase("")) estInscr = oldMat;
+                    else oldMat =row.getCell(0).getStringCellValue();
+
+                    if (libelle.equalsIgnoreCase("")) libelle = oldLibelle;
+                    else oldLibelle =row.getCell(1).getStringCellValue();
+
+
+                    long id_estInscrit = retrouverCodeEstInscrit(estInscr,libelle,anneDebut);
+                    System.out.println(id_estInscrit);
+                    long id_typEvalation = retrouverTypeEvaluation(typeEval, codeUE, anneDebut);
+                    System.out.println(id_typEvalation);
+                    TypeEvaluation typeEvaluation = new TypeEvaluationFacade().find(id_typEvalation);
+                    //System.out.println(new EstInscritFacade().find(id_estInscrit));
+
+                    //System.out.println(typeEval+" "+codeUE+" "+anneDebut+" "+id_typEvalation+" "+typeEvaluation);
+
+                    Note note = new Note(libelle, description, valeurNote, numeroTable, null, new EstInscritFacade().find(id_estInscrit), retrouverEvaluation(typeEvaluation));
+                    new NoteFacade().create(note);
+
+                }
+            }
+        }
+        workbook.close();
+        fis.close();
+    }
+
     public void enregistrerNoteExcel(String cheminAcces) throws IOException, InvalidFormatException {
         Workbook workbook = new WorkbookFactory().create(new File(cheminAcces));
 
@@ -1516,7 +1584,7 @@ public class Isj {
      */
     public ArrayList rangEtudiant(int annee, int niv, String semestre, String filiere) throws SQLException {
 
-        String matricule = "", sql = "{? = CALL isj.mgp_sem(?,?,?,?)}", sql2 = "{CALL isj.etud_class(?,?,?)}";
+        String matricule = "", sql = "{? = CALL mgp_sem(?,?,?,?)}", sql2 = "{CALL etud_class(?,?,?)}";
         Connection con = new ClasseFacade().getConnection();
 
         HashMap<String, Float> listEtudMoy = new HashMap<>();

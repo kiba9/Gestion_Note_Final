@@ -77,7 +77,7 @@
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="credit" class="java.lang.Integer"/>
-	<variable name="variable1" class="java.lang.Integer" resetType="None" incrementType="Page" calculation="Sum">
+	<variable name="variable1" class="java.lang.Integer" incrementType="Page" calculation="Sum">
 		<variableExpression><![CDATA[$F{credit}]]></variableExpression>
 	</variable>
 	<background>
