@@ -107,8 +107,8 @@ public class HistoriqueNoteController implements Initializable {
 
             table.setItems(listeHistoriqueNote);
             activationDesactivationDetails(gridPane, false);
-            //libellecolumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLibelle()));
-            //noteColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getNote().getValeurNote()).asObject());
+            libellecolumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLibelle()));
+            noteColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getNote().getValeurNote()).asObject());
             valeurNotecolumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getValeurNote()).asObject());
             codecolumn.setCellValueFactory(cellData -> new SimpleLongProperty(cellData.getValue().getCode()).asObject());
 
