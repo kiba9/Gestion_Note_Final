@@ -18,6 +18,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
+import org.isj.interfaces.util.litsenners.AutoCompleteComboBoxListener;
 import org.isj.messagerie.Mythread;
 import org.isj.metier.Isj;
 import org.isj.metier.entites.*;
@@ -168,7 +169,7 @@ public class CandidatController implements Initializable {
     public void listeClasses() {
         listeClasses.addAll(new ClasseFacade().lister());
         classe.setItems(listeClasses);
-        //classeAutocomplete = new AutoCompleteComboBoxListener<Classe>(classe);
+        AutoCompleteComboBoxListener<Classe> classeAutocomplete = new AutoCompleteComboBoxListener<Classe>(classe);
     }
 
     /**

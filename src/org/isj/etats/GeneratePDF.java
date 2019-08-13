@@ -33,7 +33,7 @@ public class GeneratePDF {
         Etudiant etudiant = new Isj().retrouverEtudiantMatricule(matricule);
 
         // - Paramètres de Connexion à la base de données
-        String url = "jdbc:mysql://localhost/isj";
+        String url = "jdbc:mysql://localhost/isj2";
         String login = "root";
         String password = "";
         Connection connection = null;
@@ -45,7 +45,7 @@ public class GeneratePDF {
             connection = DriverManager.getConnection(url, login, password);
 
             // - Chargement et compilation du rapport
-            JasperDesign jasperDesign = JRXmlLoader.load("C:\\Users\\User\\Documents\\GitHub\\ProjetTutoreL2\\src\\org\\isj\\etats\\ReleveFinal.jrxml");
+            JasperDesign jasperDesign = JRXmlLoader.load("C:\\Users\\User\\Documents\\GitHub\\Gestion_Note_Final\\src\\org\\isj\\etats\\ReleveFinal.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
 
             // - Paramètres à envoyer au rapport
@@ -70,7 +70,7 @@ public class GeneratePDF {
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
 
             // - Création du rapport au format PDF
-            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:\\Users\\User\\Desktop\\Final.pdf");
+            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:\\Users\\User\\Desktop\\ReleveFinal.pdf");
             connection.close();
         } catch (JRException e) {
 
@@ -84,7 +84,7 @@ public class GeneratePDF {
     public static void genererFicheAbsence(Integer niveau, String filiere, Integer annee_academique, String semestre){
 
         // - Paramètres de Connexion à la base de données
-        String url = "jdbc:mysql://localhost/isj";
+        String url = "jdbc:mysql://localhost/isj2";
         String login = "root";
         String password = "";
         Connection connection = null;

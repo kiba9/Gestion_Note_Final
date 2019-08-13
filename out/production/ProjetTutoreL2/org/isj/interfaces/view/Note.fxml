@@ -174,7 +174,7 @@
                                  <GridPane.margin>
                                     <Insets />
                                  </GridPane.margin></TextField>
-                                        <Label text="Description" GridPane.rowIndex="5">
+                                        <Label text="Description" GridPane.rowIndex="6">
                                             <font>
                                                 <Font name="Arial" size="13.0" />
                                             </font>
@@ -208,12 +208,21 @@
                                     <Insets left="10.0" />
                                  </GridPane.margin>
                               </Label>
-                              <TextArea fx:id="description" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                              <TextArea fx:id="description" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                                  <GridPane.margin>
                                     <Insets top="10.0" />
                                  </GridPane.margin>
                               </TextArea>
                               <TextField fx:id="valeur_note" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label layoutX="20.0" layoutY="272.0" text="Etudiant" textFill="#111111" GridPane.rowIndex="5">
+                                 <font>
+                                    <Font name="Arial" size="13.0" />
+                                 </font>
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <ComboBox fx:id="etudiant" layoutX="156.0" layoutY="268.0" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                     </children>
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="ALWAYS" maxWidth="146.0" minWidth="10.0" prefWidth="130.0" />
@@ -225,6 +234,7 @@
                                         <RowConstraints maxHeight="142.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
                               <RowConstraints maxHeight="160.0" minHeight="10.0" prefHeight="58.0" vgrow="SOMETIMES" />
                                         <RowConstraints maxHeight="281.0" minHeight="10.0" prefHeight="55.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="281.0" minHeight="10.0" prefHeight="55.0" vgrow="SOMETIMES" />
                                         <RowConstraints maxHeight="362.0" minHeight="10.0" prefHeight="117.0" vgrow="SOMETIMES" />
                               <RowConstraints maxHeight="279.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
                                     </rowConstraints>

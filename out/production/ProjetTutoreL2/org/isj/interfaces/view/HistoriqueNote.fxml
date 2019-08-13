@@ -138,7 +138,7 @@
                     <children>
                         <BorderPane layoutX="-48.0" layoutY="119.0" prefHeight="596.0" prefWidth="287.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <top>
-                                <Text fill="#120c54" strokeType="OUTSIDE" strokeWidth="0.0" text="Details de la note" textAlignment="CENTER" wrappingWidth="300.13671875" BorderPane.alignment="CENTER">
+                                <Text fill="#120c54" strokeType="OUTSIDE" strokeWidth="0.0" text="Details des modifications de la note" textAlignment="CENTER" wrappingWidth="300.13671875" BorderPane.alignment="CENTER">
                                     <font>
                                         <Font name="Sitka Heading Bold" size="24.0" />
                                     </font>
@@ -185,7 +185,7 @@
                                     <Font name="Arial" size="13.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="note" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <TextField fx:id="note" layoutX="156.0" layoutY="258.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                     </children>
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="ALWAYS" maxWidth="146.0" minWidth="10.0" prefWidth="130.0" />

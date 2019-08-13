@@ -14,10 +14,12 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
+import org.isj.interfaces.util.litsenners.AutoCompleteComboBoxListener;
 import org.isj.metier.Isj;
 import org.isj.metier.entites.HistoriqueNote;
 import org.isj.metier.entites.Note;
 import org.isj.metier.facade.HistoriqueNoteFacade;
+import org.isj.metier.facade.NoteFacade;
 
 import java.io.IOException;
 import java.net.URL;
@@ -58,7 +60,7 @@ public class HistoriqueNoteController implements Initializable {
     private TableColumn<HistoriqueNote, Long> codecolumn;
 
     @FXML
-    private TableColumn<HistoriqueNote, Long> noteColumn;
+    private TableColumn<HistoriqueNote, Double> noteColumn;
 
     @FXML
     private ComboBox<String> attributs;
@@ -105,8 +107,8 @@ public class HistoriqueNoteController implements Initializable {
 
             table.setItems(listeHistoriqueNote);
             activationDesactivationDetails(gridPane, false);
-            libellecolumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLibelle()));
-            noteColumn.setCellValueFactory(cellData -> new SimpleLongProperty(cellData.getValue().getNote().getCode()).asObject());
+            //libellecolumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLibelle()));
+            //noteColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getNote().getValeurNote()).asObject());
             valeurNotecolumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getValeurNote()).asObject());
             codecolumn.setCellValueFactory(cellData -> new SimpleLongProperty(cellData.getValue().getCode()).asObject());
 
@@ -123,7 +125,7 @@ public class HistoriqueNoteController implements Initializable {
     }
 
     /**
-     * Fonction permettant d'afficher les détails d'une note archivé
+     * Fonction permettant d'afficher les détails d'une note archivée
      *
      * @param historiqueNote variable de type CandidatController
      */
@@ -140,10 +142,9 @@ public class HistoriqueNoteController implements Initializable {
             if (historiquenote != null) {
                 historiqueNoteSelectionne = historiquenote;
                 code.setText(String.valueOf(historiquenote.getCode()));
-
                 libelle.setText(historiquenote.getLibelle());
                 note.setText(historiquenote.getNote().toString());
-                valeur_note.setText(Double.toString(historiquenote.getValeurNote()));
+                valeur_note.setText(String.valueOf(historiquenote.getValeurNote()));
             } else {
                 code.setText("");
                 libelle.setText("");
@@ -159,17 +160,6 @@ public class HistoriqueNoteController implements Initializable {
     @FXML
     public void handleNouveau() {
 
-        if (Connexion.peutEcrire(Note.class)) {
-            /*noteSelectionne = null;
-            //Raactivation de tous TextField du panneau des détails
-            activationDesactivationDetails(gridPane,true);
-            code.setText("");
-            libelle.setText("");
-            numero_table.setText("");
-            evaluation.setValue(null);
-            valeur_note.setText("");
-            description.setText("");*/
-        }
     }
 
     /**
@@ -178,17 +168,6 @@ public class HistoriqueNoteController implements Initializable {
     @FXML
     public void handleModifier() {
 
-        if (historiqueNoteSelectionne == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(Appli.getPrimaryStage);
-            alert.setTitle("ISJ");
-            alert.setHeaderText("Aucune donnée à modifier");
-            alert.setContentText("Veuillez sélectionner une ligne dans le tableau.");
-            alert.show();
-        }
-        else if (Connexion.peutModifier(HistoriqueNote.class)) {
-            activationDesactivationDetails(gridPane,true);
-        }
     }
 
     /**
@@ -203,84 +182,12 @@ public class HistoriqueNoteController implements Initializable {
      */
     @FXML
     public void handleSupprimer() {
-        /*
-        if (Connexion.peutSupprimer(HistoriqueNote.class)) {
-            try {
 
-                if (historiqueNoteSelectionne != null) {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("ISJ");
-                    alert.setHeaderText("Confirmation de Suppression");
-                    alert.setContentText("Voulez-vous vraiment supprimer la donnée ?");
-
-                    Optional<ButtonType> result = alert.showAndWait();
-                    if (result.get() == ButtonType.OK) {
-                        String suppression = historiqueNoteFacade.remove(historiqueNoteSelectionne);
-                        if (suppression != null && suppression.equalsIgnoreCase("succes"))
-                            table.getItems().remove(historiqueNoteSelectionne);
-                        else {
-                            alert = new Alert(Alert.AlertType.ERROR);
-                            alert.initOwner(Appli.getPrimaryStage);
-                            alert.setTitle("ISJ");
-                            alert.setHeaderText("La donnée ne peut être supprimée.");
-                            alert.setContentText("Il est possible qu'une contrainte d'intégrité empêche la suppression de la donnée.");
-                            alert.show();
-                        }
-                    } else {
-                        alert.close();
-                    }
-
-                } else {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.initOwner(Appli.getPrimaryStage);
-                    alert.setTitle("ISJ");
-                    alert.setHeaderText("Aucune donnée sélectionnée.");
-                    alert.setContentText("Veuillez sélectionner une ligne dans le tableau.");
-                    alert.show();
-                }
-
-            } catch (Exception e) {
-                e.getMessage();
-            }
-        }*/
     }
 
     @FXML
     public void handleEnregistrer() {
-        /*
-        if (Connexion.peutLire(Note.class) || Connexion.peutModifier(Note.class)) {
-            try {
-                String libelleNote, numeroTableNote, valeurNote, descriptionNote;
-                libelleNote = libelle.getText();
-                numeroTableNote = numero_table.getText();
-                valeurNote = valeur_note.getText();
-                descriptionNote = description.getText();
-                Evaluation evaluationNote = evaluation.getSelectionModel().getSelectedItem();
 
-                String resultat;
-                if (noteSelectionne == null)
-                    resultat = noteFacade.enregistrer(libelleNote, descriptionNote, Double.valueOf(valeurNote), Integer.parseInt(numeroTableNote), null,null,evaluationNote);
-                else
-                    resultat = noteFacade.modifier(noteSelectionne, libelleNote, descriptionNote, Double.valueOf(valeurNote), Integer.parseInt(numeroTableNote),null, null, evaluationNote);
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.initOwner(Appli.getPrimaryStage);
-                alert.setTitle("ISJ");
-                alert.setHeaderText("Resultat de l'opération");
-                alert.setContentText(resultat.toUpperCase() + " !");
-                alert.show();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.initOwner(Appli.getPrimaryStage);
-                alert.setTitle("ISJ");
-                alert.setHeaderText("Erreur lors l'opération");
-                alert.setContentText(e.getMessage() + " !");
-                alert.show();
-            }
-
-        }*/
     }
 
     private boolean raffraichir = false;

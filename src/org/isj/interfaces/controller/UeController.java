@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
+import org.isj.interfaces.util.litsenners.AutoCompleteComboBoxListener;
 import org.isj.metier.Isj;
 import org.isj.metier.entites.*;
 import org.isj.metier.entites.Module;
@@ -112,24 +113,22 @@ public class UeController implements Initializable {
         }
     }
 
-    //AutoCompleteComboBoxListener<Niveau> classeAutocomplete;
-
     public void listeNiveaux() {
         listNiveau.addAll(new NiveauFacade().lister());
         niveau.setItems(listNiveau);
-        //classeAutocomplete = new AutoCompleteComboBoxListener<Niveau>(niveau);
+        AutoCompleteComboBoxListener<Niveau> Autocomplete = new AutoCompleteComboBoxListener<Niveau>(niveau);
     }
 
     public void listeSpecialites() {
         listSpecialite.addAll(new SpecialiteFacade().lister());
         specialite.setItems(listSpecialite);
-        //classeAutocomplete1 = new AutoCompleteComboBoxListener<Specialite>(specialite);
+        AutoCompleteComboBoxListener<Specialite> Autocomplete = new AutoCompleteComboBoxListener<Specialite>(specialite);
     }
 
     public void listeModules() {
         listModule.addAll(new ModuleFacade().lister());
         module.setItems(listModule);
-        //classeAutocomplete2 = new AutoCompleteComboBoxListener<Module>(module);
+        AutoCompleteComboBoxListener<Module> Autocomplete = new AutoCompleteComboBoxListener<Module>(module);
     }
 
 

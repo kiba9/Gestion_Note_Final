@@ -16,7 +16,9 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
+import org.isj.interfaces.util.litsenners.AutoCompleteComboBoxListener;
 import org.isj.metier.Isj;
+import org.isj.metier.entites.EstInscrit;
 import org.isj.metier.entites.Filiere;
 import org.isj.metier.entites.Specialite;
 import org.isj.metier.facade.FiliereFacade;
@@ -89,14 +91,13 @@ public class SpecialiteController implements Initializable {
         }
     }
 
-    //AutoCompleteComboBoxListener<Classe> classeAutocomplete;
     /**
      * Fonction permettant de lister les différentes filiere
      */
     public void listeFilieres() {
         listeFiliere.addAll(new FiliereFacade().lister());
         filiere.setItems(listeFiliere);
-        //classeAutocomplete = new AutoCompleteComboBoxListener<Classe>(classe);
+        AutoCompleteComboBoxListener<Filiere> Autocomplete = new AutoCompleteComboBoxListener<Filiere>(filiere);
     }
 
     public void listSpecialite() throws SQLException {

@@ -19,6 +19,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
+import org.isj.interfaces.util.litsenners.AutoCompleteComboBoxListener;
 import org.isj.metier.Isj;
 import org.isj.metier.entites.*;
 import org.isj.metier.facade.EnseignantFacade;
@@ -126,7 +127,7 @@ public class EnseignementController implements Initializable {
     public void listeUe() {
         listeUEs.addAll(new UEFacade().lister());
         ue.setItems(listeUEs);
-        //classeAutocomplete = new AutoCompleteComboBoxListener<Classe>(classe);
+        AutoCompleteComboBoxListener<UE> Autocomplete = new AutoCompleteComboBoxListener<UE>(ue);
     }
 
     /**
@@ -135,7 +136,7 @@ public class EnseignementController implements Initializable {
     public void listeSemestre() {
         listeSemestres.addAll(new SemestreFacade().lister());
         semestre.setItems(listeSemestres);
-        //classeAutocomplete = new AutoCompleteComboBoxListener<Classe>(classe);
+        AutoCompleteComboBoxListener<Semestre> Autocomplete = new AutoCompleteComboBoxListener<Semestre>(semestre);
     }
 
     /**

@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
+import org.isj.etats.GeneratePDF;
 import org.isj.etats.dynamicreports.SimpleDynamicReport;
 import org.isj.interfaces.main.Appli;
 
@@ -33,7 +34,7 @@ public class ChoixReleveController implements Initializable {
             mat = matricule.getText();
             niv = niveau.getText();
             ann = annee.getText();
-            SimpleDynamicReport.genererReleve(mat, Integer.parseInt(niv), Integer.parseInt(ann));
+            new GeneratePDF().genererReleve(mat, Integer.parseInt(niv), Integer.parseInt(ann));
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.initOwner(Appli.getPrimaryStage);
             alert.setTitle("ISJ");

@@ -21,6 +21,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
+import org.isj.interfaces.util.litsenners.AutoCompleteComboBoxListener;
 import org.isj.metier.Isj;
 import org.isj.metier.entites.*;
 import org.isj.metier.facade.ClasseFacade;
@@ -167,6 +168,7 @@ public class EtudiantController implements Initializable {
     public void listeClasses() {
         listeClasse.addAll(new ClasseFacade().lister());
         classe.setItems(listeClasse);
+        AutoCompleteComboBoxListener<Classe> Autocomplete = new AutoCompleteComboBoxListener<Classe>(classe);
     }
 
     public void listEtudiants() throws SQLException {

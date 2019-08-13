@@ -118,16 +118,19 @@ public class AnonymatController implements Initializable{
     public void listeNotes() {
         listenote.addAll(new NoteFacade().lister());
         note.setItems(listenote);
+        AutoCompleteComboBoxListener<Note> noteAutocomplete = new AutoCompleteComboBoxListener<Note>(note);
     }
 
     public void listeCandidats() {
         listecandidats.addAll(new EstInscritFacade().lister());
         candidatinscrit.setItems(listecandidats);
+        AutoCompleteComboBoxListener<EstInscrit> Autocomplete = new AutoCompleteComboBoxListener<EstInscrit>(candidatinscrit);
     }
 
     public void listeEvaluations() {
         listeevaluation.addAll(new EvaluationFacade().lister());
         evaluation.setItems(listeevaluation);
+        AutoCompleteComboBoxListener<Evaluation> Autocomplete = new AutoCompleteComboBoxListener<Evaluation>(evaluation);
     }
 
 

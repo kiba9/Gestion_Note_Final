@@ -120,11 +120,13 @@ public class EstInscritController implements Initializable {
     public void listeCandidatsInscrits() {
         listeCandidatInscrit.addAll(new CandidatFacade().lister());
         candidatInscrit.setItems(listeCandidatInscrit);
+        AutoCompleteComboBoxListener<EstInscrit> Autocomplete = new AutoCompleteComboBoxListener<EstInscrit>(candidatInscrit);
     }
 
     public void listeEnseignements() {
         listeEnseignement.addAll(new EnseignementFacade().lister());
         enseignement.setItems(listeEnseignement);
+        AutoCompleteComboBoxListener<Enseignement> Autocomplete = new AutoCompleteComboBoxListener<Enseignement>(enseignement);
     }
 
     public void listEstInscrit() throws SQLException {

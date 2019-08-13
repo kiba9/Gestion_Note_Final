@@ -6,9 +6,11 @@ import javafx.beans.property.*;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -19,9 +21,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
+import org.isj.interfaces.util.litsenners.AutoCompleteComboBoxListener;
 import org.isj.metier.Isj;
+import org.isj.metier.entites.EstInscrit;
 import org.isj.metier.entites.Note;
 import org.isj.metier.entites.Evaluation;
+import org.isj.metier.facade.EstInscritFacade;
+import org.isj.metier.facade.EtudiantFacade;
 import org.isj.metier.facade.NoteFacade;
 import org.isj.metier.facade.EvaluationFacade;
 
@@ -51,6 +57,10 @@ public class NoteController implements Initializable {
 
     @FXML
     private TextField valeur_note;
+
+    @FXML
+    private ComboBox<EstInscrit> etudiant;
+    ObservableList<EstInscrit> listeEtudiant = FXCollections.observableArrayList();
 
     @FXML
     private ComboBox<Evaluation> evaluation;
@@ -109,13 +119,12 @@ public class NoteController implements Initializable {
             listNote();
             afficheDetail(null);
             listeEvaluation();
+            listeEtudiant();
             table.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> afficheDetail(newValue)));
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
-    //AutoCompleteComboBoxListener<Classe> classeAutocomplete;
 
     /**
      * Fonction permettant de lister les différentes classes auxquelles peut appartenir un candidat
@@ -123,6 +132,13 @@ public class NoteController implements Initializable {
     public void listeEvaluation() {
         listeEvaluation.addAll(new EvaluationFacade().lister());
         evaluation.setItems(listeEvaluation);
+        AutoCompleteComboBoxListener<Evaluation> Autocomplete = new AutoCompleteComboBoxListener<Evaluation>(evaluation);
+    }
+
+    public void listeEtudiant() {
+        listeEtudiant.addAll(new EstInscritFacade().lister());
+        etudiant.setItems(listeEtudiant);
+        AutoCompleteComboBoxListener<EstInscrit> Autocomplete = new AutoCompleteComboBoxListener<EstInscrit>(etudiant);
     }
 
     /**
@@ -180,6 +196,7 @@ public class NoteController implements Initializable {
                 evaluation.setValue(note.getEvaluation());
                 valeur_note.setText(Double.toString(note.getValeurNote()));
                 description.setText(note.getDescription());
+                etudiant.setValue(note.getEstInscrit());
             } else {
                 noteSelectionne = null;
                 code.setText("");
@@ -188,6 +205,7 @@ public class NoteController implements Initializable {
                 evaluation.setValue(null);
                 valeur_note.setText("");
                 description.setText("");
+                etudiant.setValue(null);
             }
         }
     }
@@ -404,7 +422,7 @@ public class NoteController implements Initializable {
 
     Stage stage = new Stage();
 
-    public void handleChargerNote() throws Exception{
+    public void handleChargerNote(ActionEvent event) throws Exception{
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/ChoixNote.fxml"));
         AnchorPane page = loader.load();

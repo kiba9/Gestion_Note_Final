@@ -57,6 +57,7 @@ public class EmplacementFichierController implements Initializable {
                 dialogStage.setScene(scene);
                 dialogStage.show();
             }else if(chargerPlusEval.isSelected()){
+                new NoteController().stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 FileChooser fileChooser = new FileChooser();
 
                 // Set extension filter
@@ -76,6 +77,7 @@ public class EmplacementFichierController implements Initializable {
                     alert.show();
                     new AnneeAcademiqueController().handleRaffraichir();
                 }
+
             }
 
         }catch (Exception e){
@@ -83,7 +85,7 @@ public class EmplacementFichierController implements Initializable {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.initOwner(Appli.getPrimaryStage);
             alert.setTitle("ISJ");
-            alert.setContentText("Veuillez cochez une case!".toUpperCase());
+            alert.setContentText("Une erreur s'est produite!");
             alert.show();
         }
     }
@@ -92,7 +94,7 @@ public class EmplacementFichierController implements Initializable {
 
     @FXML
     public void handleParcourir(){
-        choixNote.setItems(listChoix);
+
         try{
             FileChooser fileChooser = new FileChooser();
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
@@ -111,6 +113,7 @@ public class EmplacementFichierController implements Initializable {
 
     @FXML
     public void handleOk(){
+        choixNote.setItems(listChoix);
         try{
             Isj isj = new Isj();
             if(choixNote.getItems().equals("Matricule - Anonymat")){

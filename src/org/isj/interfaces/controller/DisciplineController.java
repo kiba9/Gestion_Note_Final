@@ -134,7 +134,7 @@ public class DisciplineController implements Initializable {
     public void listeSemestre() {
         listeSemestre.addAll(new SemestreFacade().lister());
         semestre.setItems(listeSemestre);
-        //classeAutocomplete = new AutoCompleteComboBoxListener<Classe>(classe);
+        AutoCompleteComboBoxListener<Semestre> Autocomplete = new AutoCompleteComboBoxListener<Semestre>(semestre);
     }
     /**
      * Fonction permettant de lister les différents etudiants
@@ -142,7 +142,7 @@ public class DisciplineController implements Initializable {
     public void listeEtudiant() {
         listeEtudiant.addAll(new EtudiantFacade().lister());
        etudiant.setItems(listeEtudiant);
-        //classeAutocomplete = new AutoCompleteComboBoxListener<Classe>(classe);
+        AutoCompleteComboBoxListener<Etudiant> Autocomplete = new AutoCompleteComboBoxListener<Etudiant>(etudiant);
     }
 
     public void listDiscipline() throws SQLException {

@@ -125,7 +125,7 @@ public class ClasseController implements Initializable {
     public void listeNiveau() {
         listeniveau.addAll(new NiveauFacade().lister());
         niveau.setItems(listeniveau);
-        //classeAutocomplete = new AutoCompleteComboBoxListener<Classe>(classe);
+        AutoCompleteComboBoxListener<Niveau> Autocomplete = new AutoCompleteComboBoxListener<Niveau>(niveau);
     }
     /**
      * Fonction permettant de lister les différentes specialites d'une classe
@@ -133,7 +133,7 @@ public class ClasseController implements Initializable {
     public void listeSpecialite() {
         listeSpecialites.addAll(new SpecialiteFacade().lister());
        specialite.setItems(listeSpecialites);
-        //classeAutocomplete = new AutoCompleteComboBoxListener<Classe>(classe);
+        AutoCompleteComboBoxListener<Specialite> Autocomplete = new AutoCompleteComboBoxListener<Specialite>(specialite);
     }
 
     public void listClasse() throws SQLException {

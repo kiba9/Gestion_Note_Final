@@ -17,6 +17,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
+import org.isj.interfaces.util.litsenners.AutoCompleteComboBoxListener;
 import org.isj.metier.Isj;
 import org.isj.metier.entites.*;
 import org.isj.metier.facade.CandidatFacade;
@@ -102,6 +103,7 @@ public class EvaluationController implements Initializable {
     public void listeTypeEvaluation() {
         listeTypeEvaluation.addAll(new TypeEvaluationFacade().lister());
         typeEvaluation.setItems(listeTypeEvaluation);
+        AutoCompleteComboBoxListener<TypeEvaluation> Autocomplete = new AutoCompleteComboBoxListener<TypeEvaluation>(typeEvaluation);
     }
 
     public void listEvaluation() throws SQLException {
