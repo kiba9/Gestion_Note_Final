@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="smslib-3.4.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/smslib/smslib/3.4.1/smslib-3.4.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
