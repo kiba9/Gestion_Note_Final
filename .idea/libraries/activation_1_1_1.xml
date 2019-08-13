@@ -20,6 +20,7 @@
       <root url="jar://$PROJECT_DIR$/lib/poi-ooxml-schemas-4.1.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/poi-scratchpad-4.1.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/xmlbeans-3.1.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/smslib/smslib/3.4.1/smslib-3.4.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
