@@ -757,7 +757,7 @@ public class DisciplineController implements Initializable {
             File file = fileChooser.showOpenDialog(Appli.getPrimaryStage);
 
             if (file != null) {
-                //Isj.chargerEtudiant(file);
+                new Isj().importerDiscipline(file.getAbsolutePath());
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.initOwner(Appli.getPrimaryStage);
                 alert.setTitle("ISJ");
