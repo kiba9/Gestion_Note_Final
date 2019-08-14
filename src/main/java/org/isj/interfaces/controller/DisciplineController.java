@@ -19,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
@@ -27,6 +28,7 @@ import org.isj.metier.Isj;
 import org.isj.metier.entites.*;
 import org.isj.metier.facade.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSetMetaData;
@@ -739,5 +741,37 @@ public class DisciplineController implements Initializable {
         Scene scene = new Scene(page);
         dialogStage.setScene(scene);
         dialogStage.show();
+    }
+
+    @FXML
+    public void handleCharger(){
+        try{
+            FileChooser fileChooser = new FileChooser();
+
+            // Set extension filter
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "Excel files (*.xlsx)", "*.xlsx");
+            fileChooser.getExtensionFilters().add(extFilter);
+
+            // Show save file dialog
+            File file = fileChooser.showOpenDialog(Appli.getPrimaryStage);
+
+            if (file != null) {
+                //Isj.chargerEtudiant(file);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.initOwner(Appli.getPrimaryStage);
+                alert.setTitle("ISJ");
+                alert.setContentText("SUCCES");
+                alert.show();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.initOwner(Appli.getPrimaryStage);
+            alert.setTitle("ISJ");
+            alert.setContentText("Veuillez vérifier les paramètres du fichier".toUpperCase() + "!");
+            alert.show();
+        }
+        handleRaffraichir();
     }
 }

@@ -57,7 +57,10 @@ public class Isj {
             System.out.println(secu.hashCode());
         }
 */
-       new Isj().creerFichePresence("LIC 2", "Licence", "semestre 1", 2018, PATH_OUT_XLSX+"f.xlsx");
+       //new Isj().creerFichePresence("LIC 2", "Licence", "semestre 1", 2018, PATH_OUT_XLSX+"f.xlsx");
+       File ft = new File("src\\main\\java\\org\\isj\\idididid.dh");
+       FileInputStream fis = new FileInputStream(ft);
+        System.out.println(ft.getAbsolutePath());
        // new EstInscritFacade().findAll();
 
        // System.out.println( new EtudiantFacade().find((long)3124).getMatricule());
@@ -616,7 +619,7 @@ public class Isj {
         sheet.setColumnWidth(3, 3500);
         sheet.setColumnWidth(4, 3500);
 
-        InputStream imageStream = new FileInputStream( "src/org/isj/metier/input.jpg");
+        InputStream imageStream = new FileInputStream( "src/main/java/org/isj/metier/input.jpg");
 
         XSSFDrawing drawing = sheet.createDrawingPatriarch();
         XSSFClientAnchor anchor = new XSSFClientAnchor();
@@ -1256,43 +1259,27 @@ public class Isj {
                 Row row = rowIterator.next();
                 int numrow = row.getRowNum();
 
-                if (numrow > 3) {
-                    String libelle, libelleEval, estInscr, codeUE, typeEval, description;
+                if (numrow > 2) {
+                    String libelle, libSemestre, matricule, description, nomEtud;
                     Date Date_Displine;
-                    int heureJustifie = 0, heureNonJustifie = 0, nombre_retard = 0;
+                    int Nbheure = 0, NbRetard = 0, heureJustifier = 0;
 
                     description = row.getCell(0).getStringCellValue().trim();
                     libelle = row.getCell(1).getStringCellValue();
                     Date_Displine = row.getCell(2).getDateCellValue();
-                    heureNonJustifie = (int)row.getCell(3).getNumericCellValue();
-                    heureJustifie = (int)row.getCell(4).getNumericCellValue();
-                    libelleEval = row.getCell(3).getStringCellValue().toUpperCase().trim();
-                    description = row.getCell(4).getStringCellValue().toUpperCase().trim();
-                    nombre_retard = (int) row.getCell(5).getNumericCellValue();
+                    Nbheure = (int)row.getCell(3).getNumericCellValue();
+                    NbRetard = (int)row.getCell(4).getNumericCellValue();
+                    libSemestre = row.getCell(5).getStringCellValue().toUpperCase().trim();
 
 
-                    typeEval = libelleEval.substring(0,libelleEval.indexOf(" ")).trim();
-                    codeUE = libelleEval.substring(libelleEval.indexOf(" ")).trim();
+                    matricule = description.substring(0,description.indexOf(" ")).trim();
 
-                    if (estInscr.equalsIgnoreCase("")) estInscr = oldMat;
-                    else oldMat =row.getCell(0).getStringCellValue();
+                    AnneeAcademique anneeAcademique = retrouverAnneeAcademique(Date_Displine);
+                    Semestre semestre = retrouverSemestre(libSemestre, anneeAcademique);
+                    Etudiant etudiant = retrouverEtudiantMatricule(matricule);
 
-                    if (libelle.equalsIgnoreCase("")) libelle = oldLibelle;
-                    else oldLibelle =row.getCell(1).getStringCellValue();
-
-
-                    long id_estInscrit = retrouverCodeEstInscrit(estInscr,libelle,anneDebut);
-                    System.out.println(id_estInscrit);
-                    long id_typEvalation = retrouverTypeEvaluation(typeEval, codeUE, anneDebut);
-                    System.out.println(id_typEvalation);
-                    TypeEvaluation typeEvaluation = new TypeEvaluationFacade().find(id_typEvalation);
-                    //System.out.println(new EstInscritFacade().find(id_estInscrit));
-
-                    //System.out.println(typeEval+" "+codeUE+" "+anneDebut+" "+id_typEvalation+" "+typeEvaluation);
-
-                    Note note = new Note(libelle, description, valeurNote, numeroTable, null, new EstInscritFacade().find(id_estInscrit), retrouverEvaluation(typeEvaluation));
-                    new NoteFacade().create(note);
-
+                    Discipline discipline = new Discipline(libelle,description,etudiant,semestre,Nbheure,NbRetard,Date_Displine,0);
+                    new DisciplineFacade().create(discipline);
                 }
             }
         }
