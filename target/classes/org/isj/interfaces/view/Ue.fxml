@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
@@ -14,7 +9,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -30,9 +24,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="623.0" prefWidth="1021.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.isj.interfaces.controller.DisciplineController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="623.0" prefWidth="954.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.isj.interfaces.controller.UeController">
     <center>
-        <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <SplitPane dividerPositions="0.6011004126547456" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                     <children>
@@ -76,21 +70,21 @@
                                                             <bottom>
                                                                 <BorderPane prefHeight="42.0" prefWidth="413.0" BorderPane.alignment="CENTER">
                                                                     <left>
-                                                                        <Button mnemonicParsing="false" onAction="#handleAjouterCritere" text="Ajouter" BorderPane.alignment="CENTER">
+                                                                        <Button mnemonicParsing="false" text="Ajouter" BorderPane.alignment="CENTER">
                                                                             <BorderPane.margin>
                                                                                 <Insets left="10.0" right="10.0" />
                                                                             </BorderPane.margin>
                                                                         </Button>
                                                                     </left>
                                                                     <center>
-                                                                        <Button mnemonicParsing="false" onAction="#handleSupprimerCritere" prefHeight="25.0" prefWidth="86.0" text="Supprimer" BorderPane.alignment="CENTER">
+                                                                        <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="86.0" text="Supprimer" BorderPane.alignment="CENTER">
                                                                             <BorderPane.margin>
                                                                                 <Insets left="10.0" right="10.0" />
                                                                             </BorderPane.margin>
                                                                         </Button>
                                                                     </center>
                                                                     <right>
-                                                                        <Button mnemonicParsing="false" onAction="#handleFiltrer" prefHeight="25.0" prefWidth="64.0" text="Filtrer" BorderPane.alignment="CENTER">
+                                                                        <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="64.0" text="Filtrer" BorderPane.alignment="CENTER">
                                                                             <BorderPane.margin>
                                                                                 <Insets left="10.0" right="10.0" />
                                                                             </BorderPane.margin>
@@ -106,42 +100,30 @@
                                     </panes>
                                 </Accordion>
                             </top>
-                            <center>
-                                <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                    <center>
-                                        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="495.0" prefWidth="690.0" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
-                                            <content>
-                                                <TableView fx:id="table" prefHeight="493.0" prefWidth="468.0" tableMenuButtonVisible="true" GridPane.columnIndex="0" GridPane.columnSpan="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS">
-                                                    <columns>
-                                                        <TableColumn fx:id="codecolumn" prefWidth="75.0" text="Code" />
-                                                        <TableColumn fx:id="libellecolumn" prefWidth="75.0" text="Libelle" />
-                                                        <TableColumn fx:id="absencecolumn" prefWidth="75.0" text="Nombre d'heure d'absence" />
-                                                        <TableColumn fx:id="retardcolumn" prefWidth="75.0" text="Nombre de retard" />
-                                          <TableColumn fx:id="etudiantcolumn" prefWidth="75.0" text="Etudiant" />
-                                          <TableColumn fx:id="semestrecolumn" prefWidth="75.0" text="Semestre" />
-                                                    </columns>
-                                                    <padding>
-                                                        <Insets left="10.0" />
-                                                    </padding>
-                                       <columnResizePolicy>
-                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                       </columnResizePolicy>
-                                                </TableView>
-                                            </content>
-                                        </ScrollPane>
-                                    </center>
-                                </BorderPane>
-                            </center>
-                            <bottom>
-                                <BorderPane prefHeight="76.0" prefWidth="610.0" BorderPane.alignment="CENTER">
-                                    <right>
-                                        <Button mnemonicParsing="false" onAction="#handleImprimer" text="Imprimer" BorderPane.alignment="CENTER" />
-                                    </right>
-                                    <left>
-                                        <Button mnemonicParsing="false" onAction="#handleRaffraichir" text="Raffraichir" BorderPane.alignment="CENTER" />
-                                    </left>
-                                </BorderPane>
-                            </bottom>
+                     <center>
+                                  <TableView fx:id="table" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" BorderPane.alignment="CENTER">
+                                      <columns>
+                                          <TableColumn fx:id="codeUeColumn" prefWidth="75.0" text="Code UE" />
+                                          <TableColumn fx:id="libelleColumn" prefWidth="75.0" text="Libelle" />
+                                          <TableColumn fx:id="moduleColumn" prefWidth="75.0" text="Module" />
+                                          <TableColumn fx:id="specialiteColumn" prefWidth="75.0" text="Spécialité" />
+                                          <TableColumn fx:id="niveauColumn" prefWidth="75.0" text="Niveau" />
+                                      </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                                  </TableView>
+                     </center>
+                     <bottom>
+                        <BorderPane prefHeight="53.0" prefWidth="569.0" BorderPane.alignment="CENTER">
+                           <left>
+                              <Button mnemonicParsing="false" text="Raffraîchir" BorderPane.alignment="CENTER" />
+                           </left>
+                           <right>
+                              <Button mnemonicParsing="false" onAction="#handleImprimerUe" text="Imprimer" BorderPane.alignment="CENTER" />
+                           </right>
+                        </BorderPane>
+                     </bottom>
                         </BorderPane>
                     </children>
                 </AnchorPane>
@@ -149,7 +131,7 @@
                     <children>
                         <BorderPane layoutX="-48.0" layoutY="119.0" prefHeight="596.0" prefWidth="287.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <top>
-                                <Text fill="#120c54" strokeType="OUTSIDE" strokeWidth="0.0" text="Détails d'une discipline" textAlignment="CENTER" wrappingWidth="300.13671875" BorderPane.alignment="CENTER">
+                                <Text fill="#120c54" strokeType="OUTSIDE" strokeWidth="0.0" text="Détails d'une unité d'enseignement" textAlignment="CENTER" wrappingWidth="300.13671875" BorderPane.alignment="CENTER">
                                     <font>
                                         <Font name="Sitka Heading Bold" size="24.0" />
                                     </font>
@@ -159,9 +141,9 @@
                                 </Text>
                             </top>
                             <center>
-                                <GridPane fx:id="gridPane" prefHeight="514.0" prefWidth="374.0" BorderPane.alignment="CENTER">
+                                <GridPane fx:id="gridPane" prefHeight="484.0" prefWidth="377.0" BorderPane.alignment="CENTER">
                                     <children>
-                                        <Label text="Description" textFill="#111111" GridPane.rowIndex="1">
+                                        <Label text="Code UE" textFill="#111111" GridPane.rowIndex="1">
                                             <font>
                                                 <Font name="Arial" size="13.0" />
                                             </font>
@@ -169,7 +151,7 @@
                                                 <Insets left="10.0" />
                                             </GridPane.margin>
                                         </Label>
-                                        <Label text="Libelle" textFill="#111111" GridPane.rowIndex="2">
+                                        <Label text="Module" textFill="#111111" GridPane.rowIndex="2">
                                             <font>
                                                 <Font name="Arial" size="13.0" />
                                             </font>
@@ -177,7 +159,7 @@
                                                 <Insets left="10.0" />
                                             </GridPane.margin>
                                         </Label>
-                                        <Label text="Nombe de retard" textFill="#111111" GridPane.rowIndex="4">
+                                        <Label text="Libelle" textFill="#111111" GridPane.rowIndex="3">
                                             <font>
                                                 <Font name="Arial" size="13.0" />
                                             </font>
@@ -185,7 +167,23 @@
                                                 <Insets left="10.0" />
                                             </GridPane.margin>
                                         </Label>
-                                        <Label layoutX="10.0" layoutY="75.0" text="Nombre d'heure d'absence" textFill="#111111" GridPane.rowIndex="3">
+                                        <Label text="Niveau" GridPane.rowIndex="6">
+                                            <font>
+                                                <Font name="Arial" size="13.0" />
+                                            </font>
+                                            <GridPane.margin>
+                                                <Insets left="10.0" />
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label text="Description" GridPane.rowIndex="5">
+                                            <font>
+                                                <Font name="Arial" size="13.0" />
+                                            </font>
+                                            <GridPane.margin>
+                                                <Insets left="10.0" />
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label layoutX="10.0" layoutY="207.0" text="Spécialité" GridPane.rowIndex="7">
                                             <font>
                                                 <Font name="Arial" size="13.0" />
                                             </font>
@@ -201,71 +199,65 @@
                                                 <Insets left="10.0" />
                                             </GridPane.margin>
                                         </Label>
-                                        <TextField fx:id="code" prefHeight="25.0" prefWidth="245.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                                        <TextField fx:id="libelle" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                        <TextArea fx:id="description" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label layoutX="20.0" layoutY="462.0" text="Etudiant" textFill="#111111" GridPane.rowIndex="5">
+                              <TextField fx:id="codeUe" prefHeight="25.0" prefWidth="245.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField fx:id="code" layoutX="156.0" layoutY="101.0" prefHeight="25.0" prefWidth="443.0" GridPane.columnIndex="1" />
+                              <TextField fx:id="libelle" layoutX="156.0" layoutY="32.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <TextArea fx:id="description" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <ComboBox fx:id="module" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <ComboBox fx:id="niveau" layoutX="156.0" layoutY="170.0" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <ComboBox fx:id="specialite" layoutX="156.0" layoutY="170.0" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="209.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                              <Label layoutX="20.0" layoutY="215.0" text="Crédits" textFill="#111111" GridPane.rowIndex="4">
                                  <font>
                                     <Font name="Arial" size="13.0" />
                                  </font>
-                                 <padding>
+                                 <GridPane.margin>
                                     <Insets left="10.0" />
-                                 </padding>
+                                 </GridPane.margin>
                               </Label>
-                              <Label layoutX="10.0" layoutY="471.0" text="Semestre" textFill="#111111" GridPane.rowIndex="6">
-                                 <font>
-                                    <Font name="Arial" size="13.0" />
-                                 </font>
-                                 <padding>
-                                    <Insets left="10.0" />
-                                 </padding>
-                              </Label>
-                              <ComboBox fx:id="etudiant" layoutX="156.0" layoutY="329.0" prefHeight="25.0" prefWidth="363.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <ComboBox fx:id="semestre" layoutX="156.0" layoutY="402.0" prefHeight="25.0" prefWidth="363.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                              <TextField fx:id="absence" layoutX="156.0" layoutY="183.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <TextField fx:id="retard" layoutX="156.0" layoutY="256.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <TextField fx:id="credit" layoutX="156.0" layoutY="211.0" prefHeight="25.0" prefWidth="260.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                     </children>
                                     <columnConstraints>
-                                        <ColumnConstraints hgrow="ALWAYS" maxWidth="146.0" minWidth="10.0" prefWidth="130.0" />
-                                        <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="161.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="146.0" minWidth="10.0" prefWidth="130.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="211.0" minWidth="10.0" prefWidth="161.0" />
                                     </columnConstraints>
                                     <rowConstraints>
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     </rowConstraints>
                                 </GridPane>
                             </center>
                             <bottom>
                                 <HBox prefHeight="48.0" prefWidth="371.0" BorderPane.alignment="CENTER">
                                     <children>
-                                        <Button mnemonicParsing="false" onAction="#handleNouveau" prefHeight="25.0" prefWidth="66.0" style="-fx-background-radius: 100px;" text="Nouveau">
+                                        <Button mnemonicParsing="false" onAction="#handleNouvelleUe" prefHeight="25.0" prefWidth="66.0" style="-fx-background-radius: 100px;" text="Nouveau">
                                             <HBox.margin>
                                                 <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                             </HBox.margin>
                                         </Button>
-                                        <Button mnemonicParsing="false" onAction="#handleModifier" prefHeight="25.0" prefWidth="76.0" style="-fx-background-radius: 100px;" text="Editer">
+                                        <Button mnemonicParsing="false" onAction="#handleEditerUe" prefHeight="25.0" prefWidth="76.0" style="-fx-background-radius: 100px;" text="Editer">
                                             <HBox.margin>
                                                 <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                             </HBox.margin>
                                         </Button>
-                                        <Button mnemonicParsing="false" onAction="#handleEnregistrer" style="-fx-background-radius: 100px;" text="Enregistrer">
+                                        <Button mnemonicParsing="false" onAction="#handleEnregistrerUe" style="-fx-background-radius: 100px;" text="Enregistrer">
                                             <HBox.margin>
                                                 <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                             </HBox.margin>
                                         </Button>
-                                        <Button mnemonicParsing="false" onAction="#handleSupprimer" style="-fx-background-radius: 100px;" text="Supprimer">
+                                        <Button mnemonicParsing="false" onAction="#handleSupprimerUe" style="-fx-background-radius: 100px;" text="Supprimer">
                                             <HBox.margin>
                                                 <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                             </HBox.margin>
                                         </Button>
-                              <Button layoutX="306.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleCharger" style="-fx-background-radius: 100px;" text="Supprimer">
+                              <Button layoutX="297.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleCharger" prefHeight="25.0" prefWidth="62.0" style="-fx-background-radius: 100px;" text="Charger">
                                  <HBox.margin>
-                                    <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+                                    <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
                                  </HBox.margin>
                               </Button>
                                     </children>
@@ -288,6 +280,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#handleCandidat" text="Candidat" />
                   <MenuItem mnemonicParsing="false" onAction="#handleEtudiant" text="Etudiant" />
                   <MenuItem mnemonicParsing="false" onAction="#handleEstInscrit" text="Candidat inscrit" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleDiscipline" text="Discipline" />
                   <MenuItem mnemonicParsing="false" onAction="#handleAnonymat" text="Anonymat" />
                   <MenuItem mnemonicParsing="false" onAction="#handleNote" text="Note" />
                </items>
@@ -296,7 +289,6 @@
                <items>
                   <MenuItem mnemonicParsing="false" onAction="#handleEnseignant" text="Enseignant" />
                   <MenuItem mnemonicParsing="false" onAction="#handleEnseignement" text="Enseignement" />
-                  <MenuItem mnemonicParsing="false" onAction="#handleUe" text="Unité d'enseignement" />
                   <MenuItem mnemonicParsing="false" onAction="#handleModule" text="Module" />
                </items>
             </Menu>
