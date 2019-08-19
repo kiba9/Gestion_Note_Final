@@ -744,6 +744,18 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
+<<<<<<< HEAD
+    public void handleCharger() throws Exception{
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(Appli.class.getResource("../view/EmplacementDiscipline.fxml"));
+        BorderPane page = loader.load();
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Liste des messages envoyés");
+        dialogStage.getIcons().add(new Image("org/isj/interfaces/images/logo_isj.jpeg"));
+        Scene scene = new Scene(page);
+        dialogStage.setScene(scene);
+        dialogStage.show();
+=======
     public void handleCharger(){
         try{
             FileChooser fileChooser = new FileChooser();
@@ -773,5 +785,6 @@ public class DisciplineController implements Initializable {
             alert.show();
         }
         handleRaffraichir();
+>>>>>>> 3717e7d8806e45f5afd441055b5d705ab6f367ba
     }
 }

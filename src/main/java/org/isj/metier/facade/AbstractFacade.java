@@ -35,6 +35,16 @@ import static org.isj.gestionutilisateurs.Connexion.utilisateurCourant;
 
 public abstract class AbstractFacade<T> {
 
+    public static Map<String, String> properties = null;
+
+    public static Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public static void setProperties(Map<String, String> properties) {
+        AbstractFacade.properties = properties;
+    }
+
     private Class<T> entityClass;
 
     Method methodeSetCreateur;
@@ -71,7 +81,7 @@ public abstract class AbstractFacade<T> {
     static EntityManagerFactory emf;
 
     public static EntityManager getEntityManager() {
-        em = (em == null || !em.isOpen()) ? (emf == null ? Persistence.createEntityManagerFactory("NewPersistenceUnit").createEntityManager() : emf.createEntityManager()) : em;
+        em = (em == null || !em.isOpen()) ? (emf == null ? Persistence.createEntityManagerFactory("NewPersistenceUnit", properties).createEntityManager() : emf.createEntityManager()) : em;
         return em;
     }
 
