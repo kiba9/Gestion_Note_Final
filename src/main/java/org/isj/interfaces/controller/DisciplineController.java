@@ -744,34 +744,15 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleCharger(){
-        try{
-            FileChooser fileChooser = new FileChooser();
-
-            // Set extension filter
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                    "Excel files (*.xlsx)", "*.xlsx");
-            fileChooser.getExtensionFilters().add(extFilter);
-
-            // Show save file dialog
-            File file = fileChooser.showOpenDialog(Appli.getPrimaryStage);
-
-            if (file != null) {
-                //Isj.chargerEtudiant(file);
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.initOwner(Appli.getPrimaryStage);
-                alert.setTitle("ISJ");
-                alert.setContentText("SUCCES");
-                alert.show();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(Appli.getPrimaryStage);
-            alert.setTitle("ISJ");
-            alert.setContentText("Veuillez vérifier les paramètres du fichier".toUpperCase() + "!");
-            alert.show();
-        }
-        handleRaffraichir();
+    public void handleCharger() throws Exception{
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(Appli.class.getResource("../view/EmplacementDiscipline.fxml"));
+        BorderPane page = loader.load();
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Liste des messages envoyés");
+        dialogStage.getIcons().add(new Image("org/isj/interfaces/images/logo_isj.jpeg"));
+        Scene scene = new Scene(page);
+        dialogStage.setScene(scene);
+        dialogStage.show();
     }
 }

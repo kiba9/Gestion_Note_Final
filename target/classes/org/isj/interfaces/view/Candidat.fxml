@@ -79,6 +79,11 @@
                   <MenuItem mnemonicParsing="false" onAction="#handleDroit" text="Droit" />
               </items>
             </Menu>
+            <Menu mnemonicParsing="false" text="Paramètres">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleProprietes" text="Propriétés de l'application" />
+              </items>
+            </Menu>
          </menus>
       </MenuBar>
    </top>

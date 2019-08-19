@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
+
+    <persistence-unit name="NewPersistenceUnit">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+
+        <class>org.isj.metier.entites.Candidat</class>
+        <class>org.isj.metier.entites.Securite</class>
+        <class>org.isj.metier.entites.Etudiant</class>
+        <class>org.isj.metier.entites.Personne</class>
+        <class>org.isj.metier.entites.Session</class>
+        <class>org.isj.metier.entites.Message</class>
+
+        <class>org.isj.metier.entites.AnneeAcademique</class>
+        <class>org.isj.metier.entites.Anonymat</class>
+        <class>org.isj.metier.entites.Classe</class>
+        <class>org.isj.metier.entites.Discipline</class>
+        <class>org.isj.metier.entites.Email</class>
+        <class>org.isj.metier.entites.Sms</class>
+        <class>org.isj.metier.entites.Enseignant</class>
+        <class>org.isj.metier.entites.Enseignement</class>
+        <class>org.isj.metier.entites.EnvoiMessage</class>
+        <class>org.isj.metier.entites.EstInscrit</class>
+        <class>org.isj.metier.entites.Evaluation</class>
+        <class>org.isj.metier.entites.Filiere</class>
+        <class>org.isj.metier.entites.Role</class>
+        <class>org.isj.metier.entites.Module</class>
+        <class>org.isj.metier.entites.Note</class>
+        <class>org.isj.metier.entites.HistoriqueNote</class>
+        <class>org.isj.metier.entites.Niveau</class>
+        <class>org.isj.metier.entites.Droit</class>
+
+        <class>org.isj.metier.entites.Semestre</class>
+        <class>org.isj.metier.entites.Specialite</class>
+        <class>org.isj.metier.entites.TypeEvaluation</class>
+        <class>org.isj.metier.entites.UE</class>
+        <class>org.isj.metier.entites.Utilisateur</class>
+
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="${url}"/>
+            <property name="javax.persistence.jdbc.user" value="${username}"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.password" value="${password}"/>
+            <property name="javax.persistence.schema-generation.database.action" value="create"/>
+        </properties>
+    </persistence-unit>
+</persistence>
