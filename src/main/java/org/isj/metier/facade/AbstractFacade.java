@@ -17,7 +17,9 @@ package org.isj.metier.facade;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
@@ -32,6 +34,16 @@ import static org.isj.gestionutilisateurs.Connexion.utilisateurCourant;
 //import static org.isj.metier.Isj.utilisateurCourant;
 
 public abstract class AbstractFacade<T> {
+
+    public static Map<String, String> properties = null;
+
+    public static Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public static void setProperties(Map<String, String> properties) {
+        AbstractFacade.properties = properties;
+    }
 
     private Class<T> entityClass;
 
@@ -69,7 +81,7 @@ public abstract class AbstractFacade<T> {
     static EntityManagerFactory emf;
 
     public static EntityManager getEntityManager() {
-        em = (em == null || !em.isOpen()) ? (emf == null ? Persistence.createEntityManagerFactory("NewPersistenceUnit").createEntityManager() : emf.createEntityManager()) : em;
+        em = (em == null || !em.isOpen()) ? (emf == null ? Persistence.createEntityManagerFactory("NewPersistenceUnit", properties).createEntityManager() : emf.createEntityManager()) : em;
         return em;
     }
 

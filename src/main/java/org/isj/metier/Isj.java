@@ -57,6 +57,9 @@ public class Isj {
             System.out.println(secu.hashCode());
         }
 */
+       //new Isj().creerFichePresence("LIC 2", "Licence", "semestre 1", 2018, PATH_OUT_XLSX+"f.xlsx");
+
+
        // new EstInscritFacade().findAll();
 
        // System.out.println( new EtudiantFacade().find((long)3124).getMatricule());
@@ -554,18 +557,18 @@ public class Isj {
     /**
      * Fonction qui creer un fichier excel pour l'enregistrement des abscences
      *
-     * @param niv     le niveau pour lequelle ont veut generer la liste
+     * @param classe     le niveau pour lequelle ont veut generer la liste
      * @param filiere la filiere presice
      * @param annee   l'annee correspondante
      * @throws Exception en cas d'erreur
      */
-    public void creerFichePresence(int niv, String filiere, String semestre, int annee, String pathOut) throws Exception {
+    public void creerFichePresence(String classe, String filiere, String semestre, int annee, String pathOut) throws Exception {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet();
 
-        String sql = "{CALL isj.etud_class(?,?,?)}";
+        String sql = "{CALL etud_class(?,?,?)}";
         CallableStatement procEtudClass = new EtudiantFacade().getConnection().prepareCall(sql);
-        procEtudClass.setInt(1, niv);
+        procEtudClass.setString(1, classe);
         procEtudClass.setString(2, filiere);
         procEtudClass.setInt(3, annee);
         procEtudClass.execute();
@@ -611,8 +614,11 @@ public class Isj {
 
         sheet.setColumnWidth(0, 1000);
         sheet.setColumnWidth(1, 2700);
+        sheet.setColumnWidth(2, 3500);
+        sheet.setColumnWidth(3, 3500);
+        sheet.setColumnWidth(4, 3500);
 
-        InputStream imageStream = new FileInputStream(pathOut + "input.jpg");
+        InputStream imageStream = new FileInputStream( "src/main/java/org/isj/metier/input.jpg");
 
         XSSFDrawing drawing = sheet.createDrawingPatriarch();
         XSSFClientAnchor anchor = new XSSFClientAnchor();
@@ -662,7 +668,7 @@ public class Isj {
         row = sheet.createRow(11);
         row.createCell(1).setCellValue("Classe:");
         row.getCell(1).setCellStyle(cellLight);
-        row.createCell(2).setCellValue(filiere + " " + niv);
+        row.createCell(2).setCellValue(classe);
         row.getCell(2).setCellStyle(cellBold);
         sheet.addMergedRegion(new CellRangeAddress(11, 11, 2, 3));
         row = sheet.createRow(12);
@@ -840,6 +846,8 @@ public class Isj {
         sendEmail.sendAttachFile(maillist, "Fiche de Note ", "<h3>" + titre + "</h3>", pathOut);
 
     }
+
+
 
     /**
      * fonction qui renvoie la meilleure note et la pire note a une evaluation specifique
@@ -1232,6 +1240,52 @@ public class Isj {
         fis.close();
     }
 
+    public void importerDiscipline(String pathOut)throws IOException{
+        FileInputStream fis = new FileInputStream(new File(pathOut));
+        XSSFWorkbook workbook = new XSSFWorkbook(fis);
+
+        Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+        while (sheetIterator.hasNext()) {
+            Sheet sheet = sheetIterator.next();
+            String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
+            String oldMat = sheet.getRow(4).getCell(1).getStringCellValue();
+            String oldLibelle = sheet.getRow(4).getCell(1).getStringCellValue();
+
+            int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
+
+            Iterator<Row> rowIterator = sheet.iterator();
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                int numrow = row.getRowNum();
+
+                if (numrow > 2) {
+                    String libelle, libSemestre, matricule, description, nomEtud;
+                    Date Date_Displine;
+                    int Nbheure = 0, NbRetard = 0, heureJustifier = 0;
+
+                    description = row.getCell(0).getStringCellValue().trim();
+                    libelle = row.getCell(1).getStringCellValue();
+                    Date_Displine = row.getCell(2).getDateCellValue();
+                    Nbheure = (int)row.getCell(3).getNumericCellValue();
+                    NbRetard = (int)row.getCell(4).getNumericCellValue();
+                    libSemestre = row.getCell(5).getStringCellValue().toUpperCase().trim();
+
+
+                    matricule = description.substring(0,description.indexOf(" ")).trim();
+
+                    AnneeAcademique anneeAcademique = retrouverAnneeAcademique(Date_Displine);
+                    Semestre semestre = retrouverSemestre(libSemestre, anneeAcademique);
+                    Etudiant etudiant = retrouverEtudiantMatricule(matricule);
+
+                    Discipline discipline = new Discipline(libelle,description,etudiant,semestre,Nbheure,NbRetard,Date_Displine,0);
+                    new DisciplineFacade().create(discipline);
+                }
+            }
+        }
+        workbook.close();
+        fis.close();
+    }
+
     public void enregistrerNoteExcel(String cheminAcces) throws IOException, InvalidFormatException {
         Workbook workbook = new WorkbookFactory().create(new File(cheminAcces));
 
@@ -1516,7 +1570,7 @@ public class Isj {
      */
     public ArrayList rangEtudiant(int annee, int niv, String semestre, String filiere) throws SQLException {
 
-        String matricule = "", sql = "{? = CALL isj.mgp_sem(?,?,?,?)}", sql2 = "{CALL isj.etud_class(?,?,?)}";
+        String matricule = "", sql = "{? = CALL mgp_sem(?,?,?,?)}", sql2 = "{CALL etud_class(?,?,?)}";
         Connection con = new ClasseFacade().getConnection();
 
         HashMap<String, Float> listEtudMoy = new HashMap<>();
@@ -1557,6 +1611,8 @@ public class Isj {
         query.setParameter("email", email);
         return (Utilisateur) query.getSingleResult();
     }
+
+
 
     /**
      * fonction qui vérifie si un email est en BD
@@ -2013,6 +2069,37 @@ public class Isj {
         }
         return code;
 
+    }
+
+    public Properties writeSettingApplication(String url, String user, String password){
+        Properties properties = new Properties();
+        try(Writer inputStream = new FileWriter("config.properties")){
+
+            //setting the properties
+            properties.setProperty("javax.persistence.jdbc.url", "jdbc:mysql://"+url+"/isj2?zeroDateTimeBehavior=convertToNull");
+            properties.setProperty("javax.persistence.jdbc.user", user);
+            properties.setProperty("javax.persistence.jdbc.password", password);
+
+            //storing the properties in the file with a heading comment
+            properties.store(inputStream, "Database Information");
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return properties;
+    }
+
+    public Properties readSettingApplication() {
+        Properties properties = new Properties();
+        try(InputStream inputStream = new FileInputStream("config.properties")){
+            //load properties
+            properties.load(inputStream);
+
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return properties;
     }
 
 }

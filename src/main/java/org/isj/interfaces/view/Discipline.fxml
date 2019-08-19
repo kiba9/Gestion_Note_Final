@@ -258,6 +258,10 @@
                                                 <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                             </HBox.margin>
                                         </Button>
+                              <Button layoutX="393.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleCharger" prefHeight="25.0" prefWidth="75.0" style="-fx-background-radius: 100px;" text="Charger">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+                                 </HBox.margin></Button>
                                     </children>
                                     <padding>
                                         <Insets left="30.0" right="10.0" top="10.0" />
