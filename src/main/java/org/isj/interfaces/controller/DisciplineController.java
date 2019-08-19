@@ -744,6 +744,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
+<<<<<<< HEAD
     public void handleCharger() throws Exception{
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/EmplacementDiscipline.fxml"));
@@ -754,5 +755,36 @@ public class DisciplineController implements Initializable {
         Scene scene = new Scene(page);
         dialogStage.setScene(scene);
         dialogStage.show();
+=======
+    public void handleCharger(){
+        try{
+            FileChooser fileChooser = new FileChooser();
+
+            // Set extension filter
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "Excel files (*.xlsx)", "*.xlsx");
+            fileChooser.getExtensionFilters().add(extFilter);
+
+            // Show save file dialog
+            File file = fileChooser.showOpenDialog(Appli.getPrimaryStage);
+
+            if (file != null) {
+                new Isj().importerDiscipline(file.getAbsolutePath());
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.initOwner(Appli.getPrimaryStage);
+                alert.setTitle("ISJ");
+                alert.setContentText("SUCCES");
+                alert.show();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.initOwner(Appli.getPrimaryStage);
+            alert.setTitle("ISJ");
+            alert.setContentText("Veuillez vérifier les paramètres du fichier".toUpperCase() + "!");
+            alert.show();
+        }
+        handleRaffraichir();
+>>>>>>> 3717e7d8806e45f5afd441055b5d705ab6f367ba
     }
 }
