@@ -58,9 +58,8 @@ public class Isj {
         }
 */
        //new Isj().creerFichePresence("LIC 2", "Licence", "semestre 1", 2018, PATH_OUT_XLSX+"f.xlsx");
-       File ft = new File("src\\main\\java\\org\\isj\\idididid.dh");
-       FileInputStream fis = new FileInputStream(ft);
-        System.out.println(ft.getAbsolutePath());
+
+
        // new EstInscritFacade().findAll();
 
        // System.out.println( new EtudiantFacade().find((long)3124).getMatricule());
@@ -1612,6 +1611,8 @@ public class Isj {
         query.setParameter("email", email);
         return (Utilisateur) query.getSingleResult();
     }
+
+
 
     /**
      * fonction qui vérifie si un email est en BD

@@ -12,11 +12,16 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.apache.commons.collections.map.HashedMap;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
+import org.isj.metier.Isj;
+import org.isj.metier.facade.UtilisateurFacade;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 import static org.isj.gestionutilisateurs.Connexion.utilisateurCourant;
