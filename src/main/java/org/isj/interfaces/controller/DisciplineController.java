@@ -89,7 +89,7 @@ public class DisciplineController implements Initializable {
     private TableColumn<Discipline, Integer> absencecolumn;
 
     @FXML
-    private TableColumn<Discipline,Integer > retardcolumn;
+    private TableColumn<Discipline, Integer> retardcolumn;
 
     @FXML
     private TableColumn<Discipline, Etudiant> etudiantcolumn;
@@ -117,6 +117,7 @@ public class DisciplineController implements Initializable {
     public DisciplineController() {
 
     }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         operateurs.setItems(listOperateurs);
@@ -130,6 +131,7 @@ public class DisciplineController implements Initializable {
             e.printStackTrace();
         }
     }
+
     /**
      * Fonction permettant de lister les différents semestres
      */
@@ -138,12 +140,13 @@ public class DisciplineController implements Initializable {
         semestre.setItems(listeSemestre);
         AutoCompleteComboBoxListener<Semestre> Autocomplete = new AutoCompleteComboBoxListener<Semestre>(semestre);
     }
+
     /**
      * Fonction permettant de lister les différents etudiants
      */
     public void listeEtudiant() {
         listeEtudiant.addAll(new EtudiantFacade().lister());
-       etudiant.setItems(listeEtudiant);
+        etudiant.setItems(listeEtudiant);
         AutoCompleteComboBoxListener<Etudiant> Autocomplete = new AutoCompleteComboBoxListener<Etudiant>(etudiant);
     }
 
@@ -258,12 +261,12 @@ public class DisciplineController implements Initializable {
 
         if (Connexion.peutLire(Discipline.class) || Connexion.peutModifier(Discipline.class)) {
             try {
-                String descriptionDiscipline, libelleDiscipline,retardDiscipline,absenceDiscipline;
+                String descriptionDiscipline, libelleDiscipline, retardDiscipline, absenceDiscipline;
 
                 descriptionDiscipline = description.getText();
                 libelleDiscipline = libelle.getText();
                 retardDiscipline = retard.getText();
-               absenceDiscipline  = absence.getText();
+                absenceDiscipline = absence.getText();
                 Etudiant etudiantclasse = etudiant.getSelectionModel().getSelectedItem();
                 Semestre semestreclasse = semestre.getSelectionModel().getSelectedItem();
 
@@ -293,7 +296,6 @@ public class DisciplineController implements Initializable {
         }
         handleRaffraichir();
     }
-
 
 
     /**
@@ -427,7 +429,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleEtudiant() throws Exception{
+    public void handleEtudiant() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Etudiant.fxml"));
         BorderPane page = loader.load();
@@ -440,7 +442,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleNote() throws Exception{
+    public void handleNote() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Note.fxml"));
         BorderPane page = loader.load();
@@ -453,7 +455,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleAnonymat() throws Exception{
+    public void handleAnonymat() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Anonymat.fxml"));
         BorderPane page = loader.load();
@@ -466,7 +468,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleCandidat() throws Exception{
+    public void handleCandidat() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Candidat.fxml"));
         BorderPane page = loader.load();
@@ -479,7 +481,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleEstInscrit() throws Exception{
+    public void handleEstInscrit() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/EstInscrit.fxml"));
         BorderPane page = loader.load();
@@ -493,7 +495,7 @@ public class DisciplineController implements Initializable {
 
 
     @FXML
-    public void handleAnneeAcademique() throws Exception{
+    public void handleAnneeAcademique() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/AnneeAcademique.fxml"));
         BorderPane page = loader.load();
@@ -506,7 +508,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleSemestre() throws Exception{
+    public void handleSemestre() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Semestre.fxml"));
         BorderPane page = loader.load();
@@ -519,7 +521,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleEvaluation() throws Exception{
+    public void handleEvaluation() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Evaluation.fxml"));
         BorderPane page = loader.load();
@@ -532,7 +534,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleTypeEvaluation() throws Exception{
+    public void handleTypeEvaluation() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/TypeEvaluation.fxml"));
         BorderPane page = loader.load();
@@ -545,7 +547,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleHistoriqueNote() throws Exception{
+    public void handleHistoriqueNote() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/HistoriqueNote.fxml"));
         BorderPane page = loader.load();
@@ -559,7 +561,7 @@ public class DisciplineController implements Initializable {
 
 
     @FXML
-    public void handleClasse() throws Exception{
+    public void handleClasse() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Classe.fxml"));
         BorderPane page = loader.load();
@@ -572,7 +574,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleFiliere() throws Exception{
+    public void handleFiliere() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Filiere.fxml"));
         BorderPane page = loader.load();
@@ -585,7 +587,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleNiveau() throws Exception{
+    public void handleNiveau() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Niveau.fxml"));
         BorderPane page = loader.load();
@@ -598,7 +600,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleSpecialite() throws Exception{
+    public void handleSpecialite() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Specialite.fxml"));
         BorderPane page = loader.load();
@@ -612,7 +614,7 @@ public class DisciplineController implements Initializable {
 
 
     @FXML
-    public void handleEnseignant() throws Exception{
+    public void handleEnseignant() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Enseignant.fxml"));
         BorderPane page = loader.load();
@@ -625,7 +627,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleEnseignement() throws Exception{
+    public void handleEnseignement() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Enseignement.fxml"));
         BorderPane page = loader.load();
@@ -638,7 +640,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleUe() throws Exception{
+    public void handleUe() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Ue.fxml"));
         BorderPane page = loader.load();
@@ -651,7 +653,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleModule() throws Exception{
+    public void handleModule() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Module.fxml"));
         BorderPane page = loader.load();
@@ -665,7 +667,7 @@ public class DisciplineController implements Initializable {
 
 
     @FXML
-    public void handleUtilisateur() throws Exception{
+    public void handleUtilisateur() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Utilisateur.fxml"));
         BorderPane page = loader.load();
@@ -678,7 +680,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleRole() throws Exception{
+    public void handleRole() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Role.fxml"));
         BorderPane page = loader.load();
@@ -691,7 +693,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleDroit() throws Exception{
+    public void handleDroit() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Droit.fxml"));
         BorderPane page = loader.load();
@@ -705,7 +707,7 @@ public class DisciplineController implements Initializable {
 
 
     @FXML
-    public void handleSms() throws Exception{
+    public void handleSms() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Sms.fxml"));
         BorderPane page = loader.load();
@@ -718,7 +720,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleEmail() throws Exception{
+    public void handleEmail() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Email.fxml"));
         BorderPane page = loader.load();
@@ -731,7 +733,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-    public void handleEnvoiMessage() throws Exception{
+    public void handleEnvoiMessage() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/EnvoiMessage.fxml"));
         BorderPane page = loader.load();
@@ -744,8 +746,8 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-<<<<<<< HEAD
-    public void handleCharger() throws Exception{
+
+    public void handleCharger() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/EmplacementDiscipline.fxml"));
         BorderPane page = loader.load();
@@ -755,36 +757,5 @@ public class DisciplineController implements Initializable {
         Scene scene = new Scene(page);
         dialogStage.setScene(scene);
         dialogStage.show();
-=======
-    public void handleCharger(){
-        try{
-            FileChooser fileChooser = new FileChooser();
-
-            // Set extension filter
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                    "Excel files (*.xlsx)", "*.xlsx");
-            fileChooser.getExtensionFilters().add(extFilter);
-
-            // Show save file dialog
-            File file = fileChooser.showOpenDialog(Appli.getPrimaryStage);
-
-            if (file != null) {
-                new Isj().importerDiscipline(file.getAbsolutePath());
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.initOwner(Appli.getPrimaryStage);
-                alert.setTitle("ISJ");
-                alert.setContentText("SUCCES");
-                alert.show();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(Appli.getPrimaryStage);
-            alert.setTitle("ISJ");
-            alert.setContentText("Veuillez vérifier les paramètres du fichier".toUpperCase() + "!");
-            alert.show();
-        }
-        handleRaffraichir();
->>>>>>> 3717e7d8806e45f5afd441055b5d705ab6f367ba
     }
 }
