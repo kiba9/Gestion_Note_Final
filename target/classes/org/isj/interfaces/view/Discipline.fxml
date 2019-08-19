@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
@@ -30,7 +25,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="623.0" prefWidth="1021.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.isj.interfaces.controller.DisciplineController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="623.0" prefWidth="1021.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.isj.interfaces.controller.DisciplineController">
     <center>
         <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
@@ -263,11 +258,14 @@
                                                 <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                             </HBox.margin>
                                         </Button>
+<<<<<<< HEAD
+                              <Button layoutX="393.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleCharger" prefHeight="25.0" prefWidth="75.0" style="-fx-background-radius: 100px;" text="Charger">
+=======
                               <Button layoutX="306.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleCharger" style="-fx-background-radius: 100px;" text="Charger">
+>>>>>>> 3717e7d8806e45f5afd441055b5d705ab6f367ba
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
-                                 </HBox.margin>
-                              </Button>
+                                 </HBox.margin></Button>
                                     </children>
                                     <padding>
                                         <Insets left="30.0" right="10.0" top="10.0" />

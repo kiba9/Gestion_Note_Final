@@ -76,7 +76,10 @@
 		<property name="com.jaspersoft.studio.field.label" value="pourcentage"/>
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="credit" class="java.lang.Integer"/>
+	<field name="credit" class="java.lang.Long"/>
+	<variable name="variable1" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[(($F{moyenne} * Integer.parseInt( $F{pourcentage}.substring( 0, 2 ) )) /100)]]></variableExpression>
+	</variable>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -282,7 +285,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="4"/>
 								</textElement>
-								<textFieldExpression><![CDATA[0]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{numero}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -381,7 +384,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="4"/>
 								</textElement>
-								<textFieldExpression><![CDATA[0]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{credit_total} / 2]]></textFieldExpression>
 							</textField>
 							<staticText>
 								<reportElement x="0" y="40" width="23" height="10" uuid="d3ce1d91-c373-4b6a-8412-280a33ee800a"/>
@@ -632,7 +635,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 									<font size="4"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{credit_MEASURE} ]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{total_credit_module} / 2]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabTotalColumnHeader>
@@ -743,7 +746,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="4"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{credit_MEASURE}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{credit_MEASURE} / 2]]></textFieldExpression>
 							</textField>
 							<staticText>
 								<reportElement x="0" y="10" width="14" height="10" uuid="a13039f5-d89a-4512-a375-19853e37767f"/>
@@ -796,7 +799,7 @@
 				<measure name="pourcentage_MEASURE" class="java.lang.String">
 					<measureExpression><![CDATA[$F{pourcentage}]]></measureExpression>
 				</measure>
-				<measure name="credit_MEASURE" class="java.lang.Integer">
+				<measure name="credit_MEASURE" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{credit}]]></measureExpression>
 				</measure>
 				<measure name="code_module_MEASURE" class="java.lang.String">
@@ -804,6 +807,18 @@
 				</measure>
 				<measure name="variable_1" class="java.lang.Double" calculation="Sum">
 					<measureExpression><![CDATA[$F{moyenne} * Integer.parseInt( $F{pourcentage}.substring( 0, 2 ) )]]></measureExpression>
+				</measure>
+				<measure name="total_credit_module" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{credit}]]></measureExpression>
+				</measure>
+				<measure name="numero" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{numero}]]></measureExpression>
+				</measure>
+				<measure name="credit_total" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{credit}]]></measureExpression>
+				</measure>
+				<measure name="measure1" class="java.lang.Double">
+					<measureExpression><![CDATA[$V{variable1}]]></measureExpression>
 				</measure>
 				<crosstabCell width="16" height="20">
 					<cellContents mode="Opaque" style="Crosstab_CD">
@@ -880,7 +895,7 @@
 : 0]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="39" y="0" width="13" height="20" uuid="78c4faf2-b7a9-4428-9b6e-07a57bfd484e"/>
+							<reportElement mode="Transparent" x="39" y="0" width="13" height="20" forecolor="#000000" uuid="78c4faf2-b7a9-4428-9b6e-07a57bfd484e"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -911,7 +926,7 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{measure1}]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement x="14" y="0" width="12" height="20" uuid="88729721-b7dd-4256-98c4-ca277f884160"/>

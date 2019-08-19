@@ -12,11 +12,16 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.apache.commons.collections.map.HashedMap;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
+import org.isj.metier.Isj;
+import org.isj.metier.facade.UtilisateurFacade;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 import static org.isj.gestionutilisateurs.Connexion.utilisateurCourant;
@@ -32,9 +37,6 @@ public class ConnexionController implements Initializable {
 
     @FXML
     private TextField password;
-
-    private Stage dialogStage;
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -91,6 +93,8 @@ public class ConnexionController implements Initializable {
             if (isInputValid.equals("")) {
                 log = login.getText();
                 pass = password.getText();
+                Properties properties = new Isj().readSettingApplication();
+                new UtilisateurFacade().setProperties((Map)properties);
                 utilisateurCourant = new Connexion().connect(log, pass);
                 if (utilisateurCourant != null) {
                     FXMLLoader loader = new FXMLLoader();
@@ -122,5 +126,18 @@ public class ConnexionController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    public void handleSetting() throws Exception{
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(Appli.class.getResource("../view/Properties.fxml"));
+        BorderPane page = loader.load();
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Propriétés de l'application");
+        dialogStage.getIcons().add(new Image("org/isj/interfaces/images/logo_isj.jpeg"));
+        Scene scene = new Scene(page);
+        dialogStage.setScene(scene);
+        dialogStage.show();
     }
 }

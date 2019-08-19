@@ -58,9 +58,8 @@ public class Isj {
         }
 */
        //new Isj().creerFichePresence("LIC 2", "Licence", "semestre 1", 2018, PATH_OUT_XLSX+"f.xlsx");
-       File ft = new File("src\\main\\java\\org\\isj\\idididid.dh");
-       FileInputStream fis = new FileInputStream(ft);
-        System.out.println(ft.getAbsolutePath());
+
+
        // new EstInscritFacade().findAll();
 
        // System.out.println( new EtudiantFacade().find((long)3124).getMatricule());
@@ -1613,6 +1612,8 @@ public class Isj {
         return (Utilisateur) query.getSingleResult();
     }
 
+
+
     /**
      * fonction qui vérifie si un email est en BD
      *
@@ -2068,6 +2069,37 @@ public class Isj {
         }
         return code;
 
+    }
+
+    public Properties writeSettingApplication(String url, String user, String password){
+        Properties properties = new Properties();
+        try(Writer inputStream = new FileWriter("config.properties")){
+
+            //setting the properties
+            properties.setProperty("javax.persistence.jdbc.url", "jdbc:mysql://"+url+"/isj2?zeroDateTimeBehavior=convertToNull");
+            properties.setProperty("javax.persistence.jdbc.user", user);
+            properties.setProperty("javax.persistence.jdbc.password", password);
+
+            //storing the properties in the file with a heading comment
+            properties.store(inputStream, "Database Information");
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return properties;
+    }
+
+    public Properties readSettingApplication() {
+        Properties properties = new Properties();
+        try(InputStream inputStream = new FileInputStream("config.properties")){
+            //load properties
+            properties.load(inputStream);
+
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return properties;
     }
 
 }
