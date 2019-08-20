@@ -11,9 +11,7 @@
 	<parameter name="sexe" class="java.lang.String"/>
 	<parameter name="matricule" class="java.lang.String"/>
 	<parameter name="rang_semestriel" class="java.lang.Integer"/>
-	<parameter name="semestre" class="java.lang.String">
-		<defaultValueExpression><![CDATA[$F{Semestre}]]></defaultValueExpression>
-	</parameter>
+	<parameter name="semestre" class="java.lang.String"/>
 	<parameter name="rang_annuel" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[Call releve_note($P{matricule},$P{niveau},$P{annee_academique})]]>
@@ -545,7 +543,7 @@
 					<textElement verticalAlignment="Middle">
 						<font size="7" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{module}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[ $F{module}]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement mode="Opaque" x="477" y="0" width="66" height="9" backcolor="#CCCCCC" uuid="2dd2cac1-ab27-416c-985e-1d102b5dc923"/>
@@ -906,7 +904,7 @@
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{ue}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[ $F{ue}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="301" y="0" width="44" height="11" uuid="d3057265-bbdc-4740-a2b2-04d67a312bf4"/>

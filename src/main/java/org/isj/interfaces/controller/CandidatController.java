@@ -939,7 +939,7 @@ public class CandidatController implements Initializable {
 
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/Connexion.fxml"));
-        BorderPane page = loader.load();
+        AnchorPane page = loader.load();
         Stage dialogStage = new Stage();
         dialogStage.setTitle("ISJ");
         dialogStage.getIcons().add(new Image("org/isj/interfaces/images/logo_isj.jpeg"));

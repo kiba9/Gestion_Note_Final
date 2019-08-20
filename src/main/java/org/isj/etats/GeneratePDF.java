@@ -34,7 +34,7 @@ public class GeneratePDF {
     public static void genererReleve(String matricule, int niveau, int annee) {
 
         Etudiant etudiant = new Isj().retrouverEtudiantMatricule(matricule);
-        Semestre semestre = new Isj().retrouverSemestre("", AnneeAcademique.class.cast(annee));
+        //Semestre semestre = new Isj().retrouverSemestre("", AnneeAcademique.class.cast(annee));
 
         // - Paramètres de Connexion à la base de données
         String url = "jdbc:mysql://localhost:3306/isj2";
@@ -49,7 +49,7 @@ public class GeneratePDF {
             connection = DriverManager.getConnection(url, login, password);
 
             // - Chargement et compilation du rapport
-            JasperDesign jasperDesign = JRXmlLoader.load("C:\\Users\\User\\Documents\\GitHub\\Gestion_Note_Final\\target\\classes\\org\\isj\\etats\\ReleveFinal.jrxml");
+            JasperDesign jasperDesign = JRXmlLoader.load("C:\\Users\\User\\Documents\\GitHub\\Gestion_Note_Final\\src\\main\\java\\org\\isj\\etats\\ReleveFinal.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
 
             // - Paramètres à envoyer au rapport
@@ -62,11 +62,11 @@ public class GeneratePDF {
             parameters.put("sexe",etudiant.getSexe());
             parameters.put("matricule",matricule);
             Isj isj = new Isj();
-            if("semestre".equalsIgnoreCase(semestre.getLibelle())){
-                ArrayList re1 = isj.rangEtudiant(annee, niveau, semestre.getLibelle(), etudiant.getClasse().getSpecialite().getFiliere().toString());
+            if("semestre".equalsIgnoreCase("Semestre 1")){
+                ArrayList re1 = isj.rangEtudiant(annee, niveau, "Semestre 1", etudiant.getClasse().getSpecialite().getFiliere().toString());
                 parameters.put("rang_semestriel",re1.indexOf(matricule)+1);
             }else{
-                ArrayList re2 = isj.rangEtudiant(annee, niveau, semestre.getLibelle(), etudiant.getClasse().getSpecialite().getFiliere().toString());
+                ArrayList re2 = isj.rangEtudiant(annee, niveau, "Semestre 2", etudiant.getClasse().getSpecialite().getFiliere().toString());
                 parameters.put("rang_semestriel",re2.indexOf(matricule)+1);
             }
 
@@ -74,7 +74,7 @@ public class GeneratePDF {
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
 
             // - Création du rapport au format PDF
-            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:\\Users\\User\\Desktop\\" + etudiant.getNom() + " " + etudiant.getPrenom());
+            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:\\Users\\User\\Desktop\\etudiant1.pdf");
         } catch (Exception e) {
 
             e.printStackTrace();

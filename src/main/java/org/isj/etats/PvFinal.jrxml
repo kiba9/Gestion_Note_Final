@@ -48,9 +48,6 @@
 	<queryString>
 		<![CDATA[call pv($P{filiere}, $P{niveau}, $P{annee_academique}, $P{semestre})]]>
 	</queryString>
-	<field name="numero" class="java.lang.Long">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
 	<field name="matricule" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="matricule"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="etudiant"/>
@@ -77,9 +74,10 @@
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="credit" class="java.lang.Long"/>
-	<variable name="variable1" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[(($F{moyenne} * Integer.parseInt( $F{pourcentage}.substring( 0, 2 ) )) /100)]]></variableExpression>
-	</variable>
+	<field name="cred" class="java.lang.Long"/>
+	<field name="cred3" class="java.lang.Long"/>
+	<field name="cred2" class="java.lang.Long"/>
+	<field name="penalites" class="java.lang.Float"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -285,7 +283,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="4"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{numero}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[0]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -311,7 +309,7 @@
 								<textElement verticalAlignment="Middle">
 									<font size="4"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{nom_prenom}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[ $V{nom_prenom}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -384,7 +382,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="4"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{credit_total} / 2]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{credit_total}]]></textFieldExpression>
 							</textField>
 							<staticText>
 								<reportElement x="0" y="40" width="23" height="10" uuid="d3ce1d91-c373-4b6a-8412-280a33ee800a"/>
@@ -635,7 +633,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 									<font size="4"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{total_credit_module} / 2]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{credit_total}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabTotalColumnHeader>
@@ -746,7 +744,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="4"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{credit_MEASURE} / 2]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{credit_MEASURE}]]></textFieldExpression>
 							</textField>
 							<staticText>
 								<reportElement x="0" y="10" width="14" height="10" uuid="a13039f5-d89a-4512-a375-19853e37767f"/>
@@ -808,17 +806,26 @@
 				<measure name="variable_1" class="java.lang.Double" calculation="Sum">
 					<measureExpression><![CDATA[$F{moyenne} * Integer.parseInt( $F{pourcentage}.substring( 0, 2 ) )]]></measureExpression>
 				</measure>
-				<measure name="total_credit_module" class="java.lang.Long" calculation="Sum">
-					<measureExpression><![CDATA[$F{credit}]]></measureExpression>
-				</measure>
-				<measure name="numero" class="java.lang.Long">
-					<measureExpression><![CDATA[$F{numero}]]></measureExpression>
-				</measure>
 				<measure name="credit_total" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{credit}]]></measureExpression>
 				</measure>
-				<measure name="measure1" class="java.lang.Double">
-					<measureExpression><![CDATA[$V{variable1}]]></measureExpression>
+				<measure name="credit_etudiant_MEASURE" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{cred}]]></measureExpression>
+				</measure>
+				<measure name="penalites" class="java.lang.Float" calculation="First">
+					<measureExpression><![CDATA[$F{penalites}]]></measureExpression>
+				</measure>
+				<measure name="variable_2" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[(($F{moyenne} * Integer.parseInt( $F{pourcentage}.substring( 0, 2 ) )) / 100) * $F{cred}]]></measureExpression>
+				</measure>
+				<measure name="total_cred" class="java.lang.Integer" calculation="Sum">
+					<measureExpression><![CDATA[$F{cred}]]></measureExpression>
+				</measure>
+				<measure name="cred3" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{cred3}]]></measureExpression>
+				</measure>
+				<measure name="sum_credit_etudiant" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{cred2}]]></measureExpression>
 				</measure>
 				<crosstabCell width="16" height="20">
 					<cellContents mode="Opaque" style="Crosstab_CD">
@@ -852,7 +859,7 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{variable_1} / 100]]></textFieldExpression>
+							<textFieldExpression><![CDATA[($V{variable_1} / 100) - $V{penalites}]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement x="14" y="0" width="12" height="20" uuid="eb6b99da-25dc-4dee-b9ca-ea93b7a9a526"/>
@@ -879,7 +886,7 @@
     : ((($V{variable_1} / 100) >= 0) && (($V{variable_1} / 100) < 6)) ? "F"
     : "NULL"]]></textFieldExpression>
 						</textField>
-						<textField>
+						<textField pattern="" isBlankWhenNull="false">
 							<reportElement x="26" y="0" width="13" height="20" uuid="5ebe3925-35c2-477c-b26a-67f789f60bf1"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -891,8 +898,7 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[(($V{variable_1} / 100) >= 9) ? $V{credit_MEASURE}
-: 0]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{credit_etudiant_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement mode="Transparent" x="39" y="0" width="13" height="20" forecolor="#000000" uuid="78c4faf2-b7a9-4428-9b6e-07a57bfd484e"/>
@@ -914,7 +920,7 @@
 				</crosstabCell>
 				<crosstabCell width="48" height="20" columnTotalGroup="ue">
 					<cellContents mode="Opaque" style="Crosstab_CG">
-						<textField>
+						<textField isStretchWithOverflow="true" pattern="###0.00">
 							<reportElement x="0" y="0" width="14" height="20" uuid="6a869446-71ca-4632-a14b-ba563f80bea0"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -926,7 +932,7 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{measure1}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[($V{variable_2} / $V{cred3}) - $V{penalites}]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement x="14" y="0" width="12" height="20" uuid="88729721-b7dd-4256-98c4-ca277f884160"/>
@@ -940,7 +946,18 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
+							<textFieldExpression><![CDATA[(((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 18) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) <= 20)) ? "A+"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 16) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 18)) ? "A"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 14) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 16)) ? "B+"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 13) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 14)) ? "B"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 12) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 13)) ? "B-"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 11) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 12)) ? "C+"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 10) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 11)) ? "C"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 9) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 10)) ? "C-"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 8) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 9)) ? "D"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 6) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 8)) ? "E"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 0) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 6)) ? "F"
+    : "NULL"]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement x="26" y="0" width="11" height="20" uuid="6908d273-cb1f-4d15-abea-e56bfc88e031"/>
@@ -954,7 +971,7 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{sum_credit_etudiant}]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement x="37" y="0" width="11" height="20" uuid="976fe581-05e8-4568-9b1e-b5425b0f46c8"/>
@@ -968,13 +985,15 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
+							<textFieldExpression><![CDATA[((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 10) ? "CA"
+: (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 9) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) <= 9)) ? "CANT"
+: "NC"]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell width="87" height="20" columnTotalGroup="module">
 					<cellContents mode="Opaque" style="Crosstab_CT">
-						<textField>
+						<textField pattern="###0.00">
 							<reportElement x="0" y="0" width="23" height="20" uuid="f56fc6a1-4866-41b7-8d62-d6fafad495dd"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -986,7 +1005,7 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
+							<textFieldExpression><![CDATA[($V{variable_2} / $V{cred3}) - $V{penalites}]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement x="23" y="0" width="15" height="20" uuid="92612af8-d4f5-44be-ab11-9121ee80998d"/>
@@ -1000,7 +1019,18 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
+							<textFieldExpression><![CDATA[(((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 18) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) <= 20)) ? "4.00"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 16) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 18)) ? "3.70"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 14) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 16)) ? "3.30"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 13) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 14)) ? "3.00"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 12) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 13)) ? "2.70"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 11) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 12)) ? "2.30"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 10) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 11)) ? "2.00"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 9) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 10)) ? "1.70"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 8) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 9)) ? "1.30"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 6) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 8)) ? "1.00"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 0) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 6)) ? "0.00"
+    : "NULL"]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement x="38" y="0" width="14" height="20" uuid="2ac75f85-9328-448f-9c12-d8dee8e66063"/>
@@ -1014,7 +1044,18 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
+							<textFieldExpression><![CDATA[(((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 18) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) <= 20)) ? "A+"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 16) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 18)) ? "A"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 14) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 16)) ? "B+"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 13) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 14)) ? "B"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 12) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 13)) ? "B-"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 11) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 12)) ? "C+"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 10) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 11)) ? "C"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 9) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 10)) ? "C-"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 8) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 9)) ? "D"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 6) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 8)) ? "E"
+    : (((($V{variable_2} / $V{cred3}) - $V{penalites}) >= 0) && ((($V{variable_2} / $V{cred3}) - $V{penalites}) < 6)) ? "F"
+    : "NULL"]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement x="52" y="0" width="17" height="20" uuid="b6078ae6-8156-4c93-8249-58a256beb8e3"/>
@@ -1028,7 +1069,7 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{sum_credit_etudiant}]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement x="69" y="0" width="18" height="20" uuid="47ca5df6-39fd-4fdd-8f40-c317b0608cd0"/>
@@ -1042,7 +1083,7 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="5"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
+							<textFieldExpression><![CDATA[( $V{penalites} != 0 ? -$V{penalites} : 0 )]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>

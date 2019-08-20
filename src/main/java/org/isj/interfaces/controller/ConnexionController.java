@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.apache.commons.collections.map.HashedMap;
 import org.isj.gestionutilisateurs.Connexion;
 import org.isj.interfaces.main.Appli;
 import org.isj.metier.Isj;
