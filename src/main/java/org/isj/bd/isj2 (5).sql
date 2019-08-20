@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.3
+-- version 4.8.0
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1:3306
--- Généré le :  lun. 12 août 2019 à 14:14
--- Version du serveur :  5.7.23
--- Version de PHP :  7.2.10
+-- Hôte : 127.0.0.1
+-- Généré le :  mar. 20 août 2019 à 17:05
+-- Version du serveur :  10.1.31-MariaDB
+-- Version de PHP :  7.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -26,7 +26,6 @@ DELIMITER $$
 --
 -- Procédures
 --
-DROP PROCEDURE IF EXISTS `abs`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `abs` (IN `niv` INT, IN `fil` VARCHAR(255), IN `ans` INT, IN `sem` VARCHAR(255))  BEGIN
 SELECT distinct matricule,CONCAT(nom," ",prenom) as pers,MONTHNAME(date_retard) as mois,nb_heures_absences,heure_justifie,(nb_heures_absences-heure_justifie) as HNJ
 from etudiant, filiere, note, type_evaluation, module, est_inscrit, candidat, evaluation, enseignement, ue, niveau, classe, specialite, annee_academique, semestre,discipline
@@ -53,7 +52,11 @@ and semestre.libelle=sem
 and filiere.libelle=fil;
 end$$
 
-DROP PROCEDURE IF EXISTS `AFFICHER_NOTE`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `add_tmp` (IN `ue` VARCHAR(255))  BEGIN
+	#Routine body goes here...
+INSERT INTO tmp_ue(tmp_ue.codeue) values(ue);
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `AFFICHER_NOTE` (IN `eval` VARCHAR(255), IN `code_ue` VARCHAR(255), IN `code_authentification` VARCHAR(255))  BEGIN
 	select DISTINCT valeur_note, ue.code_ue as code_ue, type_evaluation.libelle as examen
 from etudiant, filiere, note, type_evaluation, module, est_inscrit, candidat, evaluation, enseignement, ue, niveau, classe, specialite
@@ -77,7 +80,6 @@ and ue.module=module.`code`;
 
 END$$
 
-DROP PROCEDURE IF EXISTS `cursus`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `cursus` (IN `mat` VARCHAR(255))  BEGIN
 	#Routine body goes here...
 	select matricule, CONCAT(filiere.libelle," ",niveau.numero) as niveau,ue.code_ue as codeue,
@@ -145,35 +147,39 @@ group by ue.libelle
 order by annee,semestre;
 END$$
 
-DROP PROCEDURE IF EXISTS `etud_class`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `etud_class` (IN `niv` INT, IN `fil` VARCHAR(255), IN `ans` INT)  BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `disci` (IN `an` INT, IN `clib` VARCHAR(255), IN `sem` VARCHAR(255))  NO SQL
+BEGIN
+	#Routine body goes here...
+	SELECT matricule,CONCAT(nom," ",prenom),MONTHNAME(date_retard), SUM(nb_heures_absences)
+	FROM candidat,etudiant,discipline,semestre,annee_academique,classe
+	WHERE candidat.code=etudiant.code
+    and candidat.classe=classe.code
+	and etudiant.`code`=discipline.etudiant
+	and discipline.semestre=semestre.`code`
+	and semestre.annee_academique=annee_academique.`code`
+	and EXTRACT(year from annee_academique.date_debut)=an
+	and candidat.classe=classe.`code`
+	and classe.libelle=clib
+	and semestre.libelle=sem
+    GROUP BY matricule,MONTHNAME(date_retard)
+	order by CONCAT(nom," ",prenom),semestre.libelle asc;
+	
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `etud_class` (IN `class` VARCHAR(255), IN `fil` VARCHAR(255), IN `ans` INT)  BEGIN
 	#Routine body goes here...
 		select DISTINCT matricule, CONCAT(nom, " ", prenom)
-from etudiant, filiere, note, type_evaluation, module, est_inscrit, candidat, evaluation, enseignement, ue, niveau, classe, specialite, annee_academique, semestre,discipline
-where note.est_inscrit=est_inscrit.code
-and discipline.etudiant=etudiant.`code`
-and discipline.semestre=semestre.`code`
-and est_inscrit.enseignement=enseignement.code
-and enseignement.ue=ue.`code`
-and enseignement.semestre=semestre.`code`
-and semestre.annee_academique=annee_academique.`code`
-and extract(year from annee_academique.date_debut)=ans
-and est_inscrit.candidat_inscrit=candidat.`code`
-and evaluation.type_evaluation=type_evaluation.`code`
-and ue.module=module.`code`
-and note.evaluation=evaluation.`code`
+from etudiant, filiere,candidat,niveau, classe, specialite, annee_academique, semestre
+where extract(year from annee_academique.date_debut)=ans
 and candidat.code=etudiant.code
 and candidat.classe=classe.`code`
 and classe.specialite=specialite.`code`
 and specialite.filiere=filiere.`code`
-and type_evaluation.enseignement=enseignement.`code`
-and ue.module=module.`code`
 and filiere.libelle=fil
-and niveau.numero= niv;
+and classe.libelle=class;
 
 END$$
 
-DROP PROCEDURE IF EXISTS `inf_etud`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `inf_etud` (IN `mat` VARCHAR(255))  SELECT nom,prenom,date_naissance,sexe,matricule,filiere.libelle as filiere,niveau.numero as niveau
 from candidat,filiere,classe,niveau,specialite,etudiant
 where candidat.code=etudiant.code
@@ -183,16 +189,16 @@ AND specialite.filiere=filiere.code
 AND classe.niveau=niveau.code
 AND etudiant.matricule=mat$$
 
-DROP PROCEDURE IF EXISTS `pv`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ins_EnsUe` (IN `codeue` VARCHAR(255))  BEGIN
+	#Routine body goes here...
+	INSERT INTO EnsUe(ue) values (codeue);
+
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `pv` (IN `fil` VARCHAR(255), IN `niv` INT, IN `an` INT, IN `sem` VARCHAR(255))  BEGIN
-	select DISTINCT matricule,CONCAT(UPPER(nom)," ",UPPER(prenom)) as nom_prenom, niveau.description as niveau,
-module.libelle as module,ue.code_ue as codeue, ue.libelle as ue,( case when type_evaluation.libelle="Controle continu" then moy_ue_etud_typ_ev(matricule,enseignement.`code`)
-else valeur_note END) as moyenne,grade(moyenne_ue_etudiant(matricule,enseignement.`code`))as grade,type_evaluation.libelle,CONCAT(type_evaluation.pourcentage,"%") as pourcentage,decision(( case when type_evaluation.libelle="Controle continu" then moyenne_ue_etudiant(matricule,enseignement.`code`)
-else valeur_note END)) as decision,(case when (moyenne_ue_etudiant(matricule,enseignement.`code`) >=9) 
- THEN credits
-	when (moyenne_ue_etudiant(matricule,enseignement.`code`)<9) THEN
-      0
- END) as credits, extract(year from annee_academique.date_debut) as annee
+select DISTINCT matricule,CONCAT(UPPER(nom)," ",UPPER(prenom)) as nom_prenom,module.libelle as module,module.code_module as codemo, ue.libelle as ue,( case when type_evaluation.libelle="Controle continu" then moy_ue_etud_typ_ev(matricule,enseignement.`code`)
+else valeur_note END) as moyenne,type_evaluation.libelle as intitule,CONCAT(type_evaluation.pourcentage,"%") as pourcentage,
+(case when type_evaluation.libelle="SN" then add_tmp2(ue.code_ue,credits) else 0 END)  as credit,(case when moyenne_ue_etudiant(matricule, enseignement.code)>=9 then credits else 0 END) as cred,(CASE when type_evaluation.libelle="SN" then credits else 0 END ) as cred3, (case when moyenne_ue_etudiant(matricule, enseignement.code)>=9 and type_evaluation.libelle="SN" then credits else 0 END) as cred2,penalites(matricule,an,sem) as penalites
 from etudiant, filiere, note, type_evaluation, module, est_inscrit, candidat, evaluation, enseignement, ue, niveau, classe, specialite, annee_academique, semestre
 where note.est_inscrit=est_inscrit.code
 and est_inscrit.enseignement=enseignement.code
@@ -210,14 +216,14 @@ and classe.specialite=specialite.`code`
 and specialite.filiere=filiere.`code`
 and type_evaluation.enseignement=enseignement.`code`
 and ue.module=module.`code`
-and niveau.numero= niv
+and niveau.numero=niv
 and filiere.libelle=fil
 and semestre.libelle=sem
 group by matricule,ue.libelle,type_evaluation.libelle
-order by nom;
+order by nom_prenom,codemo,ue;
+delete FROM tmp_ue;
 END$$
 
-DROP PROCEDURE IF EXISTS `releve_note`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `releve_note` (IN `mat` VARCHAR(255), IN `niv` INT, IN `an` INT)  BEGIN
 	#Routine body goes here...
 	select DISTINCT matricule, niveau.description as niveau,ue.code_ue as codeue,module.code_module,
@@ -226,7 +232,7 @@ module.libelle as module, ue.libelle as ue, extract(year from annee_academique.d
      CONCAT(credits,"/",credits)
 	when (moyenne_ue_etudiant(mat,enseignement.`code`)<9) THEN
       CONCAT("0/",credits)
- END) as credits,(case when COUNT(case when type_evaluation.libelle='rattrapage' then 1 else NULL end )=1 then CONCAT('Rattrapge',' ',extract(year from annee_academique.date_debut)) when COUNT(case when type_evaluation.libelle='Rattrapage' then 1 else NULL end )=0 then CONCAT('Normale',' ',extract(year from annee_academique.date_debut))end) as Session,semestre.libelle as Semestre,penalites(mat,niv,an,semestre.libelle) as penalites
+ END) as credits,(case when COUNT(case when type_evaluation.libelle='rattrapage' then 1 else NULL end )=1 then CONCAT('Rattrapge',' ',extract(year from annee_academique.date_debut)) when COUNT(case when type_evaluation.libelle='Rattrapage' then 1 else NULL end )=0 then CONCAT('Normale',' ',extract(year from annee_academique.date_debut))end) as Session,semestre.libelle as Semestre,penalites(mat,an,semestre.libelle) as penalites
 from etudiant, filiere, note, type_evaluation, module, est_inscrit, candidat, evaluation, enseignement, ue, niveau, classe, specialite, annee_academique, semestre,discipline
 where note.est_inscrit=est_inscrit.code
 and discipline.etudiant=etudiant.`code`
@@ -249,15 +255,30 @@ and ue.module=module.`code`
 and etudiant.matricule=`mat`
 and niveau.numero= niv
 and classe.niveau=niveau.`code`
-group by ue.libelle,semestre
-order by semestre asc;
+group by module.libelle,ue.libelle,semestre
+order by semestre,module.libelle asc;
 
 END$$
 
 --
 -- Fonctions
 --
-DROP FUNCTION IF EXISTS `decision`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `add_tmp2` (`codeue` VARCHAR(255), `credits` INT(11)) RETURNS INT(11) BEGIN
+	#Routine body goes here...
+	DECLARE resultat int(11);
+	
+if (not EXISTS (select tmp_ue.codeue from tmp_ue
+where codeue=tmp_ue.codeue)) then
+SET resultat=credits;
+	INSERT INTO tmp_ue(tmp_ue.codeue) values(codeue);
+else	
+SET resultat=0;
+end if;
+
+return resultat;
+	
+END$$
+
 CREATE DEFINER=`root`@`localhost` FUNCTION `decision` (`val` FLOAT) RETURNS VARCHAR(255) CHARSET latin1 BEGIN
 	#Routine body goes here...
 	declare resultat varchar(255);
@@ -273,7 +294,6 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `decision` (`val` FLOAT) RETURNS VARC
 	RETURN resultat;
 END$$
 
-DROP FUNCTION IF EXISTS `grade`$$
 CREATE DEFINER=`root`@`localhost` FUNCTION `grade` (`val` FLOAT) RETURNS VARCHAR(255) CHARSET latin1 BEGIN
 	#Routine body goes here...
 	declare resultat VARCHAR(255);
@@ -306,7 +326,27 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `grade` (`val` FLOAT) RETURNS VARCHAR
 	RETURN resultat;
 END$$
 
-DROP FUNCTION IF EXISTS `mgp`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `mat_par` (`fil` VARCHAR(255), `niv` INT, `an` INT, `sem` VARCHAR(255)) RETURNS INT(11) BEGIN
+	#Routine body goes here...
+	DECLARE resultat int;
+	SELECT COUNT(distinct enseignement.libelle) into resultat
+	FROM enseignement,semestre,annee_academique,niveau,ue,specialite,classe,filiere
+	where enseignement.ue=ue.`code`
+	and ue.niveau=niveau.`code`
+	AND enseignement.semestre=semestre.`code`
+	and semestre.annee_academique=annee_academique.`code`
+	and specialite.filiere=filiere.code
+	and classe.niveau=niveau.`code`
+	and classe.specialite=specialite.`code`
+	and filiere.libelle=fil
+	and niveau.numero=niv
+	and EXTRACT(year from annee_academique.date_debut)=an
+	and semestre.libelle=sem;
+	
+
+	RETURN resultat;
+END$$
+
 CREATE DEFINER=`root`@`localhost` FUNCTION `mgp` (`val` FLOAT) RETURNS DECIMAL(10,1) BEGIN
 	#Routine body goes here...
  declare resultat DECIMAL(10,1);
@@ -339,7 +379,6 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `mgp` (`val` FLOAT) RETURNS DECIMAL(1
 
 END$$
 
-DROP FUNCTION IF EXISTS `mgp_sem`$$
 CREATE DEFINER=`root`@`localhost` FUNCTION `mgp_sem` (`mat` VARCHAR(255), `niv` BIGINT(20), `ans` BIGINT(20), `sem` VARCHAR(255)) RETURNS FLOAT BEGIN
 	#Routine body goes here...
 	declare resultat float;
@@ -371,7 +410,6 @@ return resultat;
 
 END$$
 
-DROP FUNCTION IF EXISTS `moyenne_ue_etudiant`$$
 CREATE DEFINER=`root`@`localhost` FUNCTION `moyenne_ue_etudiant` (`matricule_etudiant` VARCHAR(255), `codeenseignement` BIGINT(20)) RETURNS FLOAT BEGIN
 
 DECLARE resultat float;
@@ -401,7 +439,6 @@ and classe.niveau=niveau.`code`;
 	
 END$$
 
-DROP FUNCTION IF EXISTS `moy_sem`$$
 CREATE DEFINER=`root`@`localhost` FUNCTION `moy_sem` (`mat` VARCHAR(255), `niv` BIGINT(20), `ans` BIGINT(20), `sem` VARCHAR(255)) RETURNS FLOAT BEGIN
 	#Routine body goes here...
 	declare resultat float;
@@ -433,7 +470,6 @@ return resultat;
 
 END$$
 
-DROP FUNCTION IF EXISTS `moy_ue_etud_typ_ev`$$
 CREATE DEFINER=`root`@`localhost` FUNCTION `moy_ue_etud_typ_ev` (`matricule_etudiant` VARCHAR(255), `codeenseignement` BIGINT(20)) RETURNS FLOAT BEGIN
 
 DECLARE resultat float;
@@ -464,36 +500,19 @@ and classe.niveau=niveau.`code`;
 	
 END$$
 
-DROP FUNCTION IF EXISTS `penalites`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `penalites` (`mat` VARCHAR(255), `niv` INT, `ans` INT, `sem` VARCHAR(255)) RETURNS FLOAT BEGIN
-	#Routine body goes here...
+CREATE DEFINER=`root`@`localhost` FUNCTION `penalites` (`mat` VARCHAR(255), `an` INT, `sem` VARCHAR(255)) RETURNS FLOAT BEGIN
+	#Routine body goes here..
 	DECLARE resultat float;
-SELECT distinct TRUNCATE((case when (((TRUNCATE(discipline.nb_heures_absences/5,0))*0.1) + (TRUNCATE(discipline.nb_retards/15,0)*0.1))=0 then 0
-	else (((TRUNCATE(discipline.nb_heures_absences/5,0))*0.1) + (TRUNCATE(discipline.nb_retards/15,0)*0.1)) end),3) into resultat
-from etudiant, filiere, note, type_evaluation, module, est_inscrit, candidat, evaluation, enseignement, ue, niveau, classe, specialite, annee_academique, semestre,discipline
-where note.est_inscrit=est_inscrit.code
-and discipline.etudiant=etudiant.`code`
-and discipline.semestre=semestre.`code`
-and est_inscrit.enseignement=enseignement.code
-and enseignement.ue=ue.`code`
-and enseignement.semestre=semestre.`code`
-and semestre.annee_academique=annee_academique.`code`
-and extract(year from annee_academique.date_debut)=ans
-and est_inscrit.candidat_inscrit=candidat.`code`
-and evaluation.type_evaluation=type_evaluation.`code`
-and ue.module=module.`code`
-and note.evaluation=evaluation.`code`
-and candidat.code=etudiant.code
-#and candidat.classe=classe.`code`
-and classe.specialite=specialite.`code`
-and specialite.filiere=filiere.`code`
-and type_evaluation.enseignement=enseignement.`code`
-and ue.module=module.`code`
-and etudiant.matricule=mat
-and niveau.numero= niv
-and classe.niveau=niveau.`code`
-and semestre.libelle=sem;
-	RETURN resultat;
+	SELECT ((((SUM(nbha)-SUM(hj)) div 5)*0.1)+((SUM(nbrt) div 15)*0.1)) into resultat from
+(SELECT description,MONTHNAME(date_retard) as mois,nb_heures_absences as nbha,heure_justifie as hj,nb_retards as nbrt,etudiant,semestre as seme
+from discipline) as disc,etudiant,semestre,annee_academique
+WHERE etudiant=etudiant.`code`
+and annee_academique.`code`=semestre.annee_academique
+and semestre.`code`=seme
+and matricule=mat
+and semestre.libelle=sem
+and EXTRACT(YEAR from annee_academique.date_debut)=an;
+RETURN resultat;
 END$$
 
 DELIMITER ;
@@ -504,9 +523,8 @@ DELIMITER ;
 -- Structure de la table `annee_academique`
 --
 
-DROP TABLE IF EXISTS `annee_academique`;
-CREATE TABLE IF NOT EXISTS `annee_academique` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `annee_academique` (
+  `code` bigint(20) NOT NULL,
   `date_cloture` datetime DEFAULT NULL,
   `date_creation` datetime NOT NULL,
   `date_debut` datetime DEFAULT NULL,
@@ -516,12 +534,8 @@ CREATE TABLE IF NOT EXISTS `annee_academique` (
   `signature` varchar(255) DEFAULT NULL,
   `statut_vie` varchar(255) NOT NULL,
   `createur` bigint(20) NOT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_annee_academique_createur` (`createur`) USING BTREE,
-  KEY `FK_annee_academique_modificateur` (`modificateur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=355 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `annee_academique`
@@ -539,9 +553,8 @@ INSERT INTO `annee_academique` (`code`, `date_cloture`, `date_creation`, `date_d
 -- Structure de la table `anonymat`
 --
 
-DROP TABLE IF EXISTS `anonymat`;
-CREATE TABLE IF NOT EXISTS `anonymat` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `anonymat` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -554,15 +567,8 @@ CREATE TABLE IF NOT EXISTS `anonymat` (
   `evaluation` bigint(20) DEFAULT NULL,
   `modificateur` bigint(20) NOT NULL,
   `est_inscrit` bigint(20) DEFAULT NULL,
-  `note` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_anonymat_createur` (`createur`) USING BTREE,
-  KEY `FK_anonymat_note` (`note`) USING BTREE,
-  KEY `FK_anonymat_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_anonymat_est_inscrit` (`est_inscrit`) USING BTREE,
-  KEY `FK_anonymat_evaluation` (`evaluation`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `note` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
@@ -570,9 +576,8 @@ CREATE TABLE IF NOT EXISTS `anonymat` (
 -- Structure de la table `candidat`
 --
 
-DROP TABLE IF EXISTS `candidat`;
-CREATE TABLE IF NOT EXISTS `candidat` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `candidat` (
+  `code` bigint(20) NOT NULL,
   `DTYPE` varchar(31) DEFAULT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
@@ -597,15 +602,8 @@ CREATE TABLE IF NOT EXISTS `candidat` (
   `telephone_du_pere` int(11) DEFAULT NULL,
   `classe` bigint(20) DEFAULT NULL,
   `createur` bigint(20) NOT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `email` (`email`) USING BTREE,
-  UNIQUE KEY `telephone` (`telephone`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_candidat_classe` (`classe`) USING BTREE,
-  KEY `FK_candidat_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_candidat_createur` (`createur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=3126 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `candidat`
@@ -644,9 +642,8 @@ INSERT INTO `candidat` (`code`, `DTYPE`, `date_creation`, `date_modification`, `
 -- Structure de la table `classe`
 --
 
-DROP TABLE IF EXISTS `classe`;
-CREATE TABLE IF NOT EXISTS `classe` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `classe` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -656,14 +653,8 @@ CREATE TABLE IF NOT EXISTS `classe` (
   `createur` bigint(20) NOT NULL,
   `modificateur` bigint(20) NOT NULL,
   `niveau` bigint(20) DEFAULT NULL,
-  `specialite` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_classe_createur` (`createur`) USING BTREE,
-  KEY `FK_classe_niveau` (`niveau`) USING BTREE,
-  KEY `FK_classe_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_classe_specialite` (`specialite`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=206 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `specialite` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `classe`
@@ -686,9 +677,8 @@ INSERT INTO `classe` (`code`, `date_creation`, `date_modification`, `description
 -- Structure de la table `discipline`
 --
 
-DROP TABLE IF EXISTS `discipline`;
-CREATE TABLE IF NOT EXISTS `discipline` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `discipline` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `date_retard` datetime DEFAULT NULL,
@@ -702,14 +692,115 @@ CREATE TABLE IF NOT EXISTS `discipline` (
   `createur` bigint(20) NOT NULL,
   `etudiant` bigint(20) DEFAULT NULL,
   `modificateur` bigint(20) NOT NULL,
-  `semestre` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_discipline_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_discipline_createur` (`createur`) USING BTREE,
-  KEY `FK_discipline_semestre` (`semestre`) USING BTREE,
-  KEY `FK_discipline_etudiant` (`etudiant`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=2653 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `semestre` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+
+--
+-- Déchargement des données de la table `discipline`
+--
+
+INSERT INTO `discipline` (`code`, `date_creation`, `date_modification`, `date_retard`, `description`, `heure_justifie`, `libelle`, `nb_heures_absences`, `nb_retards`, `signature`, `statut_vie`, `createur`, `etudiant`, `modificateur`, `semestre`) VALUES
+(7301, '2019-08-14 12:58:43', '2019-08-14 12:58:43', '2018-10-04 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-10361948', 'ACTIVE', 1, 3123, 1, 705),
+(7302, '2019-08-14 12:58:43', '2019-08-14 12:58:43', '2018-10-05 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-395600612', 'ACTIVE', 1, 3123, 1, 705),
+(7303, '2019-08-14 12:58:43', '2019-08-14 12:58:43', '2018-10-06 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-806864834', 'ACTIVE', 1, 3123, 1, 705),
+(7304, '2019-08-14 12:58:43', '2019-08-14 12:58:43', '2018-10-07 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '1668091039', 'ACTIVE', 1, 3123, 1, 705),
+(7305, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-08 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-1595945881', 'ACTIVE', 1, 3123, 1, 705),
+(7306, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-09 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-414453097', 'ACTIVE', 1, 3123, 1, 705),
+(7307, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-10 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-885190274', 'ACTIVE', 1, 3123, 1, 705),
+(7308, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-11 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 5, 0, '-1316740159', 'ACTIVE', 1, 3123, 1, 705),
+(7309, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-14 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-1472916444', 'ACTIVE', 1, 3123, 1, 705),
+(7310, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-15 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '2020501503', 'ACTIVE', 1, 3123, 1, 705),
+(7311, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-16 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-1018656376', 'ACTIVE', 1, 3123, 1, 705),
+(7312, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-17 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 1, 1, '1142290897', 'ACTIVE', 1, 3123, 1, 705),
+(7313, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-18 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '2087692008', 'ACTIVE', 1, 3123, 1, 705),
+(7314, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-19 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-1824956477', 'ACTIVE', 1, 3123, 1, 705),
+(7315, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-20 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-548712442', 'ACTIVE', 1, 3123, 1, 705),
+(7316, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-21 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '1277631866', 'ACTIVE', 1, 3123, 1, 705),
+(7317, '2019-08-14 12:58:44', '2019-08-14 12:58:44', '2018-10-22 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 3, 0, '-549712023', 'ACTIVE', 1, 3123, 1, 705),
+(7318, '2019-08-14 12:58:45', '2019-08-14 12:58:45', '2018-10-23 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '1354619586', 'ACTIVE', 1, 3123, 1, 705),
+(7351, '2019-08-14 12:58:45', '2019-08-14 12:58:45', '2018-10-24 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 1, '820126809', 'ACTIVE', 1, 3123, 1, 705),
+(7352, '2019-08-14 12:58:45', '2019-08-14 12:58:45', '2018-10-25 22:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '243455540', 'ACTIVE', 1, 3123, 1, 705),
+(7353, '2019-08-14 12:58:45', '2019-08-14 12:58:45', '2018-10-28 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 1, 1, '1665448219', 'ACTIVE', 1, 3123, 1, 705),
+(7354, '2019-08-14 12:58:45', '2019-08-14 12:58:45', '2018-10-29 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '1796831679', 'ACTIVE', 1, 3123, 1, 705),
+(7355, '2019-08-14 12:58:45', '2019-08-14 12:58:45', '2018-10-30 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '2132690314', 'ACTIVE', 1, 3123, 1, 705),
+(7356, '2019-08-14 12:58:45', '2019-08-14 12:58:45', '2018-10-31 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 2, 0, '-1699991016', 'ACTIVE', 1, 3123, 1, 705),
+(7357, '2019-08-14 12:58:45', '2019-08-14 12:58:45', '2018-11-01 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-250978638', 'ACTIVE', 1, 3123, 1, 705),
+(7358, '2019-08-14 12:58:45', '2019-08-14 12:58:45', '2019-02-03 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-1123481024', 'ACTIVE', 1, 3123, 1, 706),
+(7359, '2019-08-14 12:58:45', '2019-08-14 12:58:46', '2019-02-04 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-495848554', 'ACTIVE', 1, 3123, 1, 706),
+(7360, '2019-08-14 12:58:46', '2019-08-14 12:58:46', '2019-02-05 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-1576158959', 'ACTIVE', 1, 3123, 1, 706),
+(7361, '2019-08-14 12:58:46', '2019-08-14 12:58:46', '2019-02-06 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '1599459595', 'ACTIVE', 1, 3123, 1, 706),
+(7362, '2019-08-14 12:58:46', '2019-08-14 12:58:46', '2019-02-07 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '788657508', 'ACTIVE', 1, 3123, 1, 706),
+(7363, '2019-08-14 12:58:46', '2019-08-14 12:58:46', '2019-02-08 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-607621391', 'ACTIVE', 1, 3123, 1, 706),
+(7364, '2019-08-14 12:58:46', '2019-08-14 12:58:46', '2019-02-09 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '871236168', 'ACTIVE', 1, 3123, 1, 706),
+(7365, '2019-08-14 12:58:46', '2019-08-14 12:58:46', '2019-02-10 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '2101020027', 'ACTIVE', 1, 3123, 1, 706),
+(7366, '2019-08-14 12:58:47', '2019-08-14 12:58:47', '2019-02-11 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '1557797116', 'ACTIVE', 1, 3123, 1, 706),
+(7367, '2019-08-14 12:58:47', '2019-08-14 12:58:47', '2019-02-12 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-1734096261', 'ACTIVE', 1, 3123, 1, 706),
+(7368, '2019-08-14 12:58:47', '2019-08-14 12:58:47', '2019-02-13 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-491299623', 'ACTIVE', 1, 3123, 1, 706),
+(7369, '2019-08-14 12:58:47', '2019-08-14 12:58:47', '2019-02-14 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 4, 1, '-1577080843', 'ACTIVE', 1, 3123, 1, 706),
+(7370, '2019-08-14 12:58:47', '2019-08-14 12:58:47', '2019-02-15 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 1, '-1388143739', 'ACTIVE', 1, 3123, 1, 706),
+(7371, '2019-08-14 12:58:47', '2019-08-14 12:58:47', '2019-02-16 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 1, '-145347101', 'ACTIVE', 1, 3123, 1, 706),
+(7372, '2019-08-14 12:58:48', '2019-08-14 12:58:48', '2019-02-17 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 1, '939465290', 'ACTIVE', 1, 3123, 1, 706),
+(7373, '2019-08-14 12:58:48', '2019-08-14 12:58:48', '2019-02-18 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 1, '-1478937450', 'ACTIVE', 1, 3123, 1, 706),
+(7374, '2019-08-14 12:58:48', '2019-08-14 12:58:48', '2019-02-19 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '908688050', 'ACTIVE', 1, 3123, 1, 706),
+(7375, '2019-08-14 12:58:48', '2019-08-14 12:58:48', '2019-02-20 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-1407541631', 'ACTIVE', 1, 3123, 1, 706),
+(7376, '2019-08-14 12:58:48', '2019-08-14 12:58:48', '2019-02-21 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-919289689', 'ACTIVE', 1, 3123, 1, 706),
+(7377, '2019-08-14 12:58:48', '2019-08-14 12:58:48', '2019-02-22 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 1, '-174541247', 'ACTIVE', 1, 3123, 1, 706),
+(7378, '2019-08-14 12:58:48', '2019-08-14 12:58:48', '2019-02-23 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 1, '-1102458345', 'ACTIVE', 1, 3123, 1, 706),
+(7379, '2019-08-14 12:58:48', '2019-08-14 12:58:48', '2019-02-24 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-420944821', 'ACTIVE', 1, 3123, 1, 706),
+(7380, '2019-08-14 12:58:49', '2019-08-14 12:58:49', '2019-02-25 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '465014087', 'ACTIVE', 1, 3123, 1, 706),
+(7381, '2019-08-14 12:58:49', '2019-08-14 12:58:49', '2019-02-26 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '787859943', 'ACTIVE', 1, 3123, 1, 706),
+(7382, '2019-08-14 12:58:49', '2019-08-14 12:58:49', '2019-02-27 23:00:00', '1718L031 TIMAMO Viorika Shany Marion', 0, 'Absences', 0, 0, '-1485571360', 'ACTIVE', 1, 3123, 1, 706),
+(7383, '2019-08-14 12:58:49', '2019-08-14 12:58:49', '2018-10-03 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 1, '959199423', 'ACTIVE', 1, 3104, 1, 705),
+(7384, '2019-08-14 12:58:49', '2019-08-14 12:58:49', '2018-10-04 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1895949612', 'ACTIVE', 1, 3104, 1, 705),
+(7385, '2019-08-14 12:58:49', '2019-08-14 12:58:49', '2018-10-05 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-4541409', 'ACTIVE', 1, 3104, 1, 705),
+(7386, '2019-08-14 12:58:50', '2019-08-14 12:58:50', '2018-10-06 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '100847245', 'ACTIVE', 1, 3104, 1, 705),
+(7387, '2019-08-14 12:58:50', '2019-08-14 12:58:50', '2018-10-07 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-630047269', 'ACTIVE', 1, 3104, 1, 705),
+(7388, '2019-08-14 12:58:50', '2019-08-14 12:58:50', '2018-10-08 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '10597980', 'ACTIVE', 1, 3104, 1, 705),
+(7389, '2019-08-14 12:58:50', '2019-08-14 12:58:50', '2018-10-09 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1571521623', 'ACTIVE', 1, 3104, 1, 705),
+(7390, '2019-08-14 12:58:50', '2019-08-14 12:58:50', '2018-10-10 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1402899973', 'ACTIVE', 1, 3104, 1, 705),
+(7391, '2019-08-14 12:58:51', '2019-08-14 12:58:51', '2018-10-11 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 5, 0, '-26164792', 'ACTIVE', 1, 3104, 1, 705),
+(7392, '2019-08-14 12:58:51', '2019-08-14 12:58:51', '2018-10-14 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-600482661', 'ACTIVE', 1, 3104, 1, 705),
+(7393, '2019-08-14 12:58:51', '2019-08-14 12:58:51', '2018-10-15 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-868606314', 'ACTIVE', 1, 3104, 1, 705),
+(7394, '2019-08-14 12:58:51', '2019-08-14 12:58:51', '2018-10-16 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1285461476', 'ACTIVE', 1, 3104, 1, 705),
+(7395, '2019-08-14 12:58:51', '2019-08-14 12:58:51', '2018-10-17 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 1, 1, '-1399330171', 'ACTIVE', 1, 3104, 1, 705),
+(7396, '2019-08-14 12:58:51', '2019-08-14 12:58:51', '2018-10-18 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-171407963', 'ACTIVE', 1, 3104, 1, 705),
+(7397, '2019-08-14 12:58:51', '2019-08-14 12:58:51', '2018-10-19 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '634643372', 'ACTIVE', 1, 3104, 1, 705),
+(7398, '2019-08-14 12:58:52', '2019-08-14 12:58:52', '2018-10-20 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '1316157857', 'ACTIVE', 1, 3104, 1, 705),
+(7399, '2019-08-14 12:58:52', '2019-08-14 12:58:52', '2018-10-21 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '1969815885', 'ACTIVE', 1, 3104, 1, 705),
+(7400, '2019-08-14 12:58:52', '2019-08-14 12:58:52', '2018-10-22 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 3, 0, '-1593327336', 'ACTIVE', 1, 3104, 1, 705),
+(7401, '2019-08-14 12:58:52', '2019-08-14 12:58:52', '2018-10-23 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '476410359', 'ACTIVE', 1, 3104, 1, 705),
+(7402, '2019-08-14 12:58:52', '2019-08-14 12:58:52', '2018-10-24 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 1, '-1449533234', 'ACTIVE', 1, 3104, 1, 705),
+(7403, '2019-08-14 12:58:52', '2019-08-14 12:58:52', '2018-10-25 22:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-292236070', 'ACTIVE', 1, 3104, 1, 705),
+(7404, '2019-08-14 12:58:52', '2019-08-14 12:58:52', '2018-10-28 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 1, 1, '-364489105', 'ACTIVE', 1, 3104, 1, 705),
+(7405, '2019-08-14 12:58:52', '2019-08-14 12:58:52', '2018-10-29 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '426687800', 'ACTIVE', 1, 3104, 1, 705),
+(7406, '2019-08-14 12:58:52', '2019-08-14 12:58:52', '2018-10-30 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1421180080', 'ACTIVE', 1, 3104, 1, 705),
+(7407, '2019-08-14 12:58:53', '2019-08-14 12:58:53', '2018-10-31 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 2, 0, '167331990', 'ACTIVE', 1, 3104, 1, 705),
+(7408, '2019-08-14 12:58:53', '2019-08-14 12:58:53', '2018-11-01 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-253244552', 'ACTIVE', 1, 3104, 1, 705),
+(7409, '2019-08-14 12:58:53', '2019-08-14 12:58:53', '2019-02-03 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '1024532180', 'ACTIVE', 1, 3104, 1, 706),
+(7410, '2019-08-14 12:58:53', '2019-08-14 12:58:53', '2019-02-04 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-431219674', 'ACTIVE', 1, 3104, 1, 706),
+(7411, '2019-08-14 12:58:53', '2019-08-14 12:58:53', '2019-02-05 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-699343327', 'ACTIVE', 1, 3104, 1, 706),
+(7412, '2019-08-14 12:58:54', '2019-08-14 12:58:54', '2019-02-06 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1249988077', 'ACTIVE', 1, 3104, 1, 706),
+(7413, '2019-08-14 12:58:54', '2019-08-14 12:58:54', '2019-02-07 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '165636486', 'ACTIVE', 1, 3104, 1, 706),
+(7414, '2019-08-14 12:58:54', '2019-08-14 12:58:54', '2019-02-08 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '1545982753', 'ACTIVE', 1, 3104, 1, 706),
+(7415, '2019-08-14 12:58:54', '2019-08-14 12:58:54', '2019-02-09 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-149491820', 'ACTIVE', 1, 3104, 1, 706),
+(7416, '2019-08-14 12:58:54', '2019-08-14 12:58:54', '2019-02-10 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1718598644', 'ACTIVE', 1, 3104, 1, 706),
+(7417, '2019-08-14 12:58:54', '2019-08-14 12:58:54', '2019-02-11 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1648488286', 'ACTIVE', 1, 3104, 1, 706),
+(7418, '2019-08-14 12:58:55', '2019-08-14 12:58:55', '2019-02-12 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1483626677', 'ACTIVE', 1, 3104, 1, 706),
+(7419, '2019-08-14 12:58:55', '2019-08-14 12:58:55', '2019-02-13 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1822405165', 'ACTIVE', 1, 3104, 1, 706),
+(7420, '2019-08-14 12:58:55', '2019-08-14 12:58:55', '2019-02-14 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 4, 1, '2013126959', 'ACTIVE', 1, 3104, 1, 706),
+(7421, '2019-08-14 12:58:55', '2019-08-14 12:58:55', '2019-02-15 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 1, '1462363045', 'ACTIVE', 1, 3104, 1, 706),
+(7422, '2019-08-14 12:58:55', '2019-08-14 12:58:55', '2019-02-16 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 1, '-378082996', 'ACTIVE', 1, 3104, 1, 706),
+(7423, '2019-08-14 12:58:55', '2019-08-14 12:58:55', '2019-02-17 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 1, '-1876534985', 'ACTIVE', 1, 3104, 1, 706),
+(7424, '2019-08-14 12:58:56', '2019-08-14 12:58:56', '2019-02-18 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 1, '-905077533', 'ACTIVE', 1, 3104, 1, 706),
+(7425, '2019-08-14 12:58:56', '2019-08-14 12:58:56', '2019-02-19 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-634283754', 'ACTIVE', 1, 3104, 1, 706),
+(7426, '2019-08-14 12:58:56', '2019-08-14 12:58:56', '2019-02-20 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '746062513', 'ACTIVE', 1, 3104, 1, 706),
+(7427, '2019-08-14 12:58:56', '2019-08-14 12:58:56', '2019-02-21 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '195417763', 'ACTIVE', 1, 3104, 1, 706),
+(7428, '2019-08-14 12:58:56', '2019-08-14 12:58:56', '2019-02-22 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 1, '572146595', 'ACTIVE', 1, 3104, 1, 706),
+(7429, '2019-08-14 12:58:56', '2019-08-14 12:58:56', '2019-02-23 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 1, '-1574916959', 'ACTIVE', 1, 3104, 1, 706),
+(7430, '2019-08-14 12:58:57', '2019-08-14 12:58:57', '2019-02-24 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '2011420379', 'ACTIVE', 1, 3104, 1, 706),
+(7431, '2019-08-14 12:58:57', '2019-08-14 12:58:57', '2019-02-25 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-1642901668', 'ACTIVE', 1, 3104, 1, 706),
+(7432, '2019-08-14 12:58:57', '2019-08-14 12:58:57', '2019-02-26 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '716868336', 'ACTIVE', 1, 3104, 1, 706),
+(7433, '2019-08-14 12:58:57', '2019-08-14 12:58:57', '2019-02-27 23:00:00', '1718L016 FOUDA Hyacinthe Anthony', 0, 'Absences', 0, 0, '-805778312', 'ACTIVE', 1, 3104, 1, 706);
 
 -- --------------------------------------------------------
 
@@ -717,9 +808,8 @@ CREATE TABLE IF NOT EXISTS `discipline` (
 -- Structure de la table `droit`
 --
 
-DROP TABLE IF EXISTS `droit`;
-CREATE TABLE IF NOT EXISTS `droit` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `droit` (
+  `code` bigint(20) NOT NULL,
   `categorie` varchar(255) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
@@ -733,13 +823,8 @@ CREATE TABLE IF NOT EXISTS `droit` (
   `suppression` tinyint(1) DEFAULT '0',
   `createur` bigint(20) NOT NULL,
   `modificateur` bigint(20) NOT NULL,
-  `role` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_droit_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_droit_role` (`role`) USING BTREE,
-  KEY `FK_droit_createur` (`createur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=580 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `role` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
@@ -747,12 +832,10 @@ CREATE TABLE IF NOT EXISTS `droit` (
 -- Structure de la table `email`
 --
 
-DROP TABLE IF EXISTS `email`;
-CREATE TABLE IF NOT EXISTS `email` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
-  `objet` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=152 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+CREATE TABLE `email` (
+  `code` bigint(20) NOT NULL,
+  `objet` varchar(255) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
@@ -760,9 +843,8 @@ CREATE TABLE IF NOT EXISTS `email` (
 -- Structure de la table `enseignant`
 --
 
-DROP TABLE IF EXISTS `enseignant`;
-CREATE TABLE IF NOT EXISTS `enseignant` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `enseignant` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `date_naissance` datetime NOT NULL,
@@ -778,14 +860,8 @@ CREATE TABLE IF NOT EXISTS `enseignant` (
   `statut_vie` varchar(255) NOT NULL,
   `telephone` int(11) NOT NULL,
   `createur` bigint(20) NOT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `email` (`email`) USING BTREE,
-  UNIQUE KEY `telephone` (`telephone`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_enseignant_createur` (`createur`) USING BTREE,
-  KEY `FK_enseignant_modificateur` (`modificateur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
@@ -793,9 +869,8 @@ CREATE TABLE IF NOT EXISTS `enseignant` (
 -- Structure de la table `enseignement`
 --
 
-DROP TABLE IF EXISTS `enseignement`;
-CREATE TABLE IF NOT EXISTS `enseignement` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `enseignement` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -807,14 +882,8 @@ CREATE TABLE IF NOT EXISTS `enseignement` (
   `createur` bigint(20) NOT NULL,
   `modificateur` bigint(20) NOT NULL,
   `semestre` bigint(20) DEFAULT NULL,
-  `ue` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_enseignement_ue` (`ue`) USING BTREE,
-  KEY `FK_enseignement_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_enseignement_createur` (`createur`) USING BTREE,
-  KEY `FK_enseignement_semestre` (`semestre`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=6135 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `ue` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `enseignement`
@@ -884,12 +953,9 @@ INSERT INTO `enseignement` (`code`, `date_creation`, `date_modification`, `descr
 -- Structure de la table `enseignement_enseignant`
 --
 
-DROP TABLE IF EXISTS `enseignement_enseignant`;
-CREATE TABLE IF NOT EXISTS `enseignement_enseignant` (
+CREATE TABLE `enseignement_enseignant` (
   `code_enseignant` bigint(20) NOT NULL,
-  `code_enseignement` bigint(20) NOT NULL,
-  PRIMARY KEY (`code_enseignant`,`code_enseignement`) USING BTREE,
-  KEY `FK_enseignement_enseignant_code_enseignement` (`code_enseignement`) USING BTREE
+  `code_enseignement` bigint(20) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED;
 
 -- --------------------------------------------------------
@@ -898,9 +964,8 @@ CREATE TABLE IF NOT EXISTS `enseignement_enseignant` (
 -- Structure de la table `envoi_message`
 --
 
-DROP TABLE IF EXISTS `envoi_message`;
-CREATE TABLE IF NOT EXISTS `envoi_message` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `envoi_message` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_envoi` datetime DEFAULT NULL,
   `date_modification` datetime NOT NULL,
@@ -912,14 +977,8 @@ CREATE TABLE IF NOT EXISTS `envoi_message` (
   `candidat` bigint(20) DEFAULT NULL,
   `createur` bigint(20) NOT NULL,
   `modificateur` bigint(20) NOT NULL,
-  `message` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_envoi_message_createur` (`createur`) USING BTREE,
-  KEY `FK_envoi_message_candidat` (`candidat`) USING BTREE,
-  KEY `FK_envoi_message_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_envoi_message_message` (`message`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=402 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `message` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
@@ -927,9 +986,8 @@ CREATE TABLE IF NOT EXISTS `envoi_message` (
 -- Structure de la table `est_inscrit`
 --
 
-DROP TABLE IF EXISTS `est_inscrit`;
-CREATE TABLE IF NOT EXISTS `est_inscrit` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `est_inscrit` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -940,14 +998,8 @@ CREATE TABLE IF NOT EXISTS `est_inscrit` (
   `candidat_inscrit` bigint(20) DEFAULT NULL,
   `createur` bigint(20) NOT NULL,
   `enseignement` bigint(20) DEFAULT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_est_inscrit_candidat_inscrit` (`candidat_inscrit`) USING BTREE,
-  KEY `FK_est_inscrit_createur` (`createur`) USING BTREE,
-  KEY `FK_est_inscrit_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_est_inscrit_enseignement` (`enseignement`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=6873 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `est_inscrit`
@@ -1437,15 +1489,11 @@ INSERT INTO `est_inscrit` (`code`, `date_creation`, `date_modification`, `descri
 -- Structure de la table `etudiant`
 --
 
-DROP TABLE IF EXISTS `etudiant`;
-CREATE TABLE IF NOT EXISTS `etudiant` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `etudiant` (
+  `code` bigint(20) NOT NULL,
   `code_authentification` varchar(255) DEFAULT NULL,
-  `matricule` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `matricule` (`matricule`) USING BTREE,
-  UNIQUE KEY `code_authentification` (`code_authentification`,`matricule`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=3126 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `matricule` varchar(255) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `etudiant`
@@ -1484,9 +1532,8 @@ INSERT INTO `etudiant` (`code`, `code_authentification`, `matricule`) VALUES
 -- Structure de la table `evaluation`
 --
 
-DROP TABLE IF EXISTS `evaluation`;
-CREATE TABLE IF NOT EXISTS `evaluation` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `evaluation` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_evaluation` datetime DEFAULT NULL,
   `date_modification` datetime NOT NULL,
@@ -1497,13 +1544,8 @@ CREATE TABLE IF NOT EXISTS `evaluation` (
   `statut_vie` varchar(255) NOT NULL,
   `createur` bigint(20) NOT NULL,
   `modificateur` bigint(20) NOT NULL,
-  `type_evaluation` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_evaluation_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_evaluation_type_evaluation` (`type_evaluation`) USING BTREE,
-  KEY `FK_evaluation_createur` (`createur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=6267 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `type_evaluation` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `evaluation`
@@ -1557,9 +1599,8 @@ INSERT INTO `evaluation` (`code`, `date_creation`, `date_evaluation`, `date_modi
 -- Structure de la table `filiere`
 --
 
-DROP TABLE IF EXISTS `filiere`;
-CREATE TABLE IF NOT EXISTS `filiere` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `filiere` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -1567,12 +1608,8 @@ CREATE TABLE IF NOT EXISTS `filiere` (
   `signature` varchar(255) DEFAULT NULL,
   `statut_vie` varchar(255) NOT NULL,
   `createur` bigint(20) NOT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_filiere_createur` (`createur`) USING BTREE,
-  KEY `FK_filiere_modificateur` (`modificateur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `filiere`
@@ -1588,9 +1625,8 @@ INSERT INTO `filiere` (`code`, `date_creation`, `date_modification`, `descriptio
 -- Structure de la table `historique_note`
 --
 
-DROP TABLE IF EXISTS `historique_note`;
-CREATE TABLE IF NOT EXISTS `historique_note` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `historique_note` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -1600,13 +1636,8 @@ CREATE TABLE IF NOT EXISTS `historique_note` (
   `valeur_note` double NOT NULL,
   `createur` bigint(20) NOT NULL,
   `modificateur` bigint(20) NOT NULL,
-  `note` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_historique_note_note` (`note`) USING BTREE,
-  KEY `FK_historique_note_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_historique_note_createur` (`createur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=1170 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `note` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `historique_note`
@@ -1932,9 +1963,8 @@ INSERT INTO `historique_note` (`code`, `date_creation`, `date_modification`, `de
 -- Structure de la table `message`
 --
 
-DROP TABLE IF EXISTS `message`;
-CREATE TABLE IF NOT EXISTS `message` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `message` (
+  `code` bigint(20) NOT NULL,
   `DTYPE` varchar(31) DEFAULT NULL,
   `contenu` varchar(255) DEFAULT NULL,
   `date_creation` datetime NOT NULL,
@@ -1946,12 +1976,8 @@ CREATE TABLE IF NOT EXISTS `message` (
   `signature` varchar(255) DEFAULT NULL,
   `statut_vie` varchar(255) NOT NULL,
   `createur` bigint(20) NOT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_message_createur` (`createur`) USING BTREE,
-  KEY `FK_message_modificateur` (`modificateur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=152 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
@@ -1959,8 +1985,7 @@ CREATE TABLE IF NOT EXISTS `message` (
 -- Structure de la table `module`
 --
 
-DROP TABLE IF EXISTS `module`;
-CREATE TABLE IF NOT EXISTS `module` (
+CREATE TABLE `module` (
   `code` bigint(20) NOT NULL,
   `code_module` varchar(255) DEFAULT NULL,
   `date_creation` datetime NOT NULL,
@@ -1970,12 +1995,8 @@ CREATE TABLE IF NOT EXISTS `module` (
   `signature` varchar(255) DEFAULT NULL,
   `statut_vie` varchar(255) NOT NULL,
   `createur` bigint(20) NOT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`),
-  UNIQUE KEY `signature` (`signature`),
-  KEY `FK_Module_modificateur` (`modificateur`),
-  KEY `FK_Module_createur` (`createur`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `module`
@@ -2015,9 +2036,8 @@ INSERT INTO `module` (`code`, `code_module`, `date_creation`, `date_modification
 -- Structure de la table `niveau`
 --
 
-DROP TABLE IF EXISTS `niveau`;
-CREATE TABLE IF NOT EXISTS `niveau` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `niveau` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -2026,12 +2046,8 @@ CREATE TABLE IF NOT EXISTS `niveau` (
   `signature` varchar(255) DEFAULT NULL,
   `statut_vie` varchar(255) NOT NULL,
   `createur` bigint(20) NOT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_Niveau_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_Niveau_createur` (`createur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `niveau`
@@ -2049,9 +2065,8 @@ INSERT INTO `niveau` (`code`, `date_creation`, `date_modification`, `description
 -- Structure de la table `note`
 --
 
-DROP TABLE IF EXISTS `note`;
-CREATE TABLE IF NOT EXISTS `note` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `note` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -2063,14 +2078,8 @@ CREATE TABLE IF NOT EXISTS `note` (
   `createur` bigint(20) NOT NULL,
   `evaluation` bigint(20) DEFAULT NULL,
   `modificateur` bigint(20) NOT NULL,
-  `est_inscrit` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_note_est_inscrit` (`est_inscrit`) USING BTREE,
-  KEY `FK_note_createur` (`createur`) USING BTREE,
-  KEY `FK_note_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_note_evaluation` (`evaluation`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=6968 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `est_inscrit` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `note`
@@ -2159,13 +2168,11 @@ INSERT INTO `note` (`code`, `date_creation`, `date_modification`, `description`,
 --
 -- Déclencheurs `note`
 --
-DROP TRIGGER IF EXISTS `After_InsertNote`;
 DELIMITER $$
 CREATE TRIGGER `After_InsertNote` AFTER INSERT ON `note` FOR EACH ROW INSERT INTO historique_note(date_creation,date_modification,libelle,signature,statut_vie,valeur_note,createur,modificateur,note)
 VALUES (NEW.date_creation,NEW.date_modification,NEW.libelle,NEW.signature,NEW.statut_vie,NEW.valeur_note,NEW.createur,NEW.modificateur,NEW.code)
 $$
 DELIMITER ;
-DROP TRIGGER IF EXISTS `After_UpdateNote`;
 DELIMITER $$
 CREATE TRIGGER `After_UpdateNote` AFTER UPDATE ON `note` FOR EACH ROW INSERT INTO historique_note(date_creation,date_modification,libelle,signature,statut_vie,valeur_note,createur,modificateur,note)
 VALUES (NEW.date_creation,CURRENT_TIMESTAMP,NEW.libelle,NEW.signature,NEW.statut_vie,NEW.valeur_note,NEW.createur,NEW.modificateur,NEW.code)
@@ -2178,9 +2185,8 @@ DELIMITER ;
 -- Structure de la table `role`
 --
 
-DROP TABLE IF EXISTS `role`;
-CREATE TABLE IF NOT EXISTS `role` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `role` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -2188,12 +2194,8 @@ CREATE TABLE IF NOT EXISTS `role` (
   `signature` varchar(255) DEFAULT NULL,
   `statut_vie` varchar(255) NOT NULL,
   `createur` bigint(20) NOT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_role_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_role_createur` (`createur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=552 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
@@ -2201,9 +2203,8 @@ CREATE TABLE IF NOT EXISTS `role` (
 -- Structure de la table `semestre`
 --
 
-DROP TABLE IF EXISTS `semestre`;
-CREATE TABLE IF NOT EXISTS `semestre` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `semestre` (
+  `code` bigint(20) NOT NULL,
   `date_cloture` datetime DEFAULT NULL,
   `date_creation` datetime NOT NULL,
   `date_debut` datetime DEFAULT NULL,
@@ -2214,13 +2215,8 @@ CREATE TABLE IF NOT EXISTS `semestre` (
   `statut_vie` varchar(255) NOT NULL,
   `annee_academique` bigint(20) DEFAULT NULL,
   `createur` bigint(20) NOT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_semestre_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_semestre_createur` (`createur`) USING BTREE,
-  KEY `FK_semestre_annee_academique` (`annee_academique`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=709 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `semestre`
@@ -2242,11 +2238,9 @@ INSERT INTO `semestre` (`code`, `date_cloture`, `date_creation`, `date_debut`, `
 -- Structure de la table `sequence`
 --
 
-DROP TABLE IF EXISTS `sequence`;
-CREATE TABLE IF NOT EXISTS `sequence` (
+CREATE TABLE `sequence` (
   `SEQ_NAME` varchar(50) NOT NULL,
-  `SEQ_COUNT` decimal(38,0) DEFAULT NULL,
-  PRIMARY KEY (`SEQ_NAME`) USING BTREE
+  `SEQ_COUNT` decimal(38,0) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
@@ -2254,7 +2248,7 @@ CREATE TABLE IF NOT EXISTS `sequence` (
 --
 
 INSERT INTO `sequence` (`SEQ_NAME`, `SEQ_COUNT`) VALUES
-('SEQ_GEN', '7000');
+('SEQ_GEN', '7450');
 
 -- --------------------------------------------------------
 
@@ -2262,9 +2256,8 @@ INSERT INTO `sequence` (`SEQ_NAME`, `SEQ_COUNT`) VALUES
 -- Structure de la table `session`
 --
 
-DROP TABLE IF EXISTS `session`;
-CREATE TABLE IF NOT EXISTS `session` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `session` (
+  `code` bigint(20) NOT NULL,
   `date_connection` datetime DEFAULT NULL,
   `date_creation` datetime NOT NULL,
   `date_deconnection` datetime DEFAULT NULL,
@@ -2277,13 +2270,8 @@ CREATE TABLE IF NOT EXISTS `session` (
   `statut_vie` varchar(255) NOT NULL,
   `createur` bigint(20) NOT NULL,
   `modificateur` bigint(20) NOT NULL,
-  `utilisateur` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_Session_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_Session_utilisateur` (`utilisateur`) USING BTREE,
-  KEY `FK_Session_createur` (`createur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=5902 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `utilisateur` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `session`
@@ -2320,7 +2308,13 @@ INSERT INTO `session` (`code`, `date_connection`, `date_creation`, `date_deconne
 (4401, '2019-08-12 13:08:01', '2019-08-12 13:08:01', NULL, '2019-08-12 13:08:01', NULL, NULL, 'DESKTOP-7OQ9KG8', '1015840962', 'ACTIF', 'ACTIVE', 1, 1, NULL),
 (4451, '2019-08-12 13:31:54', '2019-08-12 13:31:54', NULL, '2019-08-12 13:31:54', NULL, NULL, 'DESKTOP-7OQ9KG8', '1814434432', 'ACTIF', 'ACTIVE', 1, 1, NULL),
 (4801, '2019-08-12 13:35:59', '2019-08-12 13:35:59', NULL, '2019-08-12 13:35:59', NULL, NULL, 'DESKTOP-7OQ9KG8', '-1073109206', 'ACTIF', 'ACTIVE', 1, 1, NULL),
-(5901, '2019-08-12 13:59:24', '2019-08-12 13:59:24', NULL, '2019-08-12 13:59:24', NULL, NULL, 'DESKTOP-7OQ9KG8', '-2036671878', 'ACTIF', 'ACTIVE', 1, 1, NULL);
+(5901, '2019-08-12 13:59:24', '2019-08-12 13:59:24', NULL, '2019-08-12 13:59:24', NULL, NULL, 'DESKTOP-7OQ9KG8', '-2036671878', 'ACTIF', 'ACTIVE', 1, 1, NULL),
+(7001, '2019-08-13 16:48:21', '2019-08-13 16:48:21', NULL, '2019-08-13 16:48:22', NULL, NULL, 'DESKTOP-7OQ9KG8', '-1138754520', 'ACTIF', 'ACTIVE', 1, 1, NULL),
+(7051, '2019-08-13 16:53:26', '2019-08-13 16:53:26', NULL, '2019-08-13 16:53:26', NULL, NULL, 'DESKTOP-7OQ9KG8', '1268261459', 'ACTIF', 'ACTIVE', 1, 1, NULL),
+(7101, '2019-08-13 17:35:10', '2019-08-13 17:35:10', NULL, '2019-08-13 17:35:10', NULL, NULL, 'DESKTOP-7OQ9KG8', '1625260589', 'ACTIF', 'ACTIVE', 1, 1, NULL),
+(7151, '2019-08-14 12:46:58', '2019-08-14 12:46:58', NULL, '2019-08-14 12:46:58', NULL, NULL, 'DESKTOP-7OQ9KG8', '1384381757', 'ACTIF', 'ACTIVE', 1, 1, NULL),
+(7201, '2019-08-14 12:54:21', '2019-08-14 12:54:21', NULL, '2019-08-14 12:54:21', NULL, NULL, 'DESKTOP-7OQ9KG8', '191068842', 'ACTIF', 'ACTIVE', 1, 1, NULL),
+(7251, '2019-08-14 12:58:11', '2019-08-14 12:58:11', NULL, '2019-08-14 12:58:11', NULL, NULL, 'DESKTOP-7OQ9KG8', '-1281598149', 'ACTIF', 'ACTIVE', 1, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -2328,11 +2322,9 @@ INSERT INTO `session` (`code`, `date_connection`, `date_creation`, `date_deconne
 -- Structure de la table `sms`
 --
 
-DROP TABLE IF EXISTS `sms`;
-CREATE TABLE IF NOT EXISTS `sms` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`code`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED;
+CREATE TABLE `sms` (
+  `code` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED;
 
 -- --------------------------------------------------------
 
@@ -2340,9 +2332,8 @@ CREATE TABLE IF NOT EXISTS `sms` (
 -- Structure de la table `specialite`
 --
 
-DROP TABLE IF EXISTS `specialite`;
-CREATE TABLE IF NOT EXISTS `specialite` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `specialite` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -2351,13 +2342,8 @@ CREATE TABLE IF NOT EXISTS `specialite` (
   `statut_vie` varchar(255) NOT NULL,
   `createur` bigint(20) NOT NULL,
   `filiere` bigint(20) DEFAULT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_specialite_filiere` (`filiere`) USING BTREE,
-  KEY `FK_specialite_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_specialite_createur` (`createur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `specialite`
@@ -2372,12 +2358,22 @@ INSERT INTO `specialite` (`code`, `date_creation`, `date_modification`, `descrip
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `tmp_ue`
+--
+
+CREATE TABLE `tmp_ue` (
+  `id` int(11) NOT NULL,
+  `codeue` varchar(255) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `type_evaluation`
 --
 
-DROP TABLE IF EXISTS `type_evaluation`;
-CREATE TABLE IF NOT EXISTS `type_evaluation` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `type_evaluation` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -2387,13 +2383,8 @@ CREATE TABLE IF NOT EXISTS `type_evaluation` (
   `statut_vie` varchar(255) NOT NULL,
   `createur` bigint(20) NOT NULL,
   `enseignement` bigint(20) DEFAULT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_type_evaluation_enseignement` (`enseignement`) USING BTREE,
-  KEY `FK_type_evaluation_createur` (`createur`) USING BTREE,
-  KEY `FK_type_evaluation_modificateur` (`modificateur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=6227 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `type_evaluation`
@@ -2466,9 +2457,8 @@ INSERT INTO `type_evaluation` (`code`, `date_creation`, `date_modification`, `de
 -- Structure de la table `ue`
 --
 
-DROP TABLE IF EXISTS `ue`;
-CREATE TABLE IF NOT EXISTS `ue` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `ue` (
+  `code` bigint(20) NOT NULL,
   `code_ue` varchar(255) DEFAULT NULL,
   `credits` int(11) DEFAULT NULL,
   `date_creation` datetime NOT NULL,
@@ -2482,15 +2472,8 @@ CREATE TABLE IF NOT EXISTS `ue` (
   `modificateur` bigint(20) NOT NULL,
   `module` bigint(20) DEFAULT NULL,
   `niveau` bigint(20) DEFAULT NULL,
-  `specialite` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_UE_niveau` (`niveau`) USING BTREE,
-  KEY `FK_UE_modificateur` (`modificateur`) USING BTREE,
-  KEY `FK_UE_specialite` (`specialite`) USING BTREE,
-  KEY `FK_UE_module` (`module`) USING BTREE,
-  KEY `FK_UE_createur` (`createur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=6048 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `specialite` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `ue`
@@ -2560,9 +2543,8 @@ INSERT INTO `ue` (`code`, `code_ue`, `credits`, `date_creation`, `date_modificat
 -- Structure de la table `utilisateur`
 --
 
-DROP TABLE IF EXISTS `utilisateur`;
-CREATE TABLE IF NOT EXISTS `utilisateur` (
-  `code` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `utilisateur` (
+  `code` bigint(20) NOT NULL,
   `date_creation` datetime NOT NULL,
   `date_modification` datetime NOT NULL,
   `date_naissance` datetime NOT NULL,
@@ -2579,15 +2561,8 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
   `statut_vie` varchar(255) NOT NULL,
   `telephone` int(11) NOT NULL,
   `createur` bigint(20) NOT NULL,
-  `modificateur` bigint(20) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE,
-  UNIQUE KEY `email` (`email`) USING BTREE,
-  UNIQUE KEY `login` (`login`) USING BTREE,
-  UNIQUE KEY `telephone` (`telephone`) USING BTREE,
-  UNIQUE KEY `signature` (`signature`) USING BTREE,
-  KEY `FK_utilisateur_createur` (`createur`) USING BTREE,
-  KEY `FK_utilisateur_modificateur` (`modificateur`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `modificateur` bigint(20) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
 -- Déchargement des données de la table `utilisateur`
@@ -2602,13 +2577,475 @@ INSERT INTO `utilisateur` (`code`, `date_creation`, `date_modification`, `date_n
 -- Structure de la table `utilisateur_role`
 --
 
-DROP TABLE IF EXISTS `utilisateur_role`;
-CREATE TABLE IF NOT EXISTS `utilisateur_role` (
+CREATE TABLE `utilisateur_role` (
   `code_utilisateur` bigint(20) NOT NULL,
-  `code_role` bigint(20) NOT NULL,
-  PRIMARY KEY (`code_utilisateur`,`code_role`) USING BTREE,
-  KEY `FK_utilisateur_role_code_role` (`code_role`) USING BTREE
+  `code_role` bigint(20) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED;
+
+--
+-- Index pour les tables déchargées
+--
+
+--
+-- Index pour la table `annee_academique`
+--
+ALTER TABLE `annee_academique`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_annee_academique_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_annee_academique_modificateur` (`modificateur`) USING BTREE;
+
+--
+-- Index pour la table `anonymat`
+--
+ALTER TABLE `anonymat`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_anonymat_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_anonymat_note` (`note`) USING BTREE,
+  ADD KEY `FK_anonymat_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_anonymat_est_inscrit` (`est_inscrit`) USING BTREE,
+  ADD KEY `FK_anonymat_evaluation` (`evaluation`) USING BTREE;
+
+--
+-- Index pour la table `candidat`
+--
+ALTER TABLE `candidat`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `email` (`email`) USING BTREE,
+  ADD UNIQUE KEY `telephone` (`telephone`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_candidat_classe` (`classe`) USING BTREE,
+  ADD KEY `FK_candidat_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_candidat_createur` (`createur`) USING BTREE;
+
+--
+-- Index pour la table `classe`
+--
+ALTER TABLE `classe`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_classe_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_classe_niveau` (`niveau`) USING BTREE,
+  ADD KEY `FK_classe_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_classe_specialite` (`specialite`) USING BTREE;
+
+--
+-- Index pour la table `discipline`
+--
+ALTER TABLE `discipline`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_discipline_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_discipline_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_discipline_semestre` (`semestre`) USING BTREE,
+  ADD KEY `FK_discipline_etudiant` (`etudiant`) USING BTREE;
+
+--
+-- Index pour la table `droit`
+--
+ALTER TABLE `droit`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_droit_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_droit_role` (`role`) USING BTREE,
+  ADD KEY `FK_droit_createur` (`createur`) USING BTREE;
+
+--
+-- Index pour la table `email`
+--
+ALTER TABLE `email`
+  ADD PRIMARY KEY (`code`) USING BTREE;
+
+--
+-- Index pour la table `enseignant`
+--
+ALTER TABLE `enseignant`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `email` (`email`) USING BTREE,
+  ADD UNIQUE KEY `telephone` (`telephone`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_enseignant_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_enseignant_modificateur` (`modificateur`) USING BTREE;
+
+--
+-- Index pour la table `enseignement`
+--
+ALTER TABLE `enseignement`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_enseignement_ue` (`ue`) USING BTREE,
+  ADD KEY `FK_enseignement_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_enseignement_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_enseignement_semestre` (`semestre`) USING BTREE;
+
+--
+-- Index pour la table `enseignement_enseignant`
+--
+ALTER TABLE `enseignement_enseignant`
+  ADD PRIMARY KEY (`code_enseignant`,`code_enseignement`) USING BTREE,
+  ADD KEY `FK_enseignement_enseignant_code_enseignement` (`code_enseignement`) USING BTREE;
+
+--
+-- Index pour la table `envoi_message`
+--
+ALTER TABLE `envoi_message`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_envoi_message_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_envoi_message_candidat` (`candidat`) USING BTREE,
+  ADD KEY `FK_envoi_message_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_envoi_message_message` (`message`) USING BTREE;
+
+--
+-- Index pour la table `est_inscrit`
+--
+ALTER TABLE `est_inscrit`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_est_inscrit_candidat_inscrit` (`candidat_inscrit`) USING BTREE,
+  ADD KEY `FK_est_inscrit_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_est_inscrit_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_est_inscrit_enseignement` (`enseignement`) USING BTREE;
+
+--
+-- Index pour la table `etudiant`
+--
+ALTER TABLE `etudiant`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `matricule` (`matricule`) USING BTREE,
+  ADD UNIQUE KEY `code_authentification` (`code_authentification`,`matricule`) USING BTREE;
+
+--
+-- Index pour la table `evaluation`
+--
+ALTER TABLE `evaluation`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_evaluation_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_evaluation_type_evaluation` (`type_evaluation`) USING BTREE,
+  ADD KEY `FK_evaluation_createur` (`createur`) USING BTREE;
+
+--
+-- Index pour la table `filiere`
+--
+ALTER TABLE `filiere`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_filiere_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_filiere_modificateur` (`modificateur`) USING BTREE;
+
+--
+-- Index pour la table `historique_note`
+--
+ALTER TABLE `historique_note`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_historique_note_note` (`note`) USING BTREE,
+  ADD KEY `FK_historique_note_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_historique_note_createur` (`createur`) USING BTREE;
+
+--
+-- Index pour la table `message`
+--
+ALTER TABLE `message`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_message_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_message_modificateur` (`modificateur`) USING BTREE;
+
+--
+-- Index pour la table `module`
+--
+ALTER TABLE `module`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_Module_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_Module_createur` (`createur`) USING BTREE;
+
+--
+-- Index pour la table `niveau`
+--
+ALTER TABLE `niveau`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_Niveau_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_Niveau_createur` (`createur`) USING BTREE;
+
+--
+-- Index pour la table `note`
+--
+ALTER TABLE `note`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_note_est_inscrit` (`est_inscrit`) USING BTREE,
+  ADD KEY `FK_note_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_note_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_note_evaluation` (`evaluation`) USING BTREE;
+
+--
+-- Index pour la table `role`
+--
+ALTER TABLE `role`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_role_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_role_createur` (`createur`) USING BTREE;
+
+--
+-- Index pour la table `semestre`
+--
+ALTER TABLE `semestre`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_semestre_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_semestre_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_semestre_annee_academique` (`annee_academique`) USING BTREE;
+
+--
+-- Index pour la table `sequence`
+--
+ALTER TABLE `sequence`
+  ADD PRIMARY KEY (`SEQ_NAME`) USING BTREE;
+
+--
+-- Index pour la table `session`
+--
+ALTER TABLE `session`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_Session_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_Session_utilisateur` (`utilisateur`) USING BTREE,
+  ADD KEY `FK_Session_createur` (`createur`) USING BTREE;
+
+--
+-- Index pour la table `sms`
+--
+ALTER TABLE `sms`
+  ADD PRIMARY KEY (`code`) USING BTREE;
+
+--
+-- Index pour la table `specialite`
+--
+ALTER TABLE `specialite`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_specialite_filiere` (`filiere`) USING BTREE,
+  ADD KEY `FK_specialite_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_specialite_createur` (`createur`) USING BTREE;
+
+--
+-- Index pour la table `tmp_ue`
+--
+ALTER TABLE `tmp_ue`
+  ADD PRIMARY KEY (`id`) USING BTREE;
+
+--
+-- Index pour la table `type_evaluation`
+--
+ALTER TABLE `type_evaluation`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_type_evaluation_enseignement` (`enseignement`) USING BTREE,
+  ADD KEY `FK_type_evaluation_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_type_evaluation_modificateur` (`modificateur`) USING BTREE;
+
+--
+-- Index pour la table `ue`
+--
+ALTER TABLE `ue`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_UE_niveau` (`niveau`) USING BTREE,
+  ADD KEY `FK_UE_modificateur` (`modificateur`) USING BTREE,
+  ADD KEY `FK_UE_specialite` (`specialite`) USING BTREE,
+  ADD KEY `FK_UE_module` (`module`) USING BTREE,
+  ADD KEY `FK_UE_createur` (`createur`) USING BTREE;
+
+--
+-- Index pour la table `utilisateur`
+--
+ALTER TABLE `utilisateur`
+  ADD PRIMARY KEY (`code`) USING BTREE,
+  ADD UNIQUE KEY `email` (`email`) USING BTREE,
+  ADD UNIQUE KEY `login` (`login`) USING BTREE,
+  ADD UNIQUE KEY `telephone` (`telephone`) USING BTREE,
+  ADD UNIQUE KEY `signature` (`signature`) USING BTREE,
+  ADD KEY `FK_utilisateur_createur` (`createur`) USING BTREE,
+  ADD KEY `FK_utilisateur_modificateur` (`modificateur`) USING BTREE;
+
+--
+-- Index pour la table `utilisateur_role`
+--
+ALTER TABLE `utilisateur_role`
+  ADD PRIMARY KEY (`code_utilisateur`,`code_role`) USING BTREE,
+  ADD KEY `FK_utilisateur_role_code_role` (`code_role`) USING BTREE;
+
+--
+-- AUTO_INCREMENT pour les tables déchargées
+--
+
+--
+-- AUTO_INCREMENT pour la table `annee_academique`
+--
+ALTER TABLE `annee_academique`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=355;
+
+--
+-- AUTO_INCREMENT pour la table `anonymat`
+--
+ALTER TABLE `anonymat`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT pour la table `candidat`
+--
+ALTER TABLE `candidat`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3126;
+
+--
+-- AUTO_INCREMENT pour la table `classe`
+--
+ALTER TABLE `classe`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
+
+--
+-- AUTO_INCREMENT pour la table `discipline`
+--
+ALTER TABLE `discipline`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7434;
+
+--
+-- AUTO_INCREMENT pour la table `droit`
+--
+ALTER TABLE `droit`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=580;
+
+--
+-- AUTO_INCREMENT pour la table `email`
+--
+ALTER TABLE `email`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+
+--
+-- AUTO_INCREMENT pour la table `enseignant`
+--
+ALTER TABLE `enseignant`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT pour la table `enseignement`
+--
+ALTER TABLE `enseignement`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6135;
+
+--
+-- AUTO_INCREMENT pour la table `envoi_message`
+--
+ALTER TABLE `envoi_message`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=402;
+
+--
+-- AUTO_INCREMENT pour la table `est_inscrit`
+--
+ALTER TABLE `est_inscrit`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6873;
+
+--
+-- AUTO_INCREMENT pour la table `etudiant`
+--
+ALTER TABLE `etudiant`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3126;
+
+--
+-- AUTO_INCREMENT pour la table `evaluation`
+--
+ALTER TABLE `evaluation`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6267;
+
+--
+-- AUTO_INCREMENT pour la table `filiere`
+--
+ALTER TABLE `filiere`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT pour la table `historique_note`
+--
+ALTER TABLE `historique_note`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1170;
+
+--
+-- AUTO_INCREMENT pour la table `message`
+--
+ALTER TABLE `message`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+
+--
+-- AUTO_INCREMENT pour la table `niveau`
+--
+ALTER TABLE `niveau`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT pour la table `note`
+--
+ALTER TABLE `note`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6968;
+
+--
+-- AUTO_INCREMENT pour la table `role`
+--
+ALTER TABLE `role`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=552;
+
+--
+-- AUTO_INCREMENT pour la table `semestre`
+--
+ALTER TABLE `semestre`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=709;
+
+--
+-- AUTO_INCREMENT pour la table `session`
+--
+ALTER TABLE `session`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7252;
+
+--
+-- AUTO_INCREMENT pour la table `sms`
+--
+ALTER TABLE `sms`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT pour la table `specialite`
+--
+ALTER TABLE `specialite`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+
+--
+-- AUTO_INCREMENT pour la table `tmp_ue`
+--
+ALTER TABLE `tmp_ue`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=272;
+
+--
+-- AUTO_INCREMENT pour la table `type_evaluation`
+--
+ALTER TABLE `type_evaluation`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6227;
+
+--
+-- AUTO_INCREMENT pour la table `ue`
+--
+ALTER TABLE `ue`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6048;
+
+--
+-- AUTO_INCREMENT pour la table `utilisateur`
+--
+ALTER TABLE `utilisateur`
+  MODIFY `code` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
