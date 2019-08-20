@@ -746,10 +746,7 @@ public class DisciplineController implements Initializable {
     }
 
     @FXML
-<<<<<<< HEAD
-=======
 
->>>>>>> 7abd2a72d71ac106f8f09b56991503ac01224431
     public void handleCharger() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/EmplacementDiscipline.fxml"));

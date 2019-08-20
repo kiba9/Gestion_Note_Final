@@ -37,19 +37,18 @@
         <class>org.isj.metier.entites.Utilisateur</class>
 
         <properties>
-<<<<<<< HEAD
+
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/isj2?zeroDateTimeBehavior=convertToNull"/>
             <property name="javax.persistence.jdbc.user" value="root"/>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.password" value=""/>
-=======
+
             <property name="javax.persistence.jdbc.url" value="${url}"/>
             <property name="javax.persistence.jdbc.user" value="${username}"/>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.password" value="${password}"/>
 
 
->>>>>>> 7abd2a72d71ac106f8f09b56991503ac01224431
             <property name="javax.persistence.schema-generation.database.action" value="create"/>
         </properties>
     </persistence-unit>
