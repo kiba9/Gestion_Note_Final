@@ -26,11 +26,12 @@ public class EmplacementDisciplineController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        choixNote.setItems(listChoix);
     }
 
     File file = null;
 
+    @FXML
     public void handleParcourir(){
         try{
             FileChooser fileChooser = new FileChooser();
@@ -46,48 +47,59 @@ public class EmplacementDisciplineController implements Initializable {
             parcourir.setText(file.getAbsolutePath());
         }catch (Exception e){
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.initOwner(Appli.getPrimaryStage);
             alert.setTitle("ISJ");
-            alert.setContentText("Veuillez vérifier les paramètres du fichier".toUpperCase() + "!");
+            alert.setContentText("Veuillez sélectionner un fichier !");
             alert.show();
         }
         new DisciplineController().handleRaffraichir();
     }
 
+
+    @FXML
     public void handleOk(){
-        choixNote.setItems(listChoix);
+
         try{
-            Isj isj = new Isj();
-            if(choixNote.getItems().equals("Importer toutes les disciplines")){
-                isj.saveMatriculeAnonyma(file.getAbsolutePath());
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            if(parcourir != null){
+                Isj isj = new Isj();
+                if(choixNote.getItems().equals("Importer toutes les disciplines")){
+                    isj.importerDiscipline(file.getAbsolutePath());
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.initOwner(Appli.getPrimaryStage);
+                    alert.setTitle("ISJ");
+                    alert.setContentText("SUCCES");
+                    alert.show();
+                }else if(choixNote.getItems().equals("Importer Absences")){
+                    isj.saveAbscence(file.getAbsolutePath());
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.initOwner(Appli.getPrimaryStage);
+                    alert.setTitle("ISJ");
+                    alert.setContentText("SUCCES");
+                    alert.show();
+                }else if(choixNote.getItems().equals("Importer Retard")){
+                    //sisj.enregistrerRetard(file.getAbsolutePath());
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.initOwner(Appli.getPrimaryStage);
+                    alert.setTitle("ISJ");
+                    alert.setContentText("SUCCES");
+                    alert.show();
+                }
+                new DisciplineController().handleRaffraichir();
+            }else{
+                Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.initOwner(Appli.getPrimaryStage);
                 alert.setTitle("ISJ");
-                alert.setContentText("SUCCES");
-                alert.show();
-            }else if(choixNote.getItems().equals("Importer Absences")){
-                isj.saveNoteAnonymat(file.getAbsolutePath());
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.initOwner(Appli.getPrimaryStage);
-                alert.setTitle("ISJ");
-                alert.setContentText("SUCCES");
-                alert.show();
-            }else if(choixNote.getItems().equals("Importer Retard")){
-                isj.enregistrerNoteExcel(file.getAbsolutePath());
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.initOwner(Appli.getPrimaryStage);
-                alert.setTitle("ISJ");
-                alert.setContentText("SUCCES");
+                alert.setContentText("Veuillez sélectionner un fichier !");
                 alert.show();
             }
-            new DisciplineController().handleRaffraichir();
         }catch (Exception e){
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.initOwner(Appli.getPrimaryStage);
             alert.setTitle("ISJ");
-            alert.setContentText("Une erreur s'est produite!");
+            alert.setHeaderText("Une erreur s'est produite!");
+            alert.setContentText("Veuillez vérifier les informations entrées.");
             alert.show();
         }
     }

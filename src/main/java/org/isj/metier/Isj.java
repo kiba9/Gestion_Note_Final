@@ -17,10 +17,12 @@ import org.isj.metier.facade.*;
 import javax.mail.MessagingException;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.swing.text.DateFormatter;
 import java.io.*;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.*;
 
@@ -38,7 +40,8 @@ public class Isj {
     public static final String SAMPLE_XLSX_FILE_PATH = "C:\\Users\\cena\\Downloads\\cena\\cena\\Anonymat_Matricule 6.xlsx";
     public static final String PATH_OUT_XLSX = "C:\\Users\\cena\\Downloads\\cena\\cena\\";
     public static final String SAMPLE_XLSX_FILE_NOTE_PATH = "C:\\Users\\cena\\Downloads\\cena\\cena\\Anonymat_Note2.xlsx";
-    public static final String MAIL_RECEVER = "songcedriccena@yahoo.fr";
+    public static final String MAIL_RECEVER = " ";
+    public static final String FILE_OUT ="";
 
     public static void main(String[] args) throws Exception {
 
@@ -57,8 +60,12 @@ public class Isj {
             System.out.println(secu.hashCode());
         }
 */
-       //new Isj().creerFichePresence("LIC 2", "Licence", "semestre 1", 2018, PATH_OUT_XLSX+"f.xlsx");
+        Properties properties = new Isj().readSettingApplication();
+        new UtilisateurFacade().setProperties((Map)properties);
 
+       //new Isj().setNewClasse(2, 50, 2018, "LIC 2");
+
+       // System.out.println(new Isj().rangEtudiant(2018, "LIC 2", "Semestre 1", "Licence"));
 
        // new EstInscritFacade().findAll();
 
@@ -325,6 +332,7 @@ public class Isj {
         for (Enseignant e : listEnseignant) {
             maillist = e.getEmail()+",";
         }
+        if(maillist.isEmpty()) maillist = MAIL_RECEVER;
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -419,7 +427,12 @@ public class Isj {
 
 
         for (int i = 0; i < listDesEstInscrit.size(); i++) {
-            Candidat candidat = listDesEstInscrit.get(i).getCandidatInscrit();
+            Candidat candidat = null;
+            EstInscrit estInscrit = listDesEstInscrit.get(i);
+
+            if( estInscrit.getStatutVie() != EstInscrit.StatutVie.CLOTUREE )
+                candidat = estInscrit.getCandidatInscrit();
+
             long codeEtudiant = candidat.getCode();
             row = sheet.createRow(5 + i);
             row.setHeight((short) 400);
@@ -442,8 +455,11 @@ public class Isj {
         String titre = evaluation.getTypeEvaluation().getLibelle() + " " + ue.getCodeUE() + " " + ue.getLibelle() + " du " + formatter.format(evaluation.getDateEval()) + " " + ue.getNiveau().toString();
         SendEmail sendEmail = new SendEmail();
         System.out.println(maillist);
-        sendEmail.sendAttachFile(maillist, "Fiche de Note " + evaluation.getTypeEvaluation().getLibelle() + " " + ue.getCodeUE(), "<h3>" + titre + "</h3>", pathOut);
-
+        try {
+            sendEmail.sendAttachFile(maillist, "Fiche de Note " + evaluation.getTypeEvaluation().getLibelle() + " " + ue.getCodeUE(), "<h3>" + titre + "</h3>", pathOut);
+        }catch (Exception e){
+            e.getMessage();
+        }
     }
 
     /**
@@ -546,6 +562,24 @@ public class Isj {
         row.getCell(1).setCellStyle(cellBold);
         row.createCell(2).setCellValue("matricule");
         row.getCell(2).setCellStyle(cellBold);
+
+        List<EstInscrit> listDesEstInscrit = enseignement.getEstInscrits();//retrouverListeEstInscrit(enseignement);
+
+
+        for (int i = 0; i < listDesEstInscrit.size(); i++) {
+            Candidat candidat = null;
+            EstInscrit estInscrit = listDesEstInscrit.get(i);
+
+            if( estInscrit.getStatutVie() != EstInscrit.StatutVie.CLOTUREE )
+                candidat = estInscrit.getCandidatInscrit();
+
+            long codeEtudiant = candidat.getCode();
+            row = sheet.createRow(3 + i);
+            row.setHeight((short) 400);
+            row.createCell(2).setCellValue(retrouverEtudiant(codeEtudiant));
+            row.getCell(2).setCellStyle(cellLight);
+
+        }
 
         //Save Excel file
         FileOutputStream fout = new FileOutputStream(new File(pathOut));
@@ -750,6 +784,7 @@ public class Isj {
         for (Enseignant e : listEnseignant) {
             maillist = e.getEmail()+",";
         }
+        if(maillist.isEmpty())maillist = MAIL_RECEVER ;
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -843,7 +878,11 @@ public class Isj {
 
         String titre = evaluation.getTypeEvaluation().getLibelle() + " " + ue.getLibelle() + " du " + formatter.format(evaluation.getDateEval()) + " " + ue.getNiveau().toString();
         SendEmail sendEmail = new SendEmail();
-        sendEmail.sendAttachFile(maillist, "Fiche de Note ", "<h3>" + titre + "</h3>", pathOut);
+        try {
+            sendEmail.sendAttachFile(maillist, "Fiche de Note ", "<h3>" + titre + "</h3>", pathOut);
+        }catch (Exception e){
+            e.getMessage();
+        }
 
     }
 
@@ -902,15 +941,15 @@ public class Isj {
                     mod = dataFormatter.formatCellValue(row.getCell(3));
                     niveau = dataFormatter.formatCellValue(row.getCell(4));
                     specialite = dataFormatter.formatCellValue(row.getCell(5));
-                    if (!libelle.equalsIgnoreCase("") || !codeUe.equalsIgnoreCase("") || !cred.equalsIgnoreCase("")) {
+                    if (!libelle.isEmpty()|| !codeUe.isEmpty() || !cred.isEmpty()) {
 
-                        if (mod.equalsIgnoreCase("")) mod = odlMod;
+                        if (mod.isEmpty()) mod = odlMod;
                         else odlMod = dataFormatter.formatCellValue(row.getCell(3));
 
-                        if (niveau.equalsIgnoreCase("")) niveau = niv;
+                        if (niveau.isEmpty()) niveau = niv;
                         else niv = dataFormatter.formatCellValue(row.getCell(4));
 
-                        if (specialite.equalsIgnoreCase("")) specialite = spe;
+                        if (specialite.isEmpty()) specialite = spe;
                         else spe = dataFormatter.formatCellValue(row.getCell(5));
 
                         UE ue = new UE(libelle, "", codeUe, UE.Statut.ACTIVE, Integer.valueOf(cred), retrouverModule(mod), retrouverNiveau(Long.valueOf(niveau)), retrouverSpecialite(specialite));
@@ -945,9 +984,9 @@ public class Isj {
                     int heure;
                     long anDeb, numSemestre;
 
-                    description = dataFormatter.formatCellValue(row.getCell(0));
+                    description = dataFormatter.formatCellValue(row.getCell(0)).trim();
                     heure = Integer.valueOf(dataFormatter.formatCellValue(row.getCell(1)));
-                    libelle = dataFormatter.formatCellValue(row.getCell(2));
+                    libelle = dataFormatter.formatCellValue(row.getCell(2)).trim();
                     prog = dataFormatter.formatCellValue(row.getCell(3));
                     numSemestre = Long.valueOf(dataFormatter.formatCellValue(row.getCell(4)));
                     anDeb = (long) row.getCell(5).getNumericCellValue();
@@ -988,7 +1027,7 @@ public class Isj {
                     codeModule = dataFormatter.formatCellValue(row.getCell(0));
                     libelle = dataFormatter.formatCellValue(row.getCell(1));
                     description = dataFormatter.formatCellValue(row.getCell(2));
-                    if (!libelle.equalsIgnoreCase("") || !codeModule.equalsIgnoreCase("") || !description.equalsIgnoreCase("")) {
+                    if (!libelle.isEmpty() && !codeModule.isEmpty() || !description.isEmpty()) {
                         Module module = new Module(libelle, description, codeModule);
 //                        System.out.println(module);
                         new ModuleFacade().create(module);
@@ -1007,6 +1046,7 @@ public class Isj {
         Iterator<Sheet> sheetIterator = workbook.sheetIterator();
         while (sheetIterator.hasNext()) {
             Sheet sheet = sheetIterator.next();
+            String oldLibEns = sheet.getRow(4).getCell(3).getStringCellValue();
             String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
             int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
 
@@ -1025,10 +1065,15 @@ public class Isj {
                     pourcentage = ((float) row.getCell(2).getNumericCellValue());
                     libEns = row.getCell(3).getStringCellValue();
 
+                    if(libEns.isEmpty()) libEns = oldLibEns;
+                    else oldLibEns =row.getCell(3).getStringCellValue();
+
+                    //System.out.println(libEns);
                     enseignement = new EnseignementFacade().find(retrouverEnseignement(libEns.trim(), anneDebut));
+                    //System.out.println(enseignement);
                     TypeEvaluation typeEvaluation = new TypeEvaluation(libelle,description,pourcentage, enseignement);
                     resultat = new TypeEvaluationFacade().create(typeEvaluation);
-                   // System.out.println(libelle+" - "+description+" - "+pourcentage+" - "+enseignement);
+                   //System.out.println(libelle+" - "+description+" - "+pourcentage+" - "+enseignement);
 
 
                 }
@@ -1096,8 +1141,9 @@ public class Isj {
         workbook.close();
     }
 
-    public void importerEvaluation(String pathOut)throws IOException, SQLException {
-        FileInputStream fis = new FileInputStream(new File(pathOut));
+    public void importerEvaluation(String pathOut)throws IOException, SQLException, MessagingException {
+        File file = new File(pathOut);
+        FileInputStream fis = new FileInputStream(file);
         XSSFWorkbook workbook = new XSSFWorkbook(fis);
 
         Iterator<Sheet> sheetIterator = workbook.sheetIterator();
@@ -1124,10 +1170,27 @@ public class Isj {
 
 
                     TypeEvaluation typeEvaluation = new TypeEvaluationFacade().find(retrouverTypeEvaluation(typeEval, codeUE, anneDebut));
+                    //System.out.println(retrouverTypeEvaluation(typeEval, codeUE, anneDebut));
                     //System.out.println(typeEval+" "+codeUE+" "+anneDebut+" "+typeEvaluation);
                     Evaluation evaluation = new Evaluation(libelle,description, date,Evaluation.Statut.ACTIVE,typeEvaluation);
                     new EvaluationFacade().create(evaluation);
 
+                   long id = retrouverLast();
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy");
+                    String tpyEv = description.trim().substring(0, 2), libEval = evaluation.getTypeEvaluation().getEnseignement().getUe().getLibelle(),
+                            filier =evaluation.getTypeEvaluation().getEnseignement().getUe().getSpecialite().getFiliere().getLibelle();
+                    int niv = evaluation.getTypeEvaluation().getEnseignement().getUe().getNiveau().getNumero();
+                    libEval = libEval.replaceAll(" ","_");
+                    libEval = libEval.replaceAll("/","_");
+
+                    String anonymat =  file.getParent() +File.separator+ "Fiche_de_Note_"+tpyEv+"_"+formatter.format(date)+"_"+libEval+"_"+filier+"_"+niv+".xlsx";
+
+                    //System.out.println(anonymat+"-"+tpyEv);
+                    if(tpyEv.equalsIgnoreCase("CC") || (tpyEv.equalsIgnoreCase("TP"))){
+                        createExcelNoteFile(id, anonymat);
+                    }else if (tpyEv.equalsIgnoreCase("SN") || (tpyEv.equalsIgnoreCase("RA"))){
+                        createExcelAnonymatFile(id, anonymat);
+                    }
 
                 }
             }
@@ -1139,12 +1202,11 @@ public class Isj {
     public void importerEstInscrit(String pathOut) throws IOException, SQLException {
         FileInputStream fis = new FileInputStream(new File(pathOut));
         XSSFWorkbook workbook = new XSSFWorkbook(fis);
-
+        Candidat candidat = null;
         Iterator<Sheet> sheetIterator = workbook.sheetIterator();
         while (sheetIterator.hasNext()) {
             Sheet sheet = sheetIterator.next();
             String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
-            String oldMat = sheet.getRow(4).getCell(1).getStringCellValue();
 
             int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
 
@@ -1152,27 +1214,32 @@ public class Isj {
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
                 int numrow = row.getRowNum();
+                String libelle, description, libEns, matricule = null;
 
-                if (numrow > 3) {
-                    String libelle, description, libEns, matricule;
+                if (numrow >= 3) {
+                    System.out.println(row.getRowNum());
+                    Iterator<Cell> cellIterator = row.cellIterator();
 
-                    description = row.getCell(0).getStringCellValue().toUpperCase().trim();
-                    matricule = row.getCell(1).getStringCellValue().trim();
-                    libEns = row.getCell(3).getStringCellValue().trim();
-                    libelle = row.getCell(4).getStringCellValue();
+                    while(cellIterator.hasNext()){
+                        Cell cell = cellIterator.next();
 
-                    if (!description.equalsIgnoreCase("") || !libEns.equalsIgnoreCase("")) {
-
-                        if (matricule.equalsIgnoreCase("")) matricule = oldMat;
-                        else oldMat =row.getCell(1).getStringCellValue();
-
-                        Candidat candidat = retrouverEtudiantMatricule(matricule);
-                        long id = retrouverEnseignement(libEns, anneDebut);
-                        Enseignement enseignement = new EnseignementFacade().find(id);
-                        new EstInscritFacade().enregistrer(libelle,description,EstInscrit.Statut.VALIDE,candidat,enseignement);
-                       // System.out.println(description+" "+matricule+" "+" "+libEns+" "+retrouverEnseignement(libEns, anneDebut));
+                        if(cell.getColumnIndex() == 0) {
+                            matricule = cell.getStringCellValue().trim();
+                            candidat = retrouverEtudiantMatricule(matricule);
+                        }
+                        if(cell.getColumnIndex() >= 2 && cell.getStringCellValue().equalsIgnoreCase("oui"))  {
+                            description = sheet.getRow(1).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
+                            libEns = sheet.getRow(2).getCell(cell.getColumnIndex()).getStringCellValue().trim();
+                            long id = retrouverEnseignement(libEns, anneDebut);
+                            Enseignement enseignement = new EnseignementFacade().find(id);
+                            if(id != -1) {
+                               new EstInscritFacade().enregistrer("", description, EstInscrit.Statut.VALIDE, candidat, enseignement);
+                               //System.out.println(description + " " + matricule + " " + " " + libEns + " " + candidat+ " " + retrouverEnseignement(libEns, anneDebut));
+                            }
+                        }
 
                     }
+
                 }
             }
         }
@@ -1180,16 +1247,17 @@ public class Isj {
         fis.close();
     }
 
-    public void importerListeNote(String pathOut) throws SQLException, IOException{
+    public void importerListeNote(String pathOut) throws SQLException, IOException {
         FileInputStream fis = new FileInputStream(new File(pathOut));
         XSSFWorkbook workbook = new XSSFWorkbook(fis);
+
+        double valeurNote = 0;
+        int numeroTable = 0;
 
         Iterator<Sheet> sheetIterator = workbook.sheetIterator();
         while (sheetIterator.hasNext()) {
             Sheet sheet = sheetIterator.next();
             String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
-            String oldMat = sheet.getRow(4).getCell(1).getStringCellValue();
-            String oldLibelle = sheet.getRow(4).getCell(1).getStringCellValue();
 
             int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
 
@@ -1197,41 +1265,57 @@ public class Isj {
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
                 int numrow = row.getRowNum();
+                String libelle, libelleEval, matricule = null, codeUE, typeEval, description, oldLibelle, oldCode;
 
-                if (numrow > 3) {
-                    String libelle, libelleEval, estInscr, codeUE, typeEval, description;
-                    double valeurNote = 0;
-                    int numeroTable = 0;
+                oldLibelle = sheet.getRow(2).getCell(1).getStringCellValue().trim();
+                oldCode = sheet.getRow(1).getCell(1).getStringCellValue().toUpperCase().trim();
 
-                    estInscr = row.getCell(0).getStringCellValue().trim();
-                    libelle = row.getCell(1).getStringCellValue();
-                    valeurNote = row.getCell(2).getNumericCellValue();
-                    libelleEval = row.getCell(3).getStringCellValue().toUpperCase().trim();
-                    description = row.getCell(4).getStringCellValue().toUpperCase().trim();
-                    numeroTable = (int) row.getCell(5).getNumericCellValue();
+                if (numrow >= 4) {
 
+                    System.out.println(row.getRowNum());
+                    Iterator<Cell> cellIterator = row.cellIterator();
 
-                    typeEval = libelleEval.substring(0,libelleEval.indexOf(" ")).trim();
-                    codeUE = libelleEval.substring(libelleEval.indexOf(" ")).trim();
+                    while (cellIterator.hasNext()) {
+                        Cell cell = cellIterator.next();
 
-                    if (estInscr.equalsIgnoreCase("")) estInscr = oldMat;
-                    else oldMat =row.getCell(0).getStringCellValue();
+                        if (cell.getColumnIndex() == 0) {
+                            matricule = cell.getStringCellValue().trim();
+                        }
+                        if (cell.getColumnIndex() > 0) {
+                            libelleEval = sheet.getRow(2).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
+                            codeUE = sheet.getRow(1).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
 
-                    if (libelle.equalsIgnoreCase("")) libelle = oldLibelle;
-                    else oldLibelle =row.getCell(1).getStringCellValue();
+                            if (libelleEval.isEmpty() || codeUE.isEmpty()) {
+                                libelleEval = oldLibelle;
+                                codeUE = oldCode;
+                            } else {
+                                oldLibelle = libelleEval;
+                                oldCode = codeUE;
+                            }
 
+                            typeEval = sheet.getRow(3).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
+                            //System.out.println(cell.getColumnIndex());
+                            try {
+                                valeurNote = cell.getNumericCellValue();
+                                //numeroTable = (int) cell.getNumericCellValue();
 
-                    long id_estInscrit = retrouverCodeEstInscrit(estInscr,libelle,anneDebut);
-                    System.out.println(id_estInscrit);
-                    long id_typEvalation = retrouverTypeEvaluation(typeEval, codeUE, anneDebut);
-                    System.out.println(id_typEvalation);
-                    TypeEvaluation typeEvaluation = new TypeEvaluationFacade().find(id_typEvalation);
-                    //System.out.println(new EstInscritFacade().find(id_estInscrit));
+                                long id_estInscrit = retrouverCodeEstInscrit(matricule, libelleEval, anneDebut);
+                                //
+                                long id_typEvalation = retrouverTypeEvaluation(typeEval, codeUE, anneDebut);
+                                System.out.println(id_typEvalation);
+                                TypeEvaluation typeEvaluation = new TypeEvaluationFacade().find(id_typEvalation);
+                                //System.out.println(codeUE+" - "+typeEval+" - "+anneDebut);
+                                if(valeurNote == 0){ valeurNote = 0.001;}
+                                Note note = new Note(libelleEval, typeEval, valeurNote, numeroTable, null, new EstInscritFacade().find(id_estInscrit), retrouverEvaluation(typeEvaluation));
+                                new NoteFacade().create(note);
 
-                   //System.out.println(typeEval+" "+codeUE+" "+anneDebut+" "+id_typEvalation+" "+typeEvaluation);
+                            } catch (Exception e) {
+                                e.getMessage();
+                            }
+                            //System.out.println(libelleEval+" "+typeEval+" "+valeurNote+" "+new EstInscritFacade().find(id_estInscrit)+" "+typeEvaluation);
 
-                   Note note = new Note(libelle, description, valeurNote, numeroTable, null, new EstInscritFacade().find(id_estInscrit), retrouverEvaluation(typeEvaluation));
-                   new NoteFacade().create(note);
+                        }
+                    }
 
                 }
             }
@@ -1248,37 +1332,42 @@ public class Isj {
         while (sheetIterator.hasNext()) {
             Sheet sheet = sheetIterator.next();
             String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
-            String oldMat = sheet.getRow(4).getCell(1).getStringCellValue();
-            String oldLibelle = sheet.getRow(4).getCell(1).getStringCellValue();
+            String oldMat = sheet.getRow(2).getCell(1).getStringCellValue();
+            String oldLibelle = sheet.getRow(2).getCell(1).getStringCellValue();
 
             int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
-
             Iterator<Row> rowIterator = sheet.iterator();
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
                 int numrow = row.getRowNum();
 
-                if (numrow > 2) {
-                    String libelle, libSemestre, matricule, description, nomEtud;
-                    Date Date_Displine;
+                if (numrow > 1 ){
+                    String libelle="", libSemestre = null, matricule ="", description = "", nomEtud;
+                    Date Date_Displine = null;
                     int Nbheure = 0, NbRetard = 0, heureJustifier = 0;
 
-                    description = row.getCell(0).getStringCellValue().trim();
-                    libelle = row.getCell(1).getStringCellValue();
-                    Date_Displine = row.getCell(2).getDateCellValue();
-                    Nbheure = (int)row.getCell(3).getNumericCellValue();
-                    NbRetard = (int)row.getCell(4).getNumericCellValue();
-                    libSemestre = row.getCell(5).getStringCellValue().toUpperCase().trim();
+                    try {
+                        description = row.getCell(0).getStringCellValue().trim();
+                        libelle = row.getCell(1).getStringCellValue();
+                        Date_Displine = row.getCell(2).getDateCellValue();
+                        Nbheure = (int) row.getCell(3).getNumericCellValue();
+                        NbRetard = (int) row.getCell(4).getNumericCellValue();
+                        libSemestre = row.getCell(5).getStringCellValue().toUpperCase().trim();
 
+                        matricule = description.substring(0,description.indexOf(" ")).trim();
 
-                    matricule = description.substring(0,description.indexOf(" ")).trim();
+                        AnneeAcademique anneeAcademique = retrouverAnneeAcademique(Date_Displine);
+                        Semestre semestre = retrouverSemestre(libSemestre, anneeAcademique);
+                        Etudiant etudiant = retrouverEtudiantMatricule(matricule);
 
-                    AnneeAcademique anneeAcademique = retrouverAnneeAcademique(Date_Displine);
-                    Semestre semestre = retrouverSemestre(libSemestre, anneeAcademique);
-                    Etudiant etudiant = retrouverEtudiantMatricule(matricule);
+                        if(etudiant != null) {
+                            Discipline discipline = new Discipline(libelle, description, etudiant, semestre, Nbheure, NbRetard, Date_Displine, 0);
+                            new DisciplineFacade().create(discipline);
+                        }
+                    }catch (Exception e){
+                        e.getMessage();
+                    }
 
-                    Discipline discipline = new Discipline(libelle,description,etudiant,semestre,Nbheure,NbRetard,Date_Displine,0);
-                    new DisciplineFacade().create(discipline);
                 }
             }
         }
@@ -1316,22 +1405,135 @@ public class Isj {
                 typeEvaluation = evaluation.getTypeEvaluation();
                 enseignement = typeEvaluation.getEnseignement();
             } else if (numeroLigne >= 5) {
-                if (reponse.equals("oui")) {
-                    matricule = dataFormatter.formatCellValue(row.getCell(1));
+                try {
                     valeurNote = Double.valueOf(dataFormatter.formatCellValue(row.getCell(3)));
                     numeroTable = Integer.valueOf(dataFormatter.formatCellValue(row.getCell(4)));
-                    etudiant = new Isj().retrouverEtudiantMatricule(matricule);
-                    estInscrit = new Isj().retrouverEstInscrit(etudiant, enseignement);
-                    resultat = new NoteFacade().enregistrer("", "", valeurNote, numeroTable, null, estInscrit, evaluation);
-                } else if (reponse.equals("non")) {
-                    code = dataFormatter.formatCellValue(row.getCell(1));
-                    valeurNote = Double.valueOf(dataFormatter.formatCellValue(row.getCell(3)));
-                    numeroTable = Integer.valueOf(dataFormatter.formatCellValue(row.getCell(4)));
-                    candidat = new CandidatFacade().find(Long.valueOf(code));
-                    estInscrit = new Isj().retrouverEstInscrit(candidat, enseignement);
-                    resultat = new NoteFacade().enregistrer("", "", valeurNote, numeroTable, null, estInscrit, evaluation);
+
+                    if (reponse.equals("oui")) {
+                        matricule = dataFormatter.formatCellValue(row.getCell(1));
+                        etudiant = new Isj().retrouverEtudiantMatricule(matricule);
+                        estInscrit = new Isj().retrouverEstInscrit(etudiant, enseignement);
+
+                        //resultat = new NoteFacade().enregistrer("", "", valeurNote, numeroTable, null, estInscrit, evaluation);
+                    } else if (reponse.equals("non")) {
+                        code = dataFormatter.formatCellValue(row.getCell(1));
+                        candidat = new CandidatFacade().find(Long.valueOf(code));
+                        estInscrit = new Isj().retrouverEstInscrit(candidat, enseignement);
+                        //resultat = new NoteFacade().enregistrer("", "", valeurNote, numeroTable, null, estInscrit, evaluation);
+                    }
+                } catch (Exception e) {
+                    resultat = e.getMessage();
                 }
             }
+        }
+    }
+
+    public void setNewClasse(double mgpMin, int creditMin, int annee, String libelleClasse) throws SQLException {
+        Classe classe = retrouverClasse(libelleClasse);
+        List<Candidat> ListCandidats = classe.getCandidats();
+        List<UE> ListUes = classe.getNiveau().getUes();
+
+        UE ue = null;
+
+        double moyenne, mgp_ann = 0, creditAn = 0, moyenneUe;
+
+        int niv = classe.getNiveau().getNumero(), creditMax =0;
+
+        String sql = "{? = CALL moy_sem(?,?,?,?)}", sql3 = "{ CALL enseignement_Etudiant(?,?)}",
+                sql4 ="{? = CALL moyenne_ue_etudiant(?,?,?)}", sql2 = "{ ? = CALL ens_exist(?,?,?)}";
+        Connection con = new ClasseFacade().getConnection();
+
+        CallableStatement funCredAn = null, funcMoySem = null, funcListEns = null, funcMoyEns = null, funcEnsExist = null;
+
+        funcMoySem = con.prepareCall(sql);
+        funcMoySem.registerOutParameter(1, java.sql.Types.FLOAT);
+        funcMoySem.setInt(3, niv);
+        funcMoySem.setInt(4, annee);
+
+        funcListEns = con.prepareCall(sql3);
+        funcListEns.setInt(2, annee);
+
+        funcMoyEns = con.prepareCall(sql4);
+        funcMoyEns.registerOutParameter(1, java.sql.Types.FLOAT);
+        funcMoyEns.setInt(4, annee);
+
+        funcEnsExist = con.prepareCall(sql2);
+        funcEnsExist.registerOutParameter(1, java.sql.Types.FLOAT);
+        funcEnsExist.setInt(3, annee+1);
+        funcEnsExist.setInt(4, niv);
+
+        for(Candidat candidat: ListCandidats){
+            moyenne = 0; creditMax =0; creditAn = 0; mgp_ann = 0;
+            String matricule = null;
+            Etudiant etudiant = new EtudiantFacade().find(candidat.getCode());
+            matricule = etudiant.getMatricule();
+
+            funcMoySem.setString(2,matricule);
+            funcMoySem.setString(5, "Semestre 1");
+            funcMoySem.execute();
+            moyenne += funcMoySem.getFloat(1);
+           // System.out.println(moyenne);
+            funcMoySem.setString(5, "Semestre 2");
+            funcMoySem.execute();
+            moyenne += funcMoySem.getFloat(1);
+
+            //System.out.println(matricule+" "+moyenne/2);
+            mgp_ann = retournerMgp(moyenne/2);
+
+            //System.out.println(mgp_ann);
+            funcListEns.setString(1, matricule);
+            funcListEns.execute();
+            ResultSet rs = funcListEns.getResultSet();
+
+                while(rs.next()){
+                    moyenneUe = 0;
+                    int codeEns = rs.getInt(2), codeEstInscrit = rs.getInt(1);
+                    funcMoyEns.setString(2, matricule);
+                    funcMoyEns.setInt(3, codeEns);
+                    funcMoyEns.execute();
+
+                    try{
+                        moyenneUe = funcMoyEns.getFloat(1);
+                        //System.out.println(codeEns+" "+matricule+" "+moyenneUe);
+
+                    }catch (Exception e){
+                        moyenneUe = 0;
+                        //System.out.println(moyenneUe);
+                    }
+
+                    Enseignement enseignement = new EnseignementFacade().find((long)codeEns);
+                    //System.out.println(enseignement);
+                    creditMax +=enseignement.getUe().getCredits();
+                    if(moyenneUe>=9){
+
+                        creditAn +=enseignement.getUe().getCredits();
+                        System.out.println("validé");
+                        //System.out.println("CREDIT ANNUEL"+" - "+ creditAn+" - "+ creditMax +" - "+ enseignement);
+                    } else {
+                        funcEnsExist.setString(2, enseignement.getLibelle());
+                        funcEnsExist.execute();
+                        long idEns = funcEnsExist.getInt(1);
+                        System.out.println("non validé");
+                        if(idEns != -1) {
+                            System.out.println("reprendre la matiere non validé");
+                            //new EstInscritFacade().enregistrer(enseignement.getUe().getCodeUE(),"",EstInscrit.Statut.VALIDE, candidat, enseignement);
+                            System.out.println("reprendre la matiere "+enseignement.getUe().getCodeUE()+" "+EstInscrit.Statut.VALIDE+" "+candidat+" "+enseignement);
+                        }
+                    }
+                    //EstInscrit estInscrit = new EstInscritFacade().find((long)codeEstInscrit);
+                    //estInscrit.setStatutVie(EstInscrit.StatutVie.CLOTUREE);
+                }
+
+            System.out.println("CREDIT ANNUEL"+" - "+ creditAn+" - "+ creditMax+" - "+ mgp_ann);
+            if((creditAn >= creditMin) && (mgp_ann >= mgpMin)){
+                //candidat.setClasse();
+               // classe.setSpecialite().;
+                System.out.println(candidat+"ADMIS"+"\n\n\n");
+               // candidat.setClasse(retrouverClasse("LIC 2"));
+            }else{
+                System.out.println(candidat + "ECHEC"+"\n\n\n");
+            }
+
         }
     }
 
@@ -1342,7 +1544,8 @@ public class Isj {
      * @throws IOException en coas d'erreur lors de l'ouverture du fichier
      */
     public void saveMatriculeAnonyma(String cheminAcces) throws IOException {
-        Workbook workbook = new WorkbookFactory().create(new File(cheminAcces));
+        File file = new File(cheminAcces);
+        Workbook workbook = new WorkbookFactory().create(file);
 
         //ON RECUPERE LA FEUILLE
         Sheet sheet = workbook.getSheetAt(0);
@@ -1357,6 +1560,7 @@ public class Isj {
         int numeroTable = 0;
         double valeurNote = -1; //si note non definit alors note vaut -1 et on ne l'afficheras pas.
         int num_anonymat = 0;
+        long id = 0;
         Etudiant etudiant = null;
         Candidat candidat = null;
         TypeEvaluation typeEvaluation = null;
@@ -1372,7 +1576,8 @@ public class Isj {
             if (numeroLigne == 0) {
                 reponse = dataFormatter.formatCellValue(row.getCell(1));
             } else if (numeroLigne == 1) {
-                evaluation = new EvaluationFacade().find(Long.valueOf(dataFormatter.formatCellValue(row.getCell(1))));
+                id = Long.valueOf(dataFormatter.formatCellValue(row.getCell(1)));
+                evaluation = new EvaluationFacade().find(id);
                 typeEvaluation = evaluation.getTypeEvaluation();
                 enseignement = typeEvaluation.getEnseignement();
 
@@ -1399,10 +1604,15 @@ public class Isj {
                 anonymat.setNote(note);
                 new NoteFacade().create(note);
 
-                //new AnonymatFacade().merge(anonymat);
-
             }
         }
+        String anonymatfile =  file.getParent() +File.separator+ "Anonymat_"+file.getName();
+        try {
+            createExcelAnonymatNoteFile(id, cheminAcces);
+        }catch (Exception e){
+            resultat = e.getMessage();
+        }
+        workbook.close();
     }
 
     /**
@@ -1562,47 +1772,92 @@ public class Isj {
      * fonction qui renvoie une liste d'etudiant d'un niveau, d'une filiere et d'un semestre precis rangé par l'ordre de merite suivant
      *
      * @param annee    date de l'annee a la quelle nous voulons les rangs
-     * @param niv      niveau des etudiant que l'on veut ranger
+     * @param classe      niveau des etudiant que l'on veut ranger
      * @param semestre libelle du semestre correspondant au rangement
      * @param filiere  libelle de la filiere requise
      * @return ArrayList de matricule rangé dans l'odre
      * @throws SQLException en cas d'erreur de coomunication avec la base de donnée
      */
-    public ArrayList rangEtudiant(int annee, int niv, String semestre, String filiere) throws SQLException {
-
+    public ArrayList rangEtudiant(int annee, String classe, String semestre, String filiere) throws SQLException {
+        int niv = retrouverClasse(classe).getNiveau().getNumero();
         String matricule = "", sql = "{? = CALL mgp_sem(?,?,?,?)}", sql2 = "{CALL etud_class(?,?,?)}";
         Connection con = new ClasseFacade().getConnection();
 
         HashMap<String, Float> listEtudMoy = new HashMap<>();
 
-        CallableStatement procEtudClass = null, funcMgpSem = null;
+        CallableStatement procEtudClass = null;
         procEtudClass = con.prepareCall(sql2);
-        procEtudClass.setInt(1, niv);
+        procEtudClass.setString(1, classe);
         procEtudClass.setString(2, filiere);
         procEtudClass.setInt(3, annee);
         procEtudClass.execute();
         ResultSet rs = procEtudClass.getResultSet();
 
-        funcMgpSem = con.prepareCall(sql);
-        funcMgpSem.registerOutParameter(1, java.sql.Types.FLOAT);
-        funcMgpSem.setInt(3, niv);
-        funcMgpSem.setInt(4, annee);
-        funcMgpSem.setString(5, semestre);
-
         while (rs.next()) {
             matricule = rs.getString(1);
-            funcMgpSem.setString(2, matricule);
-            funcMgpSem.execute();
-            listEtudMoy.put(matricule, funcMgpSem.getFloat(1));
+            float mgp = mgpEtudaint(matricule,annee,semestre,niv,con);
+            listEtudMoy.put(matricule, mgp);
         }
+        //System.out.println(listEtudMoy);
+        return trierListe(listEtudMoy);
+    }
 
-        listEtudMoy = listEtudMoy.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+    public float mgpEtudaint(String matricule, int annee, String semestre, int niv, Connection con){
+        float moyenne = 0;
+        String sql = "{? = CALL mgp_sem(?,?,?,?)}";
+
+        try {
+            CallableStatement funcMgpSem = null;
+            funcMgpSem = con.prepareCall(sql);
+            funcMgpSem.registerOutParameter(1, java.sql.Types.FLOAT);
+            funcMgpSem.setString(2, matricule);
+            funcMgpSem.setInt(3, niv);
+            funcMgpSem.setInt(4, annee);
+            funcMgpSem.setString(5, semestre);
+            funcMgpSem.execute();
+            moyenne = funcMgpSem.getFloat(1);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return moyenne;
+    }
+
+
+   /*public ArrayList rangAnnuel(int annee, String classe, String filiere) throws SQLException{
+        int niv = retrouverClasse(classe).getNiveau().getNumero();
+        String matricule = "", sql = "{? = CALL mgp_sem(?,?,?,?)}", sql2 = "{CALL etud_class(?,?,?)}";
+        Connection con = new ClasseFacade().getConnection();
+
+        HashMap<String, Float> listEtudMoy = new HashMap<>();
+
+        CallableStatement procEtudClass = null;
+        procEtudClass = con.prepareCall(sql2);
+        procEtudClass.setString(1, classe);
+        procEtudClass.setString(2, filiere);
+        procEtudClass.setInt(3, annee);
+        procEtudClass.execute();
+        ResultSet rs = procEtudClass.getResultSet();
+
+        while (rs.next()) {
+            float moyenne = 0;
+            matricule = rs.getString(1);
+            for(int i=1; i<=2; i++) {
+                moyenne += mgpEtudaint(matricule,annee,"Semestre "+i,niv,con);
+            }
+            listEtudMoy.put(matricule, moyenne);
+        }
+        return trierListe(listEtudMoy);
+    }*/
+
+
+    public ArrayList trierListe(HashMap<String, Float> list){
+        list = list.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
         ArrayList listRang = new ArrayList();
-        listRang.addAll(listEtudMoy.keySet());
-        System.out.println(listRang);
+        listRang.addAll(list.keySet());
         return listRang;
     }
+
 
     public Utilisateur renvoyerLoginEmail(String email) throws NoResultException {
         String sql = "SELECT u FROM Utilisateur u WHERE u.email=:email";
@@ -1916,7 +2171,7 @@ public class Isj {
         return (AnneeAcademique) query.getSingleResult();
     }
 
-    public long retrouverLast() throws Exception {
+    public long retrouverLast() throws SQLException {
 
         int lastInsertedId = -1;
 
@@ -2101,5 +2356,16 @@ public class Isj {
         }
         return properties;
     }
+
+    public double retournerMgp(double moyenne){
+        return ((moyenne >= 18) && (moyenne <= 20)) ? 4.00 : ((moyenne >= 16) && (moyenne < 18)) ? 3.70
+    : ((moyenne >= 14) && ((moyenne < 16))) ? 3.30 : ((moyenne >= 13) && (moyenne < 14)) ? 3.00
+    : ((moyenne >= 12) && (moyenne < 13)) ? 2.70 : ((moyenne >= 11) && (moyenne < 12)) ? 2.30
+    : ((moyenne >= 10) && (moyenne < 11)) ? 2.00 : ((moyenne >= 9) && (moyenne < 10)) ? 1.70
+    : ((moyenne >= 8) && (moyenne < 9)) ? 1.30 : ((moyenne >= 6) && (moyenne < 8)) ? 1.00
+    : ((moyenne >= 0) && (moyenne < 6)) ? 0.00 : null;
+    }
+
+
 
 }

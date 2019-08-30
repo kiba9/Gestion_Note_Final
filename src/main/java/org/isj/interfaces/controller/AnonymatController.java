@@ -734,7 +734,8 @@ public class AnonymatController implements Initializable{
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.initOwner(Appli.getPrimaryStage);
             alert.setTitle("ISJ");
-            alert.setContentText("échec lors de l'opération! veuillez vérifier le fichier chargé.".toUpperCase());
+            alert.setHeaderText("Echec lors de l'opération!");
+            alert.setContentText("Veuillez vérifier le fichier à charger");
             alert.show();
         }
         handleRaffraichir();

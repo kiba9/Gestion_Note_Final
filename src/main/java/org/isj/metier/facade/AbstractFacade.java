@@ -15,7 +15,9 @@ package org.isj.metier.facade;
  */
 
 import java.lang.reflect.Method;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -254,9 +256,9 @@ public abstract class AbstractFacade<T> {
      * @return
      */
 
-    java.sql.Connection con;
+    static java.sql.Connection con;
 
-    public java.sql.Connection getConnection() throws SQLException {
+    public static java.sql.Connection getConnection() throws SQLException {
 
         if (con == null || con.isClosed()) {
             try {
@@ -271,5 +273,32 @@ public abstract class AbstractFacade<T> {
         return con;
     }
 
+    public static String getMatricule(long codeEtudiant){
+
+        String requete="select matricule from etudiant where code="+codeEtudiant;
+        try {
+            Statement st = getConnection().createStatement();
+            ResultSet rs=st.executeQuery(requete);
+            while(rs.next())
+                return rs.getString("matricule");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static String getCodeAuthentification(long codeEtudiant){
+
+        String requete="select code_authentification from etudiant where code="+codeEtudiant;
+        try {
+            Statement st = getConnection().createStatement();
+            ResultSet rs=st.executeQuery(requete);
+            while(rs.next())
+                return rs.getString("code_authentification");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return "";
+    }
 
 }

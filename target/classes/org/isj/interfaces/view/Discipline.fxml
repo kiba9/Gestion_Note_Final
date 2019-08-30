@@ -172,7 +172,7 @@
                                                 <Insets left="10.0" />
                                             </GridPane.margin>
                                         </Label>
-                                        <Label text="Nombe de retard" textFill="#111111" GridPane.rowIndex="4">
+                                        <Label text="Nombe de retard" textFill="#111111" GridPane.rowIndex="5">
                                             <font>
                                                 <Font name="Arial" size="13.0" />
                                             </font>
@@ -199,7 +199,7 @@
                                         <TextField fx:id="code" prefHeight="25.0" prefWidth="245.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
                                         <TextField fx:id="libelle" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                         <TextArea fx:id="description" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label layoutX="20.0" layoutY="462.0" text="Etudiant" textFill="#111111" GridPane.rowIndex="5">
+                              <Label layoutX="20.0" layoutY="462.0" text="Etudiant" textFill="#111111" GridPane.rowIndex="6">
                                  <font>
                                     <Font name="Arial" size="13.0" />
                                  </font>
@@ -207,7 +207,7 @@
                                     <Insets left="10.0" />
                                  </padding>
                               </Label>
-                              <Label layoutX="10.0" layoutY="471.0" text="Semestre" textFill="#111111" GridPane.rowIndex="6">
+                              <Label layoutX="10.0" layoutY="471.0" text="Semestre" textFill="#111111" GridPane.rowIndex="7">
                                  <font>
                                     <Font name="Arial" size="13.0" />
                                  </font>
@@ -215,20 +215,30 @@
                                     <Insets left="10.0" />
                                  </padding>
                               </Label>
-                              <ComboBox fx:id="etudiant" layoutX="156.0" layoutY="329.0" prefHeight="25.0" prefWidth="363.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <ComboBox fx:id="semestre" layoutX="156.0" layoutY="402.0" prefHeight="25.0" prefWidth="363.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <ComboBox fx:id="etudiant" layoutX="156.0" layoutY="329.0" prefHeight="25.0" prefWidth="363.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <ComboBox fx:id="semestre" layoutX="156.0" layoutY="402.0" prefHeight="25.0" prefWidth="363.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                               <TextField fx:id="absence" layoutX="156.0" layoutY="183.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <TextField fx:id="retard" layoutX="156.0" layoutY="256.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <TextField fx:id="retard" layoutX="156.0" layoutY="256.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <Label layoutX="20.0" layoutY="228.0" text="heure_J" textFill="#111111" GridPane.rowIndex="4">
+                                 <font>
+                                    <Font name="Arial" size="13.0" />
+                                 </font>
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <TextField fx:id="heure_j" prefHeight="25.0" prefWidth="245.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                     </children>
                                     <columnConstraints>
-                                        <ColumnConstraints hgrow="ALWAYS" maxWidth="146.0" minWidth="10.0" prefWidth="130.0" />
-                                        <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="161.0" />
+                                        <ColumnConstraints hgrow="ALWAYS" maxWidth="206.0" minWidth="10.0" prefWidth="174.0" />
+                                        <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="332.0" />
                                     </columnConstraints>
                                     <rowConstraints>
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -258,11 +268,7 @@
                                                 <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                             </HBox.margin>
                                         </Button>
-<<<<<<< HEAD
                               <Button layoutX="393.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleCharger" prefHeight="25.0" prefWidth="75.0" style="-fx-background-radius: 100px;" text="Charger">
-=======
-                              <Button layoutX="306.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleCharger" style="-fx-background-radius: 100px;" text="Charger">
->>>>>>> 3717e7d8806e45f5afd441055b5d705ab6f367ba
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                  </HBox.margin></Button>

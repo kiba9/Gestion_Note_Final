@@ -15,10 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.isj.gestionutilisateurs.Connexion;
@@ -65,6 +62,8 @@ public class DisciplineController implements Initializable {
     @FXML
     private TextField retard;
 
+    @FXML
+    private TextField heure_j;
 
     @FXML
     private ComboBox<Etudiant> etudiant;
@@ -204,6 +203,7 @@ public class DisciplineController implements Initializable {
                 retard.setText(String.valueOf(discipline.getNbRetards()));
                 etudiant.setValue(discipline.getEtudiant());
                 semestre.setValue(discipline.getSemestre());
+                heure_j.setText(String.valueOf(discipline.getHeureJustifie()));
             }
         }
     }
@@ -225,6 +225,7 @@ public class DisciplineController implements Initializable {
             retard.setText("");
             etudiant.setValue(null);
             semestre.setValue(null);
+            heure_j.setText("");
         }
     }
 
@@ -269,13 +270,13 @@ public class DisciplineController implements Initializable {
                 absenceDiscipline = absence.getText();
                 Etudiant etudiantclasse = etudiant.getSelectionModel().getSelectedItem();
                 Semestre semestreclasse = semestre.getSelectionModel().getSelectedItem();
+                String heure_j_D = heure_j.getText();
 
-                //Classe classe = new ClasseFacade().find(new Long(4));
                 String resultat;
                 if (disciplineSelectionne == null)
-                    resultat = disciplineFacade.enregistrer(libelleDiscipline, descriptionDiscipline, Integer.parseInt(absenceDiscipline), Integer.parseInt(retardDiscipline), etudiantclasse, semestreclasse, null, 0);
+                    resultat = disciplineFacade.enregistrer(libelleDiscipline, descriptionDiscipline, Integer.parseInt(absenceDiscipline), Integer.parseInt(retardDiscipline), etudiantclasse, semestreclasse, null, Integer.parseInt(heure_j_D));
                 else
-                    resultat = disciplineFacade.modifier(disciplineSelectionne, libelleDiscipline, descriptionDiscipline, Integer.parseInt(absenceDiscipline), Integer.parseInt(retardDiscipline), etudiantclasse, semestreclasse, null, 0);
+                    resultat = disciplineFacade.modifier(disciplineSelectionne, libelleDiscipline, descriptionDiscipline, Integer.parseInt(absenceDiscipline), Integer.parseInt(retardDiscipline), etudiantclasse, semestreclasse, null, Integer.parseInt(heure_j_D));
 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.initOwner(Appli.getPrimaryStage);
@@ -750,7 +751,7 @@ public class DisciplineController implements Initializable {
     public void handleCharger() throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Appli.class.getResource("../view/EmplacementDiscipline.fxml"));
-        BorderPane page = loader.load();
+        AnchorPane page = loader.load();
         Stage dialogStage = new Stage();
         dialogStage.setTitle("Liste des messages envoyés");
         dialogStage.getIcons().add(new Image("org/isj/interfaces/images/logo_isj.jpeg"));

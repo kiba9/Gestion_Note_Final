@@ -214,24 +214,33 @@ public class EvaluationController implements Initializable {
                 libelleeval = libelle.getText();
                 Date dateEvale = Date.from(dateEval.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
                 TypeEvaluation typeEvaluationEval = typeEvaluation.getSelectionModel().getSelectedItem();
-                String resultat;
+                String resultat = "";
                 if (evaluationSelectionne == null) {
                     FileChooser fileChooser = new FileChooser();
                     FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
                     fileChooser.getExtensionFilters().add(extFilter);
-                    File file = fileChooser.showOpenDialog(Appli.getPrimaryStage);
+                    File file = fileChooser.showSaveDialog(Appli.getPrimaryStage);
+                    if (file != null) {
+                        // Make sure it has the correct extension
+                        if (!file.getPath().endsWith(".xlsx")) {
+                            file = new File(file.getPath() + ".xlsx");
+                        }
                     resultat = evaluationFacade.enregistrer(libelleeval, "", dateEvale, Evaluation.Statut.ACTIVE, typeEvaluationEval);
                     Long id = new Isj().retrouverLast();
                     //System.out.println(id);
-                    String teval = (typeEvaluationEval.toString().substring( 0, typeEvaluationEval.toString().indexOf("-")-1));
+                    String teval = typeEvaluationEval.toString().substring(0, 2);
                     //System.out.println(teval.equalsIgnoreCase("CC") || teval.equalsIgnoreCase("TP"));
 
-                    if (teval.equalsIgnoreCase("cc") ) {
-                        new Isj().createExcelNoteFile(id,  file.getAbsolutePath());
+                    if (teval.equalsIgnoreCase("cc") ||teval.equalsIgnoreCase("tp")) {
+                       // System.out.println("fichier cc");
+                          new Isj().createExcelNoteFile(id,  file.getAbsolutePath());
                     } else {
+                        //System.out.println("fichier exam");
                         new Isj().createExcelAnonymatFile(id, file.getAbsolutePath());
-                        new Isj().createExcelAnonymatNoteFile(id, file.getAbsolutePath());
+                     /*  String Anonymat =  file.getParent() +File.separator+ "Anonymat_"+file.getName();
+                        new Isj().createExcelAnonymatNoteFile(id, Anonymat);*/
                     }
+                }
 
                 }else {
                     resultat = evaluationFacade.modifier(evaluationSelectionne, libelleeval, "", dateEvale, Evaluation.Statut.ACTIVE, typeEvaluationEval);

@@ -29,10 +29,10 @@ public class Personne extends Securite {
     @Column(name = "prenom")
     private String prenom;
 
-    @Column(name = "email",unique=true,nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "telephone",unique=true,nullable = false, length=20)
+    @Column(name = "telephone",nullable = false, unique = true, length=13)
     private int telephone;
 
     @Column(name = "date_naissance", nullable = false)

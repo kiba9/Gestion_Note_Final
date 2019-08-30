@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="200.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.isj.interfaces.controller.EmplacementFichierController">
+<AnchorPane prefHeight="200.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.isj.interfaces.controller.FileNoteController">
    <children>
       <Button layoutX="284.0" layoutY="67.0" mnemonicParsing="false" onAction="#handleParcourir" prefHeight="25.0" prefWidth="111.0" text="Parcourir" />
       <TextField fx:id="parcourir" layoutX="14.0" layoutY="67.0" prefHeight="25.0" prefWidth="261.0" />

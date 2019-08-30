@@ -26,13 +26,6 @@ import java.util.ResourceBundle;
 public class EmplacementFichierController implements Initializable {
 
     @FXML
-    private TextField parcourir;
-
-    @FXML
-    private ComboBox<String> choixNote;
-    ObservableList<String> listChoix = FXCollections.observableArrayList("Matricule - Anonymat","Note - Anonymat","Note - Matricule");
-
-    @FXML
     private RadioButton chargerUneEval;
 
     @FXML
@@ -56,6 +49,7 @@ public class EmplacementFichierController implements Initializable {
                 dialogStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 dialogStage.setScene(scene);
                 dialogStage.show();
+
             }else if(chargerPlusEval.isSelected()){
                 new NoteController().stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 FileChooser fileChooser = new FileChooser();
@@ -77,68 +71,7 @@ public class EmplacementFichierController implements Initializable {
                     alert.show();
                     new AnneeAcademiqueController().handleRaffraichir();
                 }
-
             }
-
-        }catch (Exception e){
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(Appli.getPrimaryStage);
-            alert.setTitle("ISJ");
-            alert.setContentText("Une erreur s'est produite!");
-            alert.show();
-        }
-    }
-
-    File fileget = null;
-
-    @FXML
-    public void handleParcourir(){
-
-        try{
-            FileChooser fileChooser = new FileChooser();
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx");
-            fileChooser.getExtensionFilters().add(extFilter);
-            fileget = fileChooser.showOpenDialog(Appli.getPrimaryStage);
-            parcourir.setText(fileget.getAbsolutePath());
-        }catch(Exception e){
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(Appli.getPrimaryStage);
-            alert.setTitle("ISJ");
-            alert.setContentText("Une erreur s'est produite!");
-            alert.show();
-        }
-    }
-
-    @FXML
-    public void handleOk(){
-        choixNote.setItems(listChoix);
-        try{
-            Isj isj = new Isj();
-            if(choixNote.getItems().equals("Matricule - Anonymat")){
-                isj.saveMatriculeAnonyma(fileget.getAbsolutePath());
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.initOwner(Appli.getPrimaryStage);
-                alert.setTitle("ISJ");
-                alert.setContentText("SUCCES");
-                alert.show();
-            }else if(choixNote.getItems().equals("Note - Anonymat")){
-                isj.saveNoteAnonymat(fileget.getAbsolutePath());
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.initOwner(Appli.getPrimaryStage);
-                alert.setTitle("ISJ");
-                alert.setContentText("SUCCES");
-                alert.show();
-            }else if(choixNote.getItems().equals("Note - Matricule")){
-                isj.enregistrerNoteExcel(fileget.getAbsolutePath());
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.initOwner(Appli.getPrimaryStage);
-                alert.setTitle("ISJ");
-                alert.setContentText("SUCCES");
-                alert.show();
-            }
-            new NoteController().handleRaffraichir();
         }catch (Exception e){
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);

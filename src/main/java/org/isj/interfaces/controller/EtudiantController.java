@@ -3,11 +3,12 @@ package org.isj.interfaces.controller;
 import ar.com.fdvs.dj.domain.constants.Page;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -26,14 +27,11 @@ import org.isj.metier.Isj;
 import org.isj.metier.entites.*;
 import org.isj.metier.facade.ClasseFacade;
 import org.isj.metier.facade.EtudiantFacade;
-import org.isj.metier.facade.FiliereFacade;
-import org.isj.metier.facade.NiveauFacade;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Date;
@@ -102,7 +100,6 @@ public class EtudiantController implements Initializable {
     private ComboBox<Classe> classe;
     ObservableList<Classe> listeClasse = FXCollections.observableArrayList();
 
-
     @FXML
     private TableView<Etudiant> table;
     ObservableList<Etudiant> listeEtudiants = FXCollections.observableArrayList();
@@ -154,8 +151,8 @@ public class EtudiantController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         operateurs.setItems(listOperateurs);
+        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         try{
-
             listeClasses();
             listEtudiants();
             afficheDetail(null);
@@ -191,6 +188,7 @@ public class EtudiantController implements Initializable {
             datecolumn.setCellValueFactory(cellData -> new SimpleStringProperty(format.format(cellData.getValue().getDateNaissance())));
 
             ResultSetMetaData resultSetMetaData = new Isj().renvoyerChamp(Etudiant.class);
+
             for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
                 try {
                     listAttributs.add(resultSetMetaData.getColumnName(i));
@@ -298,6 +296,7 @@ public class EtudiantController implements Initializable {
             alert.setHeaderText("Aucune donnée à modifier");
             alert.setContentText("Veuillez sélectionner une ligne dans le tableau.");
             alert.show();
+            System.out.println();
         }
         else if (Connexion.peutModifier(Etudiant.class)) {
             activationDesactivationDetails(gridPane,true);
@@ -492,6 +491,13 @@ public class EtudiantController implements Initializable {
         Scene scene = new Scene(page);
         dialogStage.setScene(scene);
         dialogStage.show();
+
+        ObservableList<Etudiant> selectedItems = table.getSelectionModel().getSelectedItems();
+
+        for(Etudiant e : selectedItems){
+            System.out.println("selected item " + e.getMatricule());
+        }
+
     }
 
     @FXML

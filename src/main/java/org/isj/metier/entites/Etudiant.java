@@ -65,7 +65,7 @@ public class Etudiant extends Candidat implements Serializable {
 
     @Override
     public String getLibelle(){
-        return matricule +"-" + super.getLibelle();
+        return getMatricule() +"-" + super.getLibelle();
     }
 
     @Override
@@ -75,6 +75,6 @@ public class Etudiant extends Candidat implements Serializable {
 
     @Override
     public String toString() {
-        return getNom()+" "+getPrenom()+" "+matricule;
+        return getNom()+" "+getPrenom()+" "+getMatricule();
     }
 }

@@ -86,7 +86,9 @@ public class SendEmail {
 
         message.setContent(multipart);
         //envoi de message
+
         Transport.send(message);
+
         System.out.println("Envoyé");
     }
     /**

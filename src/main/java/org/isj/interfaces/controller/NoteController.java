@@ -226,6 +226,7 @@ public class NoteController implements Initializable {
             evaluation.setValue(null);
             valeur_note.setText("");
             description.setText("");
+            etudiant.setValue(null);
         }
     }
 
@@ -262,12 +263,13 @@ public class NoteController implements Initializable {
                 valeurNote = valeur_note.getText();
                 descriptionNote = description.getText();
                 Evaluation evaluationNote = evaluation.getSelectionModel().getSelectedItem();
+                EstInscrit estInscrit = etudiant.getSelectionModel().getSelectedItem();
 
                 String resultat;
                 if (noteSelectionne == null)
-                    resultat = noteFacade.enregistrer(libelleNote, descriptionNote, Double.valueOf(valeurNote), Integer.parseInt(numeroTableNote), null,null,evaluationNote);
+                    resultat = noteFacade.enregistrer(libelleNote, descriptionNote, Double.valueOf(valeurNote), Integer.parseInt(numeroTableNote), null,estInscrit,evaluationNote);
                 else
-                    resultat = noteFacade.modifier(noteSelectionne, libelleNote, descriptionNote, Double.valueOf(valeurNote), Integer.parseInt(numeroTableNote),null, null, evaluationNote);
+                    resultat = noteFacade.modifier(noteSelectionne, libelleNote, descriptionNote, Double.valueOf(valeurNote), Integer.parseInt(numeroTableNote),null, estInscrit, evaluationNote);
 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.initOwner(Appli.getPrimaryStage);
