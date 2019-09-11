@@ -109,6 +109,7 @@
                                                 <TableView fx:id="table" prefHeight="493.0" prefWidth="608.0" tableMenuButtonVisible="true" GridPane.columnIndex="0" GridPane.columnSpan="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS">
                                                     <columns>
                                                         <TableColumn fx:id="codecolumn" prefWidth="75.0" text="Code" />
+                                          <TableColumn fx:id="etudiantcolumn" prefWidth="75.0" text="Etudiant" />
                                                         <TableColumn fx:id="libellecolumn" prefWidth="75.0" text="Libellé" />
                                                         <TableColumn fx:id="NumeroTablecolumn" prefWidth="75.0" text="Numero de table" />
                                                         <TableColumn fx:id="evaluationcolumn" prefWidth="86.0" text="Evaluation" />

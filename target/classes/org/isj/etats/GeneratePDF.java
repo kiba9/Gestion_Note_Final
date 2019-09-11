@@ -42,7 +42,7 @@ public class GeneratePDF {
             connection = DriverManager.getConnection(url, login, password);
 
             // - Chargement et compilation du rapport
-            JasperDesign jasperDesign = JRXmlLoader.load("C:\\Users\\cena\\Documents\\GitHub\\Gestion_Note_Final\\src\\main\\java\\org\\isj\\etats\\ReleveFinal.jrxml");
+            JasperDesign jasperDesign = JRXmlLoader.load("C:\\Users\\User\\Documents\\GitHub\\Gestion_Note_Final\\src\\main\\java\\org\\isj\\etats\\ReleveFinal.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
 
             // - Paramètres à envoyer au rapport
@@ -64,7 +64,7 @@ public class GeneratePDF {
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
 
             // - Création du rapport au format PDF
-            JasperExportManager. exportReportToPdfFile(jasperPrint, "C:\\Users\\Cena\\Desktop\\etudiant1.pdf");
+            JasperExportManager. exportReportToPdfFile(jasperPrint, "C:\\Users\\User\\Desktop\\etudiant1.pdf");
         } catch (Exception e) {
 
             e.printStackTrace();

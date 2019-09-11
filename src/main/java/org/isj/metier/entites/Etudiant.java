@@ -4,6 +4,8 @@ package org.isj.metier.entites;
  * importation des classes
  */
 
+import org.isj.metier.facade.AbstractFacade;
+
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -40,6 +42,8 @@ public class Etudiant extends Candidat implements Serializable {
     public Etudiant(){}
 
     public String getMatricule() {
+        if(matricule==null)
+            matricule= AbstractFacade.getMatricule(getCode());
         return matricule;
     }
 
@@ -48,6 +52,9 @@ public class Etudiant extends Candidat implements Serializable {
     }
 
     public String getCodeAuthentification() {
+
+        if(codeAuthentification==null)
+            codeAuthentification=AbstractFacade.getCodeAuthentification(getCode());
         return codeAuthentification;
     }
 
@@ -65,7 +72,7 @@ public class Etudiant extends Candidat implements Serializable {
 
     @Override
     public String getLibelle(){
-        return getMatricule() +"-" + super.getLibelle();
+        return matricule +"-" + super.getLibelle();
     }
 
     @Override
@@ -75,6 +82,6 @@ public class Etudiant extends Candidat implements Serializable {
 
     @Override
     public String toString() {
-        return getNom()+" "+getPrenom()+" "+getMatricule();
+        return getNom()+" "+getPrenom()+" "+matricule;
     }
 }

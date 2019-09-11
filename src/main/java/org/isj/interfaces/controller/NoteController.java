@@ -89,6 +89,9 @@ public class NoteController implements Initializable {
     private TableColumn<Note, String> descriptioncolumn;
 
     @FXML
+    private TableColumn<Note, String> etudiantcolumn;
+
+    @FXML
     private TableColumn<Note, Double> valeurNotecolumn;
 
     @FXML
@@ -160,6 +163,7 @@ public class NoteController implements Initializable {
             valeurNotecolumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getValeurNote()).asObject());
             descriptioncolumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
             codecolumn.setCellValueFactory(cellData -> new SimpleLongProperty(cellData.getValue().getCode()).asObject());
+            etudiantcolumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEstInscrit().getCandidatInscrit().getNom()));
 
             ResultSetMetaData resultSetMetaData = new Isj().renvoyerChamp(Note.class);
             for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {

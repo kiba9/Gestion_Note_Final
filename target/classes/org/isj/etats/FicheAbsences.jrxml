@@ -4,34 +4,19 @@
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center"/>
-	<parameter name="niveau" class="java.lang.Integer"/>
-	<parameter name="filiere" class="java.lang.String"/>
+	<parameter name="classe" class="java.lang.String"/>
 	<parameter name="annee_academique" class="java.lang.Integer"/>
 	<parameter name="semestre" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[call abs($P{niveau},$P{filiere},$P{annee_academique},$P{semestre})]]>
+		<![CDATA[call disci($P{annee_academique},$P{classe},$P{semestre})]]>
 	</queryString>
 	<field name="matricule" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="pers" class="java.lang.String"/>
-	<field name="mois" class="java.lang.String"/>
-	<field name="nb_heures_absences" class="java.lang.Integer">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="heure_justifie" class="java.lang.Integer">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="HNJ" class="java.lang.Long"/>
-	<variable name="total_mois" class="java.lang.Integer" calculation="Sum">
-		<variableExpression><![CDATA[$F{nb_heures_absences}]]></variableExpression>
-	</variable>
-	<variable name="total_NJ" class="java.lang.Integer" calculation="Sum">
-		<variableExpression><![CDATA[$F{HNJ}]]></variableExpression>
-	</variable>
-	<variable name="total_J" class="java.lang.Integer" calculation="Sum">
-		<variableExpression><![CDATA[$F{heure_justifie}]]></variableExpression>
-	</variable>
+	<field name="nom_prenom" class="java.lang.String"/>
+	<field name="retard" class="java.lang.String"/>
+	<field name="absc" class="java.math.BigDecimal"/>
+	<field name="heure_j" class="java.math.BigDecimal"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -63,49 +48,26 @@
 				</textElement>
 				<text><![CDATA[Site : www.institutsaintjean.org]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="134" y="118" width="70" height="20" uuid="21c726b0-66ad-466d-91bf-4a6acd60d7e7"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font isBold="true" isUnderline="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{filiere}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="134" y="138" width="45" height="20" uuid="a3325af8-d60e-4666-a2d3-7a5393f0bfa5"/>
-				<textElement verticalAlignment="Middle">
-					<font isBold="true" isUnderline="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{niveau}]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="88" y="118" width="46" height="20" uuid="95557f8f-5fa1-44c6-9fc6-36cf3a8460cb"/>
+				<reportElement x="88" y="118" width="51" height="20" uuid="95557f8f-5fa1-44c6-9fc6-36cf3a8460cb"/>
 				<textElement verticalAlignment="Middle">
 					<font isUnderline="true"/>
 				</textElement>
-				<text><![CDATA[FILIERE :]]></text>
+				<text><![CDATA[CLASSE :]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="88" y="138" width="46" height="20" uuid="e07b38bb-7a54-49af-bf1c-0be281a608e5"/>
+			<textField>
+				<reportElement x="139" y="118" width="100" height="20" uuid="df20cb09-9cfa-4f5f-8bd5-5ceb50550819"/>
 				<textElement verticalAlignment="Middle">
-					<font isUnderline="true"/>
+					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[NIVEAU :]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA[$P{classe}.toUpperCase()]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<summary>
 		<band height="169">
 			<crosstab>
-				<reportElement x="0" y="0" width="555" height="57" uuid="df69c909-1bf4-49a2-b226-d4b2937c89bf"/>
-				<crosstabParameter name="total_mois" class="java.lang.Integer">
-					<parameterValueExpression><![CDATA[$V{total_mois}]]></parameterValueExpression>
-				</crosstabParameter>
-				<crosstabParameter name="total_NJ" class="java.lang.Integer">
-					<parameterValueExpression><![CDATA[$V{total_NJ}]]></parameterValueExpression>
-				</crosstabParameter>
-				<crosstabParameter name="total_J" class="java.lang.Integer">
-					<parameterValueExpression><![CDATA[$V{total_J}]]></parameterValueExpression>
-				</crosstabParameter>
+				<reportElement x="26" y="0" width="529" height="57" uuid="df69c909-1bf4-49a2-b226-d4b2937c89bf"/>
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
@@ -169,7 +131,7 @@
 				</rowGroup>
 				<rowGroup name="pers" width="151">
 					<bucket class="java.lang.String">
-						<bucketExpression><![CDATA[$F{pers}]]></bucketExpression>
+						<bucketExpression><![CDATA[$F{nom_prenom}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#F0F8FF" mode="Opaque">
@@ -198,7 +160,7 @@
 				</rowGroup>
 				<columnGroup name="mois" height="23" totalPosition="End">
 					<bucket class="java.lang.String">
-						<bucketExpression><![CDATA[$F{mois}]]></bucketExpression>
+						<bucketExpression><![CDATA[$F{retard}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents backcolor="#F0F8FF" mode="Opaque">
@@ -271,8 +233,14 @@
 						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<measure name="nb_heures_absencesMeasure" class="java.lang.Integer">
-					<measureExpression><![CDATA[$F{nb_heures_absences}]]></measureExpression>
+				<measure name="nb_heures_absencesMeasure" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{absc}]]></measureExpression>
+				</measure>
+				<measure name="heure_J" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{heure_j}]]></measureExpression>
+				</measure>
+				<measure name="total" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{absc}]]></measureExpression>
 				</measure>
 				<crosstabCell width="50" height="13">
 					<cellContents>
@@ -323,7 +291,7 @@
 							<textElement verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$P{total_mois}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{total}]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement style="Crosstab Data Text" mode="Opaque" x="35" y="0" width="34" height="13" uuid="13605035-06c7-479c-9b02-52450945db36"/>
@@ -337,7 +305,7 @@
 							<textElement verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$P{total_NJ}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{nb_heures_absencesMeasure} - $V{heure_J}]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement style="Crosstab Data Text" mode="Opaque" x="69" y="0" width="35" height="13" uuid="b34adf60-838b-4cd7-abf6-8b98773d5624"/>
@@ -351,7 +319,7 @@
 							<textElement verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$P{total_J}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{heure_J}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>

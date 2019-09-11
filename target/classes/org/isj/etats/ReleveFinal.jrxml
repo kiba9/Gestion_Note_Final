@@ -2,26 +2,28 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReleveFinal" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8dc6c1c5-97c6-4c3b-ad57-5f6bcf1d92fa">
 	<property name="ireport.zoom" value="1.3310000000000008"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="38"/>
+	<property name="ireport.y" value="40"/>
 	<parameter name="filiere" class="java.lang.String"/>
 	<parameter name="nom_etudiant" class="java.lang.String"/>
 	<parameter name="date_naissance" class="java.lang.String"/>
-	<parameter name="niveau" class="java.lang.Integer"/>
+	<parameter name="classe" class="java.lang.String"/>
 	<parameter name="annee_academique" class="java.lang.Integer"/>
 	<parameter name="sexe" class="java.lang.String"/>
 	<parameter name="matricule" class="java.lang.String"/>
-	<parameter name="rang_semestriel" class="java.lang.Integer"/>
-	<parameter name="semestre" class="java.lang.String">
-		<defaultValueExpression><![CDATA[$F{Semestre}]]></defaultValueExpression>
-	</parameter>
+	<parameter name="semestre" class="java.lang.String"/>
 	<parameter name="rang_annuel" class="java.lang.String"/>
+	<parameter name="image_isj" class="java.lang.Object"/>
+	<parameter name="image_uy1" class="java.lang.Object"/>
+	<parameter name="image_ensp" class="java.lang.Object"/>
+	<parameter name="niveau" class="java.lang.Integer"/>
+	<parameter name="numero" class="java.lang.Long"/>
 	<queryString>
-		<![CDATA[Call releve_note($P{matricule},$P{niveau},$P{annee_academique})]]>
+		<![CDATA[Call releve_note($P{matricule},$P{classe},$P{annee_academique})]]>
 	</queryString>
 	<field name="matricule" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="niveau" class="java.lang.String"/>
+	<field name="niv" class="java.lang.String"/>
 	<field name="codeue" class="java.lang.String"/>
 	<field name="code_module" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
@@ -41,6 +43,8 @@
 	<field name="Session" class="java.lang.String"/>
 	<field name="Semestre" class="java.lang.String"/>
 	<field name="penalites" class="java.lang.Float"/>
+	<field name="mgp" class="java.math.BigDecimal"/>
+	<field name="rang" class="java.lang.Integer"/>
 	<variable name="moyenne_SUM" class="java.lang.Float" resetType="Group" resetGroup="Module" incrementType="Group" incrementGroup="Module" calculation="Sum">
 		<variableExpression><![CDATA[$F{moyenne}]]></variableExpression>
 	</variable>
@@ -102,7 +106,7 @@
 		<variableExpression><![CDATA[(($F{moyenne} < 10) && ($F{moyenne} >= 7))]]></variableExpression>
 	</variable>
 	<variable name="variable2" class="java.lang.Float" resetType="Group" resetGroup="Module">
-		<variableExpression><![CDATA[($F{moyenne} < 10)? 1:0]]></variableExpression>
+		<variableExpression><![CDATA[(($F{moyenne} >= 9) && ($F{moyenne} < 10))? 1:0]]></variableExpression>
 	</variable>
 	<variable name="condition_niveau" class="java.lang.String">
 		<variableExpression><![CDATA[($P{niveau} == 1) ? "Première Année"
@@ -110,7 +114,13 @@
 : ($P{niveau} == 3) ? "Troisème Année"
 : ($P{niveau} == 4) ? "Quatrième Année"
 : ($P{niveau} == 5) ? "Cinquième Année"
-: "NULL"]]></variableExpression>
+: $P{niveau}]]></variableExpression>
+	</variable>
+	<variable name="mgp_annuel" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$F{mgp}]]></variableExpression>
+	</variable>
+	<variable name="mgp_semestre" class="java.lang.Float" resetType="Group" resetGroup="Semestre" calculation="Sum">
+		<variableExpression><![CDATA[$F{mgp}]]></variableExpression>
 	</variable>
 	<group name="Semestre">
 		<groupExpression><![CDATA[$F{Semestre}]]></groupExpression>
@@ -427,8 +437,8 @@
 					</textElement>
 					<textFieldExpression><![CDATA[($V{somme_M_C_2} / $V{cred_semestre_2}) - $F{penalites}]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="284" y="29" width="89" height="11" uuid="a4148e2a-e2da-4479-b9cd-5e2c671a5537"/>
+				<textField pattern="###0.00">
+					<reportElement x="284" y="29" width="89" height="11" isRemoveLineWhenBlank="true" uuid="a4148e2a-e2da-4479-b9cd-5e2c671a5537"/>
 					<box>
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -439,18 +449,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font size="8" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[(($V{grade_semestre} >= 18) && ($V{grade_semestre} <= 20)) ? "4.00"
-    : (($V{grade_semestre} >= 16) && ($V{grade_semestre} < 18)) ? "3.70"
-    : (($V{grade_semestre} >= 14) && ($V{grade_semestre} < 16)) ? "3.30"
-    : (($V{grade_semestre} >= 13) && ($V{grade_semestre} < 14)) ? "3.00"
-    : (($V{grade_semestre} >= 12) && ($V{grade_semestre} < 13)) ? "2.70"
-    : (($V{grade_semestre} >= 11) && ($V{grade_semestre} < 12)) ? "2.30"
-    : (($V{grade_semestre} >= 10) && ($V{grade_semestre} < 11)) ? "2.00"
-    : (($V{grade_semestre} >= 9) && ($V{grade_semestre} < 10)) ? "1.70"
-    : (($V{grade_semestre} >= 8) && ($V{grade_semestre} < 9)) ? "1.30"
-    : (($V{grade_semestre} >= 6) && ($V{grade_semestre} < 8)) ? "1.00"
-    : (($V{grade_semestre} >= 0) && ($V{grade_semestre} < 6)) ? "0.00"
-    : "NULL"]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$V{mgp_semestre} / $V{cred_semestre_2}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="373" y="29" width="91" height="11" uuid="f9094bd8-7587-4cc9-b470-a62a21f4d672"/>
@@ -489,7 +488,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font size="8" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$P{rang_semestriel}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{rang}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="39" y="9" width="89" height="9" uuid="58cdccf7-02b2-4027-a5ca-7c633a725bb4"/>
@@ -545,7 +544,7 @@
 					<textElement verticalAlignment="Middle">
 						<font size="7" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[  $F{module}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{module}]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement mode="Opaque" x="477" y="0" width="66" height="9" backcolor="#CCCCCC" uuid="2dd2cac1-ab27-416c-985e-1d102b5dc923"/>
@@ -724,15 +723,15 @@
 			</staticText>
 			<image>
 				<reportElement x="82" y="44" width="46" height="31" uuid="03b99fed-a8c0-4e8e-8fcd-a77888bb30a6"/>
-				<imageExpression><![CDATA["C:\\Users\\User\\Documents\\logo isj.jpeg"]]></imageExpression>
+				<imageExpression><![CDATA[$P{image_isj}]]></imageExpression>
 			</image>
 			<image>
 				<reportElement x="408" y="44" width="39" height="31" uuid="7ec8a95b-5260-486f-bdf6-fd9cdede936c"/>
-				<imageExpression><![CDATA["C:\\Users\\User\\Documents\\logo uy1.jpg"]]></imageExpression>
+				<imageExpression><![CDATA[$P{image_uy1}]]></imageExpression>
 			</image>
 			<image>
 				<reportElement x="464" y="44" width="29" height="31" uuid="dfb9c1f0-540e-4e93-959d-091f598ca091"/>
-				<imageExpression><![CDATA["C:\\Users\\User\\Documents\\logo ensp.jpg"]]></imageExpression>
+				<imageExpression><![CDATA[$P{image_ensp}]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="0" y="75" width="555" height="17" uuid="b38225e7-df73-4438-b045-3d7067812aa6"/>
@@ -742,11 +741,11 @@
 				<text><![CDATA[RELEVE DE NOTES ANNUEL]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="92" width="380" height="12" uuid="a84f7485-b856-4873-944e-14751f68a499"/>
+				<reportElement x="209" y="92" width="171" height="12" uuid="a84f7485-b856-4873-944e-14751f68a499"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
-				<text><![CDATA[N°000141/ENSP/DA-ENSP/GI-ENSP/ISJ/DPISJ/RP/]]></text>
+				<text><![CDATA[/ENSP/DA-ENSP/GI-ENSP/ISJ/DPISJ/RP/]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="6" y="104" width="36" height="13" uuid="00fc338e-89e4-479c-a528-91ea97b6f7cc"/>
@@ -828,7 +827,7 @@
 : ($P{niveau} == 3) ? "Troisème Année"
 : ($P{niveau} == 4) ? "Quatrième Année"
 : ($P{niveau} == 5) ? "Cinquième Année"
-: "NULL"]]></textFieldExpression>
+: " "]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="259" y="145" width="21" height="14" uuid="df5037e9-3610-456c-8adb-8ace279b0f13"/>
@@ -876,6 +875,20 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{niveau} + "Ann"]]></textFieldExpression>
 			</textField>
+			<textField>
+				<reportElement x="154" y="92" width="55" height="12" uuid="4ff69894-d38b-4b82-9839-b4d750a1c0fa"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{numero}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="142" y="92" width="12" height="12" uuid="cd3426a6-e7b4-4b09-83ad-bb49f77d9929"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[N°]]></text>
+			</staticText>
 		</band>
 	</title>
 	<detail>
@@ -906,7 +919,7 @@
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[  $F{ue}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{ue}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="301" y="0" width="44" height="11" uuid="d3057265-bbdc-4740-a2b2-04d67a312bf4"/>
@@ -1136,7 +1149,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$V{bilan_annuel} / 2]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField pattern="###0.00">
 				<reportElement x="236" y="23" width="77" height="12" uuid="2b4a2da6-8676-4273-bdbd-48aea0e3629b"/>
 				<box>
 					<pen lineWidth="1.0"/>
@@ -1148,18 +1161,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($V{grade_annuel} >= 18) && ($V{grade_annuel} <= 20)) ? "4.00"
-    : (($V{grade_annuel} >= 16) && ($V{grade_annuel} < 18)) ? "3.70"
-    : (($V{grade_annuel} >= 14) && ($V{grade_annuel} < 16)) ? "3.30"
-    : (($V{grade_annuel} >= 13) && ($V{grade_annuel} < 14)) ? "3.00"
-    : (($V{grade_annuel} >= 12) && ($V{grade_annuel} < 13)) ? "2.70"
-    : (($V{grade_annuel} >= 11) && ($V{grade_annuel} < 12)) ? "2.30"
-    : (($V{grade_annuel} >= 10) && ($V{grade_annuel} < 11)) ? "2.00"
-    : (($V{grade_annuel} >= 9) && ($V{grade_annuel} < 10)) ? "1.70"
-    : (($V{grade_annuel} >= 8) && ($V{grade_annuel} < 9)) ? "1.30"
-    : (($V{grade_annuel} >= 6) && ($V{grade_annuel} < 8)) ? "1.00"
-    : (($V{grade_annuel} >= 0) && ($V{grade_annuel} < 6)) ? "0.00"
-    : "NULL"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{mgp_annuel} / $V{credit_annuel_2}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="313" y="23" width="72" height="12" uuid="035e9997-0ed0-4a10-881d-4c85fdd47446"/>

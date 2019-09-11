@@ -63,21 +63,21 @@ public class EmplacementDisciplineController implements Initializable {
         try{
             if(parcourir != null){
                 Isj isj = new Isj();
-                if(choixNote.getItems().equals("Importer toutes les disciplines")){
+                if(choixNote.getSelectionModel().getSelectedItem().equals("Importer toutes les disciplines")){
                     isj.importerDiscipline(file.getAbsolutePath());
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.initOwner(Appli.getPrimaryStage);
                     alert.setTitle("ISJ");
                     alert.setContentText("SUCCES");
                     alert.show();
-                }else if(choixNote.getItems().equals("Importer Absences")){
+                }else if(choixNote.getSelectionModel().getSelectedItem().equals("Importer Absences")){
                     isj.saveAbscence(file.getAbsolutePath());
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.initOwner(Appli.getPrimaryStage);
                     alert.setTitle("ISJ");
                     alert.setContentText("SUCCES");
                     alert.show();
-                }else if(choixNote.getItems().equals("Importer Retard")){
+                }else if(choixNote.getSelectionModel().getSelectedItem().equals("Importer Retard")){
                     //sisj.enregistrerRetard(file.getAbsolutePath());
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.initOwner(Appli.getPrimaryStage);

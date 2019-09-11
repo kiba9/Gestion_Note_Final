@@ -5,6 +5,7 @@ package org.isj.metier;
  */
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
@@ -915,6 +916,11 @@ public class Isj {
         return minMax;
     }
 
+    /**
+     * fonction qui importe la liste des  ue
+     * @param pathOut         chemin d'acces vers le repertoire de sauvegarde du fichier.
+     * @throws IOException en cas de erreur lors de l'enregistrement du fichier
+     */
     public void sauvegarderUe(String pathOut) throws IOException {
         FileInputStream fis = new FileInputStream(new File(pathOut));
         //création d'un classeuR
@@ -924,38 +930,42 @@ public class Isj {
         while (sheetIterator.hasNext()) {
             Sheet sheet = sheetIterator.next();
             DataFormatter dataFormatter = new DataFormatter();
+
             //on itère sur les lignes
             Iterator<Row> rowIt = sheet.rowIterator();
-            String odlMod = sheet.getRow(1).getCell(3).getStringCellValue();
-            String niv = String.valueOf(sheet.getRow(1).getCell(4).getNumericCellValue());
-            String spe = sheet.getRow(1).getCell(5).getStringCellValue();
+            String odlMod = sheet.getRow(1).getCell(3).getStringCellValue().trim();
+            String niv = String.valueOf(sheet.getRow(1).getCell(4).getNumericCellValue()).trim();
+            String spe = sheet.getRow(1).getCell(5).getStringCellValue().trim();
             while (rowIt.hasNext()) {
                 Row row = rowIt.next();
                 int numRow = row.getRowNum();
                 if (numRow > 0) {
                     String codeUe, libelle, mod, cred, niveau, specialite;
 
-                    codeUe = dataFormatter.formatCellValue(row.getCell(0));
-                    libelle = dataFormatter.formatCellValue(row.getCell(1));
+                    codeUe = dataFormatter.formatCellValue(row.getCell(0)).trim();
+                    libelle = dataFormatter.formatCellValue(row.getCell(1)).trim();
                     cred = dataFormatter.formatCellValue(row.getCell(2));
-                    mod = dataFormatter.formatCellValue(row.getCell(3));
+                    mod = dataFormatter.formatCellValue(row.getCell(3)).trim();
                     niveau = dataFormatter.formatCellValue(row.getCell(4));
-                    specialite = dataFormatter.formatCellValue(row.getCell(5));
+                    specialite = dataFormatter.formatCellValue(row.getCell(5)).trim();
                     if (!libelle.isEmpty()|| !codeUe.isEmpty() || !cred.isEmpty()) {
 
                         if (mod.isEmpty()) mod = odlMod;
-                        else odlMod = dataFormatter.formatCellValue(row.getCell(3));
+                        else odlMod = dataFormatter.formatCellValue(row.getCell(3)).trim();
 
                         if (niveau.isEmpty()) niveau = niv;
-                        else niv = dataFormatter.formatCellValue(row.getCell(4));
+                        else niv = dataFormatter.formatCellValue(row.getCell(4)).trim();
 
                         if (specialite.isEmpty()) specialite = spe;
-                        else spe = dataFormatter.formatCellValue(row.getCell(5));
+                        else spe = dataFormatter.formatCellValue(row.getCell(5)).trim();
 
-                        UE ue = new UE(libelle, "", codeUe, UE.Statut.ACTIVE, Integer.valueOf(cred), retrouverModule(mod), retrouverNiveau(Long.valueOf(niveau)), retrouverSpecialite(specialite));
-                       new UEFacade().create(ue);
-                        //System.out.println(codeUe+" "+libelle+" "+" "+cred+" "+retrouverModule(mod)+" "+retrouverNiveau(Long.valueOf(niveau))+" "+retrouverSpecialite(specialite));
-
+                        try {
+                            // UE ue = new UE(libelle, "", codeUe, UE.Statut.ACTIVE, Integer.valueOf(cred), retrouverModule(mod), retrouverNiveau(Long.valueOf(niveau)), retrouverSpecialite(specialite));
+                            // new UEFacade().create(ue);
+                            System.out.println(codeUe + " " + libelle + " " + " " + cred + " " + retrouverModule(mod) + " " + retrouverNiveau(Long.valueOf(niveau)) + " " + retrouverSpecialite(specialite));
+                        }catch (Exception e){
+                            throw new NoResultException("");
+                        }
                     }
 
                 }
@@ -965,6 +975,12 @@ public class Isj {
         wb.close();
     }
 
+    /**
+     * fonction qui importer la liste des enseignement contenu dans un classeur excel
+     * @param pathOut chemin d'acces vers le repertoire de sauvegarde du fichier.
+     * @throws IOException en cas de erreur lors de l'enregistrement du fichier
+     * @throws SQLException en cas de erreur lors de la communication avec la base de données
+     */
     public void sauvegarderEnseignement(String pathOut) throws IOException, SQLException {
         FileInputStream fis = new FileInputStream(new File(pathOut));
         XSSFWorkbook wb = new XSSFWorkbook(fis);
@@ -985,17 +1001,19 @@ public class Isj {
                     long anDeb, numSemestre;
 
                     description = dataFormatter.formatCellValue(row.getCell(0)).trim();
-                    heure = Integer.valueOf(dataFormatter.formatCellValue(row.getCell(1)));
+                    heure = Integer.valueOf(dataFormatter.formatCellValue(row.getCell(1)).trim());
                     libelle = dataFormatter.formatCellValue(row.getCell(2)).trim();
                     prog = dataFormatter.formatCellValue(row.getCell(3));
-                    numSemestre = Long.valueOf(dataFormatter.formatCellValue(row.getCell(4)));
+                    numSemestre = Long.valueOf(dataFormatter.formatCellValue(row.getCell(4)).trim());
+                    if(numSemestre % 2 == 0) numSemestre = 2;
+                    if(numSemestre % 2 == 1) numSemestre = 1;
                     anDeb = (long) row.getCell(5).getNumericCellValue();
-                    codeUe = dataFormatter.formatCellValue(row.getCell(6));
+                    codeUe = dataFormatter.formatCellValue(row.getCell(6)).trim();
                    // System.out.println(codeUe);
 
                     Semestre semestre = new SemestreFacade().find(retrouverCodeSemestre(numSemestre, anDeb));
-                    Enseignement En = new Enseignement(libelle, description, heure, prog, semestre, retrouverUe(codeUe));
-//                    System.out.println(description + " - " + heure + " - " + libelle + " - " + prog + " - " + semestre.getCode() + " - " + anDeb + " - " + codeUe);
+                  Enseignement En = new Enseignement(libelle, description, heure, prog, semestre, retrouverUe(codeUe.trim()));
+                   // System.out.println(description + " - " + heure + " - " + libelle + " - " + prog + " - " + semestre.getCode() + " - " + anDeb + " - " + retrouverUe(codeUe.trim()));
                     new EnseignementFacade().create(En);
                 }
             }
@@ -1005,6 +1023,11 @@ public class Isj {
         wb.close();
     }
 
+    /**
+     * fonction qui importer la liste des module contenu dans un classeur excel
+     * @param pathOut chemin d'acces vers le repertoire de sauvegarde du fichier.
+     * @throws IOException en cas de erreur lors de l'enregistrement du fichier
+     */
     public void saveModule(String pathOut) throws IOException {
 
         FileInputStream fis = new FileInputStream(new File(pathOut));
@@ -1024,9 +1047,9 @@ public class Isj {
                 int numRow = row.getRowNum();
                 if (numRow > 0) {
                     String codeModule, libelle, description;
-                    codeModule = dataFormatter.formatCellValue(row.getCell(0));
-                    libelle = dataFormatter.formatCellValue(row.getCell(1));
-                    description = dataFormatter.formatCellValue(row.getCell(2));
+                    codeModule = dataFormatter.formatCellValue(row.getCell(0)).trim();
+                    libelle = dataFormatter.formatCellValue(row.getCell(1)).trim();
+                    description = dataFormatter.formatCellValue(row.getCell(2)).trim();
                     if (!libelle.isEmpty() && !codeModule.isEmpty() || !description.isEmpty()) {
                         Module module = new Module(libelle, description, codeModule);
 //                        System.out.println(module);
@@ -1039,6 +1062,12 @@ public class Isj {
         wb.close();
     }
 
+    /**
+     * fonction qui importer la liste des type evaluation (cc, tp, sn, ra) contenu dans un classeur Excel
+     * @param pathOut chemin d'accès vers le répertoire de sauvegarde du fichier.
+     * @throws IOException en cas d'erreur lors de l'enregistrement du fichier
+     * @throws SQLException en cas d'erreur lors de la communication avec la base de données
+     */
     public void importerTypeEvaluation(String pathOut) throws IOException, SQLException {
         FileInputStream fis = new FileInputStream(new File(pathOut));
         XSSFWorkbook workbook = new XSSFWorkbook(fis);
@@ -1046,7 +1075,9 @@ public class Isj {
         Iterator<Sheet> sheetIterator = workbook.sheetIterator();
         while (sheetIterator.hasNext()) {
             Sheet sheet = sheetIterator.next();
-            String oldLibEns = sheet.getRow(4).getCell(3).getStringCellValue();
+
+            String oldLibEns = sheet.getRow(4).getCell(3).getStringCellValue().trim();
+            String oldCodeUe = sheet.getRow(4).getCell(4).getStringCellValue().trim();
             String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
             int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
 
@@ -1057,19 +1088,23 @@ public class Isj {
 
                 if (numrow > 3) {
                     Enseignement enseignement = null;
-                    String libelle, description, libEns, resultat;
+                    String libelle, description, libEns, codeUe,resultat;
                     float pourcentage = 0;
 
-                    libelle = row.getCell(0).getStringCellValue().toUpperCase();
-                    description = row.getCell(1).getStringCellValue();
+                    libelle = row.getCell(0).getStringCellValue().toUpperCase().trim();
+                    description = row.getCell(1).getStringCellValue().trim();
                     pourcentage = ((float) row.getCell(2).getNumericCellValue());
-                    libEns = row.getCell(3).getStringCellValue();
+                    libEns = row.getCell(3).getStringCellValue().trim();
+                    codeUe = row.getCell(4).getStringCellValue().trim();
 
                     if(libEns.isEmpty()) libEns = oldLibEns;
-                    else oldLibEns =row.getCell(3).getStringCellValue();
+                    else oldLibEns =row.getCell(3).getStringCellValue().trim();
+
+                    if(codeUe.isEmpty()) codeUe = oldCodeUe;
+                    else oldCodeUe = codeUe;
 
                     //System.out.println(libEns);
-                    enseignement = new EnseignementFacade().find(retrouverEnseignement(libEns.trim(), anneDebut));
+                    enseignement = new EnseignementFacade().find(retrouverEnseignement(libEns.trim(), codeUe, anneDebut));
                     //System.out.println(enseignement);
                     TypeEvaluation typeEvaluation = new TypeEvaluation(libelle,description,pourcentage, enseignement);
                     resultat = new TypeEvaluationFacade().create(typeEvaluation);
@@ -1083,64 +1118,86 @@ public class Isj {
         fis.close();
     }
 
-
+    /**
+     * fonction qui importer les candidats contenu dans un classeur Excel
+     * @param pathOut chemin d'accès vers le répertoire de sauvegarde du fichier.
+     * @throws IOException en cas d'erreur lors de l'enregistrement du fichier
+     */
     public void importerCandidat(String pathOut) throws IOException {
         FileInputStream fis = new FileInputStream(new File(pathOut));
         XSSFWorkbook workbook = new XSSFWorkbook(fis);
-
         Iterator<Sheet> sheetIterator = workbook.sheetIterator();
         while (sheetIterator.hasNext()) {
             Sheet sheet = sheetIterator.next();
 
             Iterator<Row> rowIterator = sheet.iterator();
             while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                int numrow = row.getRowNum();
+                try {
+                    Row row = rowIterator.next();
+                    int numrow = row.getRowNum();
 
-                if (numrow > 0) {
-                    String matricule ="", nom = "", prenom = "", lieuNaiss = "", sexe = "", ecoleOrigine = "", email = "", nomPere = "";
-                    String professionPere = "", professionMere = "", regionOrigin = "", Dtype = "", nomMere = "", codeAuth ="";
-                    Classe classe = null;
-                    Date dateNaiss;
-                    int telpPere, telpMere, telpEtud;
-
-                    matricule = row.getCell(0).getStringCellValue();
-                    nom = row.getCell(1).getStringCellValue();
-                    prenom = row.getCell(2).getStringCellValue();
-                    classe = retrouverClasse(row.getCell(3).getStringCellValue());
-                    telpEtud = (int) row.getCell(4).getNumericCellValue();
-                    dateNaiss = row.getCell(5).getDateCellValue();
-
-                    sexe = row.getCell(7).getStringCellValue();
-                    ecoleOrigine = row.getCell(8).getStringCellValue();
-                    email = row.getCell(9).getStringCellValue();
-                    nomPere = row.getCell(11).getStringCellValue();
-                    professionPere = row.getCell(12).getStringCellValue();
-                    nomMere = row.getCell(13).getStringCellValue();
-                    professionMere = row.getCell(14).getStringCellValue();
-                    regionOrigin = row.getCell(15).getStringCellValue();
-                    Dtype = row.getCell(16).getStringCellValue();
-                    telpMere = (int) row.getCell(17).getNumericCellValue();
-                    telpPere = (int) row.getCell(18).getNumericCellValue();
-
-                    codeAuth = String.valueOf(new Eleve().code(matricule));
-
-                    if(Dtype.equalsIgnoreCase("Etudiant"))
-                        new EtudiantFacade().enregistrer(null, null, nom, prenom, email, telpEtud, dateNaiss, Personne.Sexe.valueOf(sexe), Candidat.Statut.ACTIVE, nomMere, nomPere, telpMere, telpPere, professionPere, professionMere, regionOrigin, ecoleOrigine, matricule, codeAuth,classe);
-                    else
-                        new CandidatFacade().enregistrer(null, null, nom, prenom, email, telpEtud, dateNaiss, Personne.Sexe.valueOf(sexe), Candidat.Statut.ACTIVE, nomMere, nomPere, telpMere, telpPere, professionPere, professionMere, regionOrigin, ecoleOrigine, classe);
-                    //System.out.println(candidat);
+                    if (numrow > 0) {
+                        String matricule = "", nom = "", prenom = "", lieuNaiss = "", sexe = "", ecoleOrigine = "", email = "", nomPere = "";
+                        String professionPere = "", professionMere = "", regionOrigin = "", Dtype = "", nomMere = "", codeAuth = "";
+                        Classe classe = null;
+                        Date dateNaiss = null;
+                        int telpPere = 0, telpMere = 0, telpEtud = 0;
 
 
+                        matricule = row.getCell(0).getStringCellValue().trim();
+                        nom = row.getCell(1).getStringCellValue().trim();
+                        prenom = row.getCell(2).getStringCellValue().trim();
+                        classe = retrouverClasse(row.getCell(3).getStringCellValue());
+                        telpEtud = (int) row.getCell(4).getNumericCellValue();
+                        dateNaiss = row.getCell(5).getDateCellValue();
 
+                        sexe = row.getCell(7).getStringCellValue().trim();
+                        ecoleOrigine = row.getCell(8).getStringCellValue().trim();
+                        email = row.getCell(9).getStringCellValue().trim();
+                        nomPere = row.getCell(11).getStringCellValue().trim();
+                        nomMere = row.getCell(13).getStringCellValue().trim();
+                        regionOrigin = row.getCell(15).getStringCellValue().trim();
+                        Dtype = row.getCell(16).getStringCellValue().trim();
+
+                        try {
+                            professionPere = row.getCell(12).getStringCellValue().trim();
+                            professionMere = row.getCell(14).getStringCellValue().trim();
+
+                            telpMere = (int) row.getCell(17).getNumericCellValue();
+                            telpPere = (int) row.getCell(18).getNumericCellValue();
+
+                        } catch (Exception e) {
+                            e.getMessage();
+                        }
+
+                        codeAuth = String.valueOf(new Eleve().getCodeAuthentification());
+
+                        if (Dtype.equalsIgnoreCase("Etudiant")) {
+                            new EtudiantFacade().enregistrer(null, null, nom, prenom, email, telpEtud, dateNaiss, Personne.Sexe.valueOf(sexe), Candidat.Statut.ACTIVE, nomMere, nomPere, telpMere, telpPere, professionPere, professionMere, regionOrigin, ecoleOrigine, matricule, codeAuth, classe);
+                        } else {
+                            new CandidatFacade().enregistrer(null, null, nom, prenom, email, telpEtud, dateNaiss, Personne.Sexe.valueOf(sexe), Candidat.Statut.ACTIVE, nomMere, nomPere, telpMere, telpPere, professionPere, professionMere, regionOrigin, ecoleOrigine, classe);
+                            //System.out.println(candidat);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
             }
         }
         fis.close();
         workbook.close();
+
     }
 
+    /**
+     * fonction a pour rôles d’enregistrer les informations des différentes évaluations contenues dans un classeur Excel
+     * @param pathOut chemin d'accès vers le répertoire de sauvegarde du fichier.
+     * @throws IOException en cas d'erreur lors de l'enregistrement du fichier
+     * @throws SQLException en cas d'erreur lors de la communication avec la base de données
+     * @throws MessagingException en cas d'erreur lors de l'envoie du mail
+     *
+     */
     public void importerEvaluation(String pathOut)throws IOException, SQLException, MessagingException {
         File file = new File(pathOut);
         FileInputStream fis = new FileInputStream(file);
@@ -1149,7 +1206,7 @@ public class Isj {
         Iterator<Sheet> sheetIterator = workbook.sheetIterator();
         while (sheetIterator.hasNext()) {
             Sheet sheet = sheetIterator.next();
-            String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
+            String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue().trim();
             int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
 
             Iterator<Row> rowIterator = sheet.iterator();
@@ -1163,7 +1220,7 @@ public class Isj {
 
                     date = row.getCell(0).getDateCellValue();
                     description = row.getCell(1).getStringCellValue().toUpperCase().trim();
-                    libelle = row.getCell(2).getStringCellValue();
+                    libelle = row.getCell(2).getStringCellValue().trim();
 
                     typeEval = description.substring(0,description.indexOf(" ")).trim();
                     codeUE = description.substring(description.indexOf(" ")).trim();
@@ -1175,23 +1232,6 @@ public class Isj {
                     Evaluation evaluation = new Evaluation(libelle,description, date,Evaluation.Statut.ACTIVE,typeEvaluation);
                     new EvaluationFacade().create(evaluation);
 
-                   long id = retrouverLast();
-                    SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy");
-                    String tpyEv = description.trim().substring(0, 2), libEval = evaluation.getTypeEvaluation().getEnseignement().getUe().getLibelle(),
-                            filier =evaluation.getTypeEvaluation().getEnseignement().getUe().getSpecialite().getFiliere().getLibelle();
-                    int niv = evaluation.getTypeEvaluation().getEnseignement().getUe().getNiveau().getNumero();
-                    libEval = libEval.replaceAll(" ","_");
-                    libEval = libEval.replaceAll("/","_");
-
-                    String anonymat =  file.getParent() +File.separator+ "Fiche_de_Note_"+tpyEv+"_"+formatter.format(date)+"_"+libEval+"_"+filier+"_"+niv+".xlsx";
-
-                    //System.out.println(anonymat+"-"+tpyEv);
-                    if(tpyEv.equalsIgnoreCase("CC") || (tpyEv.equalsIgnoreCase("TP"))){
-                        createExcelNoteFile(id, anonymat);
-                    }else if (tpyEv.equalsIgnoreCase("SN") || (tpyEv.equalsIgnoreCase("RA"))){
-                        createExcelAnonymatFile(id, anonymat);
-                    }
-
                 }
             }
         }
@@ -1199,189 +1239,225 @@ public class Isj {
         fis.close();
     }
 
+    /**
+     * fonction qui inscrit les candidats aux differents Enseignement
+     * @param pathOut chemin d'accès vers le répertoire de sauvegarde du fichier.
+     * @throws IOException en cas d'erreur lors de l'enregistrement du fichiers
+     * @throws SQLException en cas d'erreur lors de la communication avec la base de données
+     *
+     */
     public void importerEstInscrit(String pathOut) throws IOException, SQLException {
         FileInputStream fis = new FileInputStream(new File(pathOut));
         XSSFWorkbook workbook = new XSSFWorkbook(fis);
         Candidat candidat = null;
         Iterator<Sheet> sheetIterator = workbook.sheetIterator();
         while (sheetIterator.hasNext()) {
-            Sheet sheet = sheetIterator.next();
-            String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
+            try {
+                Sheet sheet = sheetIterator.next();
+                String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
 
-            int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
+                int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
 
-            Iterator<Row> rowIterator = sheet.iterator();
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                int numrow = row.getRowNum();
-                String libelle, description, libEns, matricule = null;
+                Iterator<Row> rowIterator = sheet.iterator();
+                while (rowIterator.hasNext()) {
+                    Row row = rowIterator.next();
+                    int numrow = row.getRowNum();
+                    String codeUe, description, libEns, matricule = null;
 
-                if (numrow >= 3) {
-                    System.out.println(row.getRowNum());
-                    Iterator<Cell> cellIterator = row.cellIterator();
+                    if (numrow >= 3) {
+                        System.out.println(row.getRowNum());
+                        Iterator<Cell> cellIterator = row.cellIterator();
 
-                    while(cellIterator.hasNext()){
-                        Cell cell = cellIterator.next();
+                        while (cellIterator.hasNext()) {
+                            Cell cell = cellIterator.next();
 
-                        if(cell.getColumnIndex() == 0) {
-                            matricule = cell.getStringCellValue().trim();
-                            candidat = retrouverEtudiantMatricule(matricule);
-                        }
-                        if(cell.getColumnIndex() >= 2 && cell.getStringCellValue().equalsIgnoreCase("oui"))  {
-                            description = sheet.getRow(1).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
-                            libEns = sheet.getRow(2).getCell(cell.getColumnIndex()).getStringCellValue().trim();
-                            long id = retrouverEnseignement(libEns, anneDebut);
-                            Enseignement enseignement = new EnseignementFacade().find(id);
-                            if(id != -1) {
-                               new EstInscritFacade().enregistrer("", description, EstInscrit.Statut.VALIDE, candidat, enseignement);
-                               //System.out.println(description + " " + matricule + " " + " " + libEns + " " + candidat+ " " + retrouverEnseignement(libEns, anneDebut));
+                            if (cell.getColumnIndex() == 0) {
+                                matricule = cell.getStringCellValue().trim();
+                                candidat = retrouverEtudiantMatricule(matricule);
                             }
+                            if (cell.getColumnIndex() >= 2 && cell.getStringCellValue().equalsIgnoreCase("oui")) {
+                                codeUe = sheet.getRow(1).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
+                                libEns = sheet.getRow(2).getCell(cell.getColumnIndex()).getStringCellValue().trim();
+
+                                long id = retrouverEnseignement(libEns, codeUe, anneDebut);
+                                Enseignement enseignement = new EnseignementFacade().find(id);
+                                if (id != -1) {
+                                    new EstInscritFacade().enregistrer("", codeUe, EstInscrit.Statut.VALIDE, candidat, enseignement);
+                                    //System.out.println(description + " " + matricule + " " + " " + libEns + " " + candidat+ " " + retrouverEnseignement(libEns, anneDebut));
+                                }
+                            }
+
                         }
 
                     }
-
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         workbook.close();
         fis.close();
     }
 
+    /**
+     * fonction qui importer la liste des notes pour les candidats
+     * @param pathOut chemin d'accès vers le répertoire de sauvegarde du fichier.
+     * @throws IOException en cas d'erreur lors de l'enregistrement du fichiers
+     */
     public void importerListeNote(String pathOut) throws SQLException, IOException {
         FileInputStream fis = new FileInputStream(new File(pathOut));
         XSSFWorkbook workbook = new XSSFWorkbook(fis);
 
         double valeurNote = 0;
         int numeroTable = 0;
+        try {
+            Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+            while (sheetIterator.hasNext()) {
+                Sheet sheet = sheetIterator.next();
+                String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
 
-        Iterator<Sheet> sheetIterator = workbook.sheetIterator();
-        while (sheetIterator.hasNext()) {
-            Sheet sheet = sheetIterator.next();
-            String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
+                int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
 
-            int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
+                Iterator<Row> rowIterator = sheet.iterator();
+                while (rowIterator.hasNext()) {
+                    Row row = rowIterator.next();
+                    int numrow = row.getRowNum();
+                    String libelle, libelleEval, matricule = null, codeUE, typeEval, description, oldLibelle, oldCode;
 
-            Iterator<Row> rowIterator = sheet.iterator();
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                int numrow = row.getRowNum();
-                String libelle, libelleEval, matricule = null, codeUE, typeEval, description, oldLibelle, oldCode;
+                    oldLibelle = sheet.getRow(2).getCell(1).getStringCellValue().trim();
+                    oldCode = sheet.getRow(1).getCell(1).getStringCellValue().toUpperCase().trim();
 
-                oldLibelle = sheet.getRow(2).getCell(1).getStringCellValue().trim();
-                oldCode = sheet.getRow(1).getCell(1).getStringCellValue().toUpperCase().trim();
+                    if (numrow >= 4) {
 
-                if (numrow >= 4) {
+                        System.out.println(row.getRowNum());
+                        Iterator<Cell> cellIterator = row.cellIterator();
 
-                    System.out.println(row.getRowNum());
-                    Iterator<Cell> cellIterator = row.cellIterator();
+                        while (cellIterator.hasNext()) {
+                            Cell cell = cellIterator.next();
 
-                    while (cellIterator.hasNext()) {
-                        Cell cell = cellIterator.next();
-
-                        if (cell.getColumnIndex() == 0) {
-                            matricule = cell.getStringCellValue().trim();
-                        }
-                        if (cell.getColumnIndex() > 0) {
-                            libelleEval = sheet.getRow(2).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
-                            codeUE = sheet.getRow(1).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
-
-                            if (libelleEval.isEmpty() || codeUE.isEmpty()) {
-                                libelleEval = oldLibelle;
-                                codeUE = oldCode;
-                            } else {
-                                oldLibelle = libelleEval;
-                                oldCode = codeUE;
+                            if (cell.getColumnIndex() == 0) {
+                                matricule = cell.getStringCellValue().trim();
                             }
+                            if (cell.getColumnIndex() > 0) {
+                                libelleEval = sheet.getRow(2).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
+                                codeUE = sheet.getRow(1).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
 
-                            typeEval = sheet.getRow(3).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
-                            //System.out.println(cell.getColumnIndex());
-                            try {
-                                valeurNote = cell.getNumericCellValue();
-                                //numeroTable = (int) cell.getNumericCellValue();
+                                if (libelleEval.isEmpty() || codeUE.isEmpty()) {
+                                    libelleEval = oldLibelle;
+                                    codeUE = oldCode;
+                                } else {
+                                    oldLibelle = libelleEval;
+                                    oldCode = codeUE;
+                                }
 
-                                long id_estInscrit = retrouverCodeEstInscrit(matricule, libelleEval, anneDebut);
-                                //
-                                long id_typEvalation = retrouverTypeEvaluation(typeEval, codeUE, anneDebut);
-                                System.out.println(id_typEvalation);
-                                TypeEvaluation typeEvaluation = new TypeEvaluationFacade().find(id_typEvalation);
-                                //System.out.println(codeUE+" - "+typeEval+" - "+anneDebut);
-                                if(valeurNote == 0){ valeurNote = 0.001;}
-                                Note note = new Note(libelleEval, typeEval, valeurNote, numeroTable, null, new EstInscritFacade().find(id_estInscrit), retrouverEvaluation(typeEvaluation));
-                                new NoteFacade().create(note);
+                                typeEval = sheet.getRow(3).getCell(cell.getColumnIndex()).getStringCellValue().toUpperCase().trim();
+                                //System.out.println(cell.getColumnIndex());
+                                try {
+                                    valeurNote = cell.getNumericCellValue();
+                                    //numeroTable = (int) cell.getNumericCellValue();
 
-                            } catch (Exception e) {
-                                e.getMessage();
+                                    long id_estInscrit = retrouverCodeEstInscrit(matricule, libelleEval, anneDebut);
+                                    //
+                                    long id_typEvalation = retrouverTypeEvaluation(typeEval, codeUE, anneDebut);
+                                    System.out.println(id_typEvalation);
+                                    TypeEvaluation typeEvaluation = new TypeEvaluationFacade().find(id_typEvalation);
+                                    //System.out.println(codeUE+" - "+typeEval+" - "+anneDebut);
+                                    if (valeurNote == 0) {
+                                        valeurNote = 0.001;
+                                    }
+                                    Note note = new Note(libelleEval, typeEval, valeurNote, numeroTable, null, new EstInscritFacade().find(id_estInscrit), retrouverEvaluation(typeEvaluation));
+                                    new NoteFacade().create(note);
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                //System.out.println(libelleEval+" "+typeEval+" "+valeurNote+" "+new EstInscritFacade().find(id_estInscrit)+" "+typeEvaluation);
+
                             }
-                            //System.out.println(libelleEval+" "+typeEval+" "+valeurNote+" "+new EstInscritFacade().find(id_estInscrit)+" "+typeEvaluation);
-
                         }
+
                     }
-
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         workbook.close();
         fis.close();
+
     }
 
-    public void importerDiscipline(String pathOut)throws IOException{
+    /**
+     * fonction qui importer la discipline de maniere globale
+     * @param pathOut chemin d'accès vers le répertoire de sauvegarde du fichier.
+     * @throws IOException en cas d'erreur lors de l'enregistrement du fichiers
+     */
+    public void importerDiscipline(String pathOut) throws IOException {
         FileInputStream fis = new FileInputStream(new File(pathOut));
         XSSFWorkbook workbook = new XSSFWorkbook(fis);
 
         Iterator<Sheet> sheetIterator = workbook.sheetIterator();
         while (sheetIterator.hasNext()) {
-            Sheet sheet = sheetIterator.next();
-            String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue();
-            String oldMat = sheet.getRow(2).getCell(1).getStringCellValue();
-            String oldLibelle = sheet.getRow(2).getCell(1).getStringCellValue();
+            try {
+                Sheet sheet = sheetIterator.next();
+                String tmpAnne = sheet.getRow(0).getCell(1).getStringCellValue().trim();
+                String oldMat = sheet.getRow(2).getCell(1).getStringCellValue().trim();
+                String oldLibelle = sheet.getRow(2).getCell(1).getStringCellValue().trim();
 
-            int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
-            Iterator<Row> rowIterator = sheet.iterator();
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                int numrow = row.getRowNum();
+                int anneDebut = Integer.valueOf(tmpAnne.substring(0, tmpAnne.indexOf("/")));
+                Iterator<Row> rowIterator = sheet.iterator();
+                while (rowIterator.hasNext()) {
+                    Row row = rowIterator.next();
+                    int numrow = row.getRowNum();
 
-                if (numrow > 1 ){
-                    String libelle="", libSemestre = null, matricule ="", description = "", nomEtud;
-                    Date Date_Displine = null;
-                    int Nbheure = 0, NbRetard = 0, heureJustifier = 0;
+                    if (numrow > 1) {
+                        String libelle = "", libSemestre = null, matricule = "", description = "", nomEtud;
+                        Date Date_Displine = null;
+                        int Nbheure = 0, NbRetard = 0, heureJustifier = 0;
 
-                    try {
-                        description = row.getCell(0).getStringCellValue().trim();
-                        libelle = row.getCell(1).getStringCellValue();
-                        Date_Displine = row.getCell(2).getDateCellValue();
-                        Nbheure = (int) row.getCell(3).getNumericCellValue();
-                        NbRetard = (int) row.getCell(4).getNumericCellValue();
-                        libSemestre = row.getCell(5).getStringCellValue().toUpperCase().trim();
+                        try {
+                            description = row.getCell(0).getStringCellValue().trim();
+                            libelle = row.getCell(1).getStringCellValue().trim();
+                            Date_Displine = row.getCell(2).getDateCellValue();
+                            Nbheure = (int) row.getCell(3).getNumericCellValue();
+                            NbRetard = (int) row.getCell(4).getNumericCellValue();
+                            libSemestre = row.getCell(5).getStringCellValue().toUpperCase().trim();
 
-                        matricule = description.substring(0,description.indexOf(" ")).trim();
+                            matricule = description.substring(0, description.indexOf(" ")).trim();
 
-                        AnneeAcademique anneeAcademique = retrouverAnneeAcademique(Date_Displine);
-                        Semestre semestre = retrouverSemestre(libSemestre, anneeAcademique);
-                        Etudiant etudiant = retrouverEtudiantMatricule(matricule);
+                            AnneeAcademique anneeAcademique = retrouverAnneeAcademique(Date_Displine);
+                            Semestre semestre = retrouverSemestre(libSemestre, anneeAcademique);
+                            Etudiant etudiant = retrouverEtudiantMatricule(matricule);
 
-                        if(etudiant != null) {
-                            Discipline discipline = new Discipline(libelle, description, etudiant, semestre, Nbheure, NbRetard, Date_Displine, 0);
-                            new DisciplineFacade().create(discipline);
+                            if (etudiant != null) {
+                                Discipline discipline = new Discipline(libelle, description, etudiant, semestre, Nbheure, NbRetard, Date_Displine, 0);
+                                new DisciplineFacade().create(discipline);
+                            }
+                        } catch (Exception e) {
+                            e.getMessage();
                         }
-                    }catch (Exception e){
-                        e.getMessage();
-                    }
 
+                    }
                 }
+            } catch (Exception e) {
+                e.getMessage();
             }
         }
         workbook.close();
         fis.close();
     }
 
+    /**
+     * fonction qui enregisrtre les notes de CC et TP des etudiant via le fichier Excel
+     * @param cheminAcces
+     * @throws IOException
+     * @throws InvalidFormatException
+     */
     public void enregistrerNoteExcel(String cheminAcces) throws IOException, InvalidFormatException {
         Workbook workbook = new WorkbookFactory().create(new File(cheminAcces));
 
-        Sheet sheet = workbook.getSheetAt(0);
-
         DataFormatter dataFormatter = new DataFormatter();
-        Iterator<Row> rowIterator = sheet.rowIterator();
+
         String matricule = null;
         String reponse = null;
         Evaluation evaluation = null;
@@ -1394,40 +1470,60 @@ public class Isj {
         EstInscrit estInscrit = null;
         String resultat = null, code = null;
         int numeroLigne = -1;
-        while (rowIterator.hasNext()) {
 
-            Row row = rowIterator.next();
-            numeroLigne = row.getRowNum();
-            if (numeroLigne == 0) {
-                reponse = dataFormatter.formatCellValue(row.getCell(1));
-            } else if (numeroLigne == 1) {
-                evaluation = new EvaluationFacade().find(Long.valueOf(dataFormatter.formatCellValue(row.getCell(1))));
-                typeEvaluation = evaluation.getTypeEvaluation();
-                enseignement = typeEvaluation.getEnseignement();
-            } else if (numeroLigne >= 5) {
-                try {
-                    valeurNote = Double.valueOf(dataFormatter.formatCellValue(row.getCell(3)));
-                    numeroTable = Integer.valueOf(dataFormatter.formatCellValue(row.getCell(4)));
+        Iterator<Sheet> sheetIterator = workbook.sheetIterator();
 
-                    if (reponse.equals("oui")) {
-                        matricule = dataFormatter.formatCellValue(row.getCell(1));
-                        etudiant = new Isj().retrouverEtudiantMatricule(matricule);
-                        estInscrit = new Isj().retrouverEstInscrit(etudiant, enseignement);
+        while(sheetIterator.hasNext()) {
+            Sheet sheet = sheetIterator.next();
 
-                        //resultat = new NoteFacade().enregistrer("", "", valeurNote, numeroTable, null, estInscrit, evaluation);
-                    } else if (reponse.equals("non")) {
-                        code = dataFormatter.formatCellValue(row.getCell(1));
-                        candidat = new CandidatFacade().find(Long.valueOf(code));
-                        estInscrit = new Isj().retrouverEstInscrit(candidat, enseignement);
-                        //resultat = new NoteFacade().enregistrer("", "", valeurNote, numeroTable, null, estInscrit, evaluation);
+            Iterator<Row> rowIterator = sheet.rowIterator();
+
+            while (rowIterator.hasNext()) {
+
+                Row row = rowIterator.next();
+                numeroLigne = row.getRowNum();
+                if (numeroLigne == 0) {
+                    reponse = dataFormatter.formatCellValue(row.getCell(1)).trim();
+                } else if (numeroLigne == 1) {
+                    evaluation = new EvaluationFacade().find(Long.valueOf(dataFormatter.formatCellValue(row.getCell(1)).trim()));
+                    typeEvaluation = evaluation.getTypeEvaluation();
+                    enseignement = typeEvaluation.getEnseignement();
+                } else if (numeroLigne >= 5) {
+                    try {
+                        valeurNote = Double.valueOf(dataFormatter.formatCellValue(row.getCell(3)).trim());
+                        numeroTable = Integer.valueOf(dataFormatter.formatCellValue(row.getCell(4)).trim());
+
+                        if (reponse.equals("oui")) {
+                            matricule = dataFormatter.formatCellValue(row.getCell(1)).trim();
+                            etudiant = new Isj().retrouverEtudiantMatricule(matricule);
+                            estInscrit = new Isj().retrouverEstInscrit(etudiant, enseignement);
+
+                            //resultat = new NoteFacade().enregistrer("", "", valeurNote, numeroTable, null, estInscrit, evaluation);
+                        } else if (reponse.equals("non")) {
+                            code = dataFormatter.formatCellValue(row.getCell(1));
+                            candidat = new CandidatFacade().find(Long.valueOf(code));
+                            estInscrit = new Isj().retrouverEstInscrit(candidat, enseignement);
+                        }
+
+                        resultat = new NoteFacade().enregistrer("", "", valeurNote, numeroTable, null, estInscrit, evaluation);
+                    } catch (Exception e) {
+                        valeurNote = 0;
+                        resultat = e.getMessage();
                     }
-                } catch (Exception e) {
-                    resultat = e.getMessage();
                 }
             }
         }
     }
 
+
+    /**
+     * fonction qui permet de faire passé un etudiant a une classe suppérieur
+     * @param mgpMin mgp minimun qu'il faut avoir
+     * @param creditMin  nombre de credit minimun qu'il faut avoir
+     * @param annee année de passage
+     * @param libelleClasse la classe dans laquelle se trouve l'etudiant a cette année
+     * @throws SQLException en cas d'erreur de communication avec la base de donnée
+     */
     public void setNewClasse(double mgpMin, int creditMin, int annee, String libelleClasse) throws SQLException {
         Classe classe = retrouverClasse(libelleClasse);
         List<Candidat> ListCandidats = classe.getCandidats();
@@ -1547,13 +1643,6 @@ public class Isj {
         File file = new File(cheminAcces);
         Workbook workbook = new WorkbookFactory().create(file);
 
-        //ON RECUPERE LA FEUILLE
-        Sheet sheet = workbook.getSheetAt(0);
-
-        DataFormatter dataFormatter = new DataFormatter();
-
-        //ON ITERER SUR LES LIGNES DU FICHIER XML
-        Iterator<Row> rowIterator = sheet.rowIterator();
         String matricule = null;
         String reponse = null, rowName = null;
         Evaluation evaluation = null;
@@ -1569,48 +1658,60 @@ public class Isj {
         String resultat = null;
         int numeroLigne = -1;
 
-        //on parcours le fichier tant que la ligne suivante est definie
-        while (rowIterator.hasNext()) {
-            numeroLigne++;
-            Row row = rowIterator.next();
-            if (numeroLigne == 0) {
-                reponse = dataFormatter.formatCellValue(row.getCell(1));
-            } else if (numeroLigne == 1) {
-                id = Long.valueOf(dataFormatter.formatCellValue(row.getCell(1)));
-                evaluation = new EvaluationFacade().find(id);
-                typeEvaluation = evaluation.getTypeEvaluation();
-                enseignement = typeEvaluation.getEnseignement();
+        DataFormatter dataFormatter = new DataFormatter();
 
-            } else if (numeroLigne >= 3) {
-                numeroTable = Integer.valueOf(dataFormatter.formatCellValue(row.getCell(0)));
-                matricule = dataFormatter.formatCellValue(row.getCell(2));
-                num_anonymat = Integer.parseInt(dataFormatter.formatCellValue(row.getCell(1)));
-                if (reponse.equals("oui")) {
-                    etudiant = new Isj().retrouverEtudiantMatricule(matricule);
-                    estInscrit = new Isj().retrouverEstInscrit(etudiant, enseignement);
+        //ON RECUPERE LA FEUILLE
+        Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+        while (sheetIterator.hasNext()) {
 
-                } else if (reponse.equals("non")) {
-                    candidat = new CandidatFacade().find(Long.valueOf(matricule));
-                    estInscrit = new Isj().retrouverEstInscrit(candidat, enseignement);
+            Sheet sheet = sheetIterator.next();
+
+            //ON ITERER SUR LES LIGNES DU FICHIER XML
+            Iterator<Row> rowIterator = sheet.rowIterator();
+
+            //on parcours le fichier tant que la ligne suivante est definie
+            while (rowIterator.hasNext()) {
+                numeroLigne++;
+                Row row = rowIterator.next();
+                if (numeroLigne == 0) {
+                    reponse = dataFormatter.formatCellValue(row.getCell(1)).trim();
+                } else if (numeroLigne == 1) {
+                    id = Long.valueOf(dataFormatter.formatCellValue(row.getCell(1)).trim());
+                    evaluation = new EvaluationFacade().find(id);
+                    typeEvaluation = evaluation.getTypeEvaluation();
+                    enseignement = typeEvaluation.getEnseignement();
+
+                } else if (numeroLigne >= 3) {
+                    numeroTable = Integer.parseInt(dataFormatter.formatCellValue(row.getCell(0)).trim());
+                    matricule = dataFormatter.formatCellValue(row.getCell(2)).trim();
+                    num_anonymat = Integer.parseInt(dataFormatter.formatCellValue(row.getCell(1)).trim());
+                    if (reponse.equals("oui")) {
+                        etudiant = new Isj().retrouverEtudiantMatricule(matricule);
+                        estInscrit = new Isj().retrouverEstInscrit(etudiant, enseignement);
+
+                    } else if (reponse.equals("non")) {
+                        candidat = new CandidatFacade().find(Long.valueOf(matricule));
+                        estInscrit = new Isj().retrouverEstInscrit(candidat, enseignement);
+
+                    }
+                    //une fois les données recuperé on creer l'anonymat
+                    Anonymat anonymat = new Anonymat("", "", num_anonymat, null, evaluation, estInscrit, numeroTable);
+                    new AnonymatFacade().create(anonymat);
+
+
+                    //une fois les données recuperé on creer l'anonymat
+                    Note note = new Note("", "", valeurNote, numeroTable, anonymat, estInscrit, evaluation);
+                    anonymat.setNote(note);
+                    new NoteFacade().create(note);
 
                 }
-                //une fois les données recuperé on creer l'anonymat
-                Anonymat anonymat = new Anonymat("", "", num_anonymat, null, evaluation, estInscrit, numeroTable);
-                new AnonymatFacade().create(anonymat);
-
-
-                //une fois les données recuperé on creer l'anonymat
-                Note note = new Note("", "", valeurNote, numeroTable, anonymat, estInscrit, evaluation);
-                anonymat.setNote(note);
-                new NoteFacade().create(note);
-
             }
-        }
-        String anonymatfile =  file.getParent() +File.separator+ "Anonymat_"+file.getName();
-        try {
-            createExcelAnonymatNoteFile(id, cheminAcces);
-        }catch (Exception e){
-            resultat = e.getMessage();
+            String anonymatfile = file.getParent() + File.separator + "Anonymat_" + file.getName();
+            try {
+                createExcelAnonymatNoteFile(id, anonymatfile);
+            } catch (Exception e) {
+                resultat = e.getMessage();
+            }
         }
         workbook.close();
     }
@@ -1625,8 +1726,7 @@ public class Isj {
 
         File excelFile = new File(cheminAcces);
         FileInputStream fis = new FileInputStream(excelFile);
-        int key = 0;
-        double value = 0;
+
         Anonymat anonymat = null;
         Note note = null;
         //creation d'un Objet XSSFWorkbook pour la lecture d'un fichier excel
@@ -1635,28 +1735,40 @@ public class Isj {
         DataFormatter dataFormatter = new DataFormatter();
 
         //Recuperation de la premiere feuille
-        XSSFSheet sheet = workbook.getSheetAt(0);
+        Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+        while(sheetIterator.hasNext()){
+            Sheet sheet = sheetIterator.next();
 
-        //On itere sur les ligne
-        Iterator<Row> rowIt = sheet.iterator();
-        int NumeroLigne = -1;
+            //On itere sur les ligne
+            Iterator<Row> rowIt = sheet.iterator();
+            int NumeroLigne = -1;
 
-        //ArrayList listNoteAnonym = new ArrayList();
-        while (rowIt.hasNext()) {
+            //ArrayList listNoteAnonym = new ArrayList();
+            while (rowIt.hasNext()) {
 
-            Row row = rowIt.next();
-            NumeroLigne = row.getRowNum();
-            if (NumeroLigne >= 5) {
-                key = Integer.parseInt(dataFormatter.formatCellValue(row.getCell(0)));
-                value = Double.valueOf(dataFormatter.formatCellValue(row.getCell(1)));
+                Row row = rowIt.next();
+                int key = 0;
+                double value;
+                NumeroLigne = row.getRowNum();
+                if (NumeroLigne >= 5) {
+                    try{
+                        key = Integer.parseInt(dataFormatter.formatCellValue(row.getCell(0)).trim());
+                        value = row.getCell(1).getNumericCellValue();
+                        System.out.println(value);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                       value = 0;
+                    }
 
-                anonymat = new Isj().retrouverAnonymatNote(key);
-                note = anonymat.getNote();
+                    anonymat = new Isj().retrouverAnonymatNote(key);
+                    note = anonymat.getNote();
 
-                note.setValeurNote(value);
-                new NoteFacade().merge(note);
+                    note.setValeurNote(value);
+                    new NoteFacade().merge(note);
+                }
             }
         }
+
         workbook.close();
         fis.close();
     }
@@ -1697,7 +1809,7 @@ public class Isj {
             Row row = rowIt.next();
             NumeroLigne = row.getRowNum();
             if (NumeroLigne == 10) {
-                semstr = dataFormatter.formatCellValue(row.getCell(1));
+                semstr = dataFormatter.formatCellValue(row.getCell(1)).trim();
             } else if (NumeroLigne == 12) {
                 date = row.getCell(2).getDateCellValue();
                 anneeAcademique = retrouverAnneeAcademique(date);
@@ -1706,7 +1818,7 @@ public class Isj {
                 matricule = dataFormatter.formatCellValue(row.getCell(1));
                 etudiant = retrouverEtudiantMatricule(matricule);
                 for (int i = 5; i < 14; i++) {
-                    nb_heure += Integer.valueOf(dataFormatter.formatCellValue(row.getCell(i)));
+                    nb_heure += Integer.valueOf(dataFormatter.formatCellValue(row.getCell(i)).trim());
                 }
                 Discipline discipline = new Discipline("", "", etudiant, semestre, nb_heure, 0, date, 0);
                 new DisciplineFacade().create(discipline);
@@ -1717,8 +1829,7 @@ public class Isj {
     }
 
     /**
-     * fonction qui enregistre les abscence a partie du fichier texte généré par la badgeuse
-     *
+     * fonction qui enregistre les retards a partie du fichier texte généré par la badgeuse
      * @param pathfile fichier d'acces vers le fichier
      * @throws IOException en cas d'erreur d'ouverture du fichier
      */
@@ -1728,23 +1839,33 @@ public class Isj {
         int numL = -1;
         String l, mat = "", strdate = "";
 
+        //on creer un formateur de date
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss", Locale.getDefault());
+        //on instancie un objet de type calendrier pour nous aidera a decomposer la date
         Calendar calendar = Calendar.getInstance();
 
+        //tableau associatif contenant le matricule et nombre de retard
         Map<String, Integer> listRetard = new HashMap<>();
 
+        //lecture du fichier txt
         while ((l = br.readLine()) != null) {
             numL++;
             if (numL >= 1) {
+                //on soustrait la date de la chaine de caractere qui a ete lu
                 strdate = l.substring(l.lastIndexOf("\t") + 1);
                 // System.out.println(date);
+
+                //on convertis la date recuperer en objet date puis on passe notre date a notre objet calendrier
                 date = formatter.parse(strdate);
                 calendar.setTime(date);
+                //on reinitilise la date recupéré a l'heure voulu
                 calendar.set(Calendar.HOUR_OF_DAY, 7);
                 calendar.set(Calendar.MINUTE, 20);
                 calendar.set(Calendar.SECOND, 00);
+                //get a current date time
                 dateCompar = calendar.getTime();
 
+                //on soustrait le matricule
                 l = l.substring(l.indexOf("\t") + 1, l.lastIndexOf("\t"));
                 l = l.substring(l.indexOf("\t") + 1, l.lastIndexOf("\t"));
                 mat = l.substring(l.indexOf("\t") + 1, l.lastIndexOf("\t"));
@@ -1753,8 +1874,9 @@ public class Isj {
 //                System.out.println(dateCompar);
                 mat = mat.replace("   ", "");
 
+                //on compare les deux date
                 if (date.before(dateCompar)) {
-                    listRetard.merge(mat, 1, Integer::sum);
+                    listRetard.merge(mat, 1, Integer::sum);//
                 }
             }
         }
@@ -2229,11 +2351,13 @@ public class Isj {
         return (UE) query.getSingleResult();
     }
 
-    public long retrouverEnseignement(String libEns,long anDebut) throws SQLException{
+    public long retrouverEnseignement(String libEns, String codeUe,long anDebut) throws SQLException{
         long code = -1;
         String sql="SELECT enseignement.`code`\n" +
-                "from enseignement,semestre,annee_academique\n" +
+                "from enseignement,semestre,annee_academique,ue\n" +
                 "where enseignement.semestre=semestre.code\n" +
+                "and enseignement.ue = ue.code\n"+
+                " and ue.code_ue=\""+codeUe+"\""+
                 "and annee_academique.code=semestre.annee_academique\n" +
                 "and enseignement.libelle=\""+libEns+"\"\n" +
                 "and EXTRACT(year from annee_academique.date_debut)="+anDebut;

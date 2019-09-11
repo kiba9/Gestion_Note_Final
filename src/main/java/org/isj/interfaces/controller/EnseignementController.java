@@ -79,7 +79,7 @@ public class EnseignementController implements Initializable {
     private TableColumn<Enseignement, UE> uecolumn;
 
     @FXML
-    private TableColumn<Enseignement, Long> semestrecolumn;
+    private TableColumn<Enseignement, String> semestrecolumn;
 
     @FXML
     private TableColumn<Enseignement, Long> codecolumn;
@@ -156,7 +156,7 @@ public class EnseignementController implements Initializable {
             heuresDeCourscolumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getHeuresDeCours()).asObject());
             uecolumn.setCellValueFactory(cellData -> new SimpleObjectProperty(cellData.getValue().getUe()));
             codecolumn.setCellValueFactory(cellData -> new SimpleLongProperty(cellData.getValue().getCode()).asObject());
-            semestrecolumn.setCellValueFactory(cellData -> new SimpleLongProperty(cellData.getValue().getCode()).asObject());
+            semestrecolumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getSemestre().toString()));
 
             ResultSetMetaData resultSetMetaData = new Isj().renvoyerChamp(Enseignement.class);
             for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
@@ -279,6 +279,8 @@ public class EnseignementController implements Initializable {
         }
     }
 
+    EnseignementFacade enseignementFacade = new EnseignementFacade();
+
     /**
      * Fonction permettant d'enregistrer un enseignement dans la base de données
      */
@@ -297,10 +299,9 @@ public class EnseignementController implements Initializable {
 
                 String resultat;
                 if (enseignementSelectionne == null) {
-                    Enseignement enseignement = new Enseignement(libelleEnseignement,descriptionEnseignement,Integer.parseInt(heuresDeCoursEnseignement),programmeDeCoursEnseignement,semestreEnseignement,ueEnseignement);
-                    resultat = enseignementFacade.create(enseignement);
+                    resultat = enseignementFacade.enregistrer(libelleEnseignement,descriptionEnseignement,Integer.parseInt(heuresDeCoursEnseignement),programmeDeCoursEnseignement,semestreEnseignement,ueEnseignement);
                 }else {
-                    resultat = new EnseignementFacade().modifier(enseignementSelectionne,libelleEnseignement,descriptionEnseignement,Integer.parseInt(heuresDeCoursEnseignement),programmeDeCoursEnseignement,semestreEnseignement,ueEnseignement);
+                    resultat = enseignementFacade.modifier(enseignementSelectionne,libelleEnseignement,descriptionEnseignement,Integer.parseInt(heuresDeCoursEnseignement),programmeDeCoursEnseignement,semestreEnseignement,ueEnseignement);
                 }
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.initOwner(Appli.getPrimaryStage);
@@ -321,9 +322,6 @@ public class EnseignementController implements Initializable {
         }
         handleRaffraichir();
     }
-
-
-    EnseignementFacade enseignementFacade = new EnseignementFacade();
 
     /**
      * Fonction permettant de supprimer un candidat dans la base de données
